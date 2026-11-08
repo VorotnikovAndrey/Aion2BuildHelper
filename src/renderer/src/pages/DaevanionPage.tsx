@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Lock, Waypoints } from 'lucide-react'
 import type { BoardReport, GoalReport } from '@shared/analysis/daevanion'
 import { BOARD_CURRENCY, neighbors, type DaevanionNode } from '@shared/gamedata/daevanion'
+import { skillIconSrc } from '@shared/gamedata/art'
 import { formatStatValue } from '@shared/gamedata/stats'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
 import { Card } from '@/components/ui/Card'
@@ -329,7 +330,7 @@ function BoardView({ board, goals, ctx }: { board: BoardReport; goals: GoalRepor
                       strokeWidth={1.5}
                     />
                     <image
-                      href={`./icons/skills/${n.skill}.webp`}
+                      href={skillIconSrc(n.skill!)}
                       x={x(n) - r}
                       y={y(n) - r}
                       width={r * 2}

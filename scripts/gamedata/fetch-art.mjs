@@ -23,6 +23,7 @@ for (const p of Object.values(art.titleEmblems)) add('titles', p)
 for (const p of Object.values(art.pantheonSlots)) add('pantheon', p)
 for (const it of Object.values(art.pantheon)) add('pantheon', it.icon)
 for (const p of Object.values(art.classes)) add('classes', p)
+for (const p of Object.values(art.skillIcons ?? {})) add('skills', p)
 add('arcana', art.arcana.frame)
 add('arcana', art.arcana.enchant)
 for (const type of art.arcana.types) {

@@ -260,7 +260,7 @@ export const templarPveConsensus: Guide = {
     },
     { skill: INSULTING_ROAR, role: 'passive', level: 16, note: 'Агро и +АТК при атаке спереди. Топ: ур. 16,3 — вторая после Ярости.' },
     { skill: PUNISHING_BENEDICTION, role: 'passive', level: 16, note: 'Крит. удар и доп. урон при попадании. Топ: ур. 15,6.' },
-    { skill: IMPACT_HIT, role: 'passive', level: 16, note: 'Шанс эффектов удара и мощного удара. Топ: ур. 15,9.' },
+    { skill: IMPACT_HIT, role: 'passive', level: 16, note: 'Попадание шок. эффектами и Сокрушающий удар. Топ: ур. 15,9.' },
     { skill: IRONCLAD_DEFENSE, role: 'passive', level: 14, note: 'ЗЩТ и непробиваемость. Топ: ур. 15,6.' },
     { skill: ENHANCE_HEALTH, role: 'passive', level: 14, note: 'ОЗ и получаемое исцеление. Топ: ур. 15,5.' },
     { skill: BLOCK_PAIN, role: 'passive', note: 'Стойкость к урону после блока. Топ: ур. 13,5.' },
@@ -537,7 +537,7 @@ export const templarPveConsensus: Guide = {
     },
     {
       title: 'Крылья и пантеон',
-      text: 'Крылья: Talisra (−4% перезарядки) в итоге, Dark Veil на старте. Пантеон: статы Мудрость (двойной удар) и Видение (перезарядка), затем Пространство (блок) и Время (скорость боя); картина «Драупнир» — цель (ExpCarry).'
+      text: 'Крылья: Talisra (−4% перезарядки) в итоге, Dark Veil на старте. Пантеон: статы Мудрость (Сокрушающий удар) и Видение (перезарядка), затем Пространство (блок) и Время (скорость боя); картина «Драупнир» — цель (ExpCarry).'
     },
     {
       title: 'Порог урона',

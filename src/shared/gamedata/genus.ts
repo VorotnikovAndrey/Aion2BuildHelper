@@ -31,7 +31,7 @@ export const GENUS_MAX: Record<number, number> = {
   379: 400, // Увелич. урона в PvE 4%
   70: 300, // Стойкость к урону 3%
   380: 400, // Стойкость к урону в PvE 4%
-  443: 300 // Мощный удар 3%
+  443: 300 // Сокрушающий удар 3%
 }
 
 export function genusOptions(characters: { genus: { effects: { stat: number }[] }[] }[] = []): Set<number> {

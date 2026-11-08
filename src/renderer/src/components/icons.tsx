@@ -2,6 +2,7 @@
 // Для умений, чьих иконок нет (другие классы, пока справочник не обновлён), — аккуратная заглушка.
 
 import { useState } from 'react'
+import { skillIconSrc } from '@shared/gamedata/art'
 import { skillDef } from '@shared/gamedata/skills'
 import type { Tone } from '@/lib/status'
 import { cn } from '@/lib/format'
@@ -43,7 +44,7 @@ export function SkillIcon({
   }
   return (
     <img
-      src={`./icons/skills/${id}.webp`}
+      src={skillIconSrc(id)}
       alt=""
       width={size}
       height={size}

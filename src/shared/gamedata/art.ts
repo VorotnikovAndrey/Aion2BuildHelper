@@ -16,6 +16,7 @@ interface ArtJson {
   pantheonSlots: Record<PantheonKind, string>
   pantheon: Record<string, { ru: string; grade: ItemGrade; icon: string }>
   classes: Record<string, string>
+  skillIcons: Record<string, string>
 }
 
 const ART = artJson as unknown as ArtJson
@@ -117,6 +118,17 @@ export function pantheonArt(deco: number): PantheonArt | null {
   return a ? { ru: a.ru, grade: a.grade, src: artFile('pantheon', a.icon) } : null
 }
 
+// ───────────── Умения ─────────────
+
+/**
+ * Иконка умения: родной арт из public/icons/skills (npm run gamedata), а где metabot ошибается —
+ * картинка игры из списка skillIcons (npm run art).
+ */
+export function skillIconSrc(skill: number): string {
+  const fix = ART.skillIcons[String(skill)]
+  return fix ? artFile('skills', fix) : `./icons/skills/${skill}.webp`
+}
+
 // ───────────── Классы ─────────────
 
 export function classArt(cls: ClassKey | null | undefined): string | null {
@@ -133,6 +145,7 @@ export function allArtFiles(): string[] {
   out.push(...Object.values(ART.pantheonSlots).map((p) => artFile('pantheon', p)))
   out.push(...Object.values(ART.pantheon).map((it) => artFile('pantheon', it.icon)))
   out.push(...Object.values(ART.classes).map((p) => artFile('classes', p)))
+  out.push(...Object.values(ART.skillIcons).map((p) => artFile('skills', p)))
   out.push(ARCANA_FRAME)
   for (const t of Object.keys(ARCANA_TYPE_ART) as ArcanaType[]) out.push(arcanaTypeArt(t), arcanaCardArt(t, 'magic'), arcanaCardArt(t, 'vigor'))
   return out

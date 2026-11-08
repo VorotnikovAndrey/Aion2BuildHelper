@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { allArtFiles, arcanaCardArt, frameArt, itemArt, pantheonArt, pantheonKind, stoneInfo } from './art'
+import { allArtFiles, arcanaCardArt, frameArt, itemArt, pantheonArt, pantheonKind, skillIconSrc, stoneInfo } from './art'
 import { gradeOfItem } from './slots'
 
 describe('арт игры', () => {
@@ -51,5 +51,12 @@ describe('арт игры', () => {
     expect(pantheonKind(17)).toBe('colossus')
     expect(pantheonArt(54)?.ru).toBe('Драупнир')
     expect(pantheonArt(1)).toBeNull()
+  })
+
+  it('иконки умений: где metabot ошибается — картинка игры, остальные — из public/icons', () => {
+    // Попадание шоком и Инстинкт выживания — общие со гладиатором пассивки (сверено по окну умений)
+    expect(skillIconSrc(12760000)).toBe('./art/skills/icon_gl_skill_passive_006.webp')
+    expect(skillIconSrc(12790000)).toBe('./art/skills/icon_gl_skill_passive_009.webp')
+    expect(skillIconSrc(12240000)).toBe('./icons/skills/12240000.webp')
   })
 })

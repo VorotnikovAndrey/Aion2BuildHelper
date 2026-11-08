@@ -67,6 +67,11 @@
     "1023": { "ru": "Зеркало Асара", "grade": "legend", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_statueS_A_l_NPC_AsharMir_01.webp" },
     "5015": { "ru": "Воплощенное защитное перо", "grade": "rare", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_statueL_A_r_MOB_Protect_01.webp" }
   },
+  "skillIconsNote": "Иконки умений, которые metabot отдаёт неверно (общие со гладиатором пассивки). Сверено по окну умений игры 9 ноября 2026: картинка игры заменяет файл из public/icons/skills.",
+  "skillIcons": {
+    "12760000": "assets/Game/UI/Resource/Texture/Skill/ICON_GL_SKILL_Passive_006.webp",
+    "12790000": "assets/Game/UI/Resource/Texture/Skill/ICON_GL_SKILL_Passive_009.webp"
+  },
   "classes": {
     "gladiator": "assets/Game/UI/Resource/Texture/Icon/UT_Class_Gladiator_Large.webp",
     "templar": "assets/Game/UI/Resource/Texture/Icon/UT_Class_Templar_Large.webp",
