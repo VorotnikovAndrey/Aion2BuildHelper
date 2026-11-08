@@ -4,6 +4,7 @@ import { BookOpen, Check, Copy, Download, ExternalLink, Pencil, Plus, Trash2, Up
 import { classInfo } from '@shared/gamedata/classes'
 import { emptyGuide, MODE_LABEL, ROLE_LABEL, type Guide } from '@shared/guide/types'
 import { ClassIcon } from '@/components/game'
+import { SkillIcon } from '@/components/icons'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Modal, PageHeader } from '@/components/ui/misc'
@@ -208,7 +209,12 @@ function GuideDetail({
                 <div className="mb-1.5 text-[11px] text-ink-3">{ROLE_LABEL[role]}</div>
                 <div className="flex flex-wrap gap-1.5">
                   {by(role).map((s) => (
-                    <Pill key={s.skill} tone={role === 'core' ? 'accent' : role === 'stigma' && s.equip === false ? 'neutral' : 'aether'}>
+                    <Pill
+                      key={s.skill}
+                      tone={role === 'core' ? 'accent' : role === 'stigma' && s.equip === false ? 'neutral' : 'aether'}
+                      icon={<SkillIcon id={s.skill} size={14} />}
+                      tip={s.note ?? n.skill(s.skill).alt}
+                    >
                       {n.skill(s.skill).main}
                       {s.level ? ` · ур. ${s.level}` : ''}
                       {s.specs?.length ? ` · спец. ${s.specs.join(', ')}` : ''}

@@ -4,7 +4,7 @@
 // Это способ для AI-агента увидеть приложение без ручных кликов.
 
 import { app, type BrowserWindow } from 'electron'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { updateUi } from './storage'
@@ -14,7 +14,14 @@ export const shotsEnabled = () => Boolean(process.env.A2BH_SHOTS)
 
 /** Вызывать до app.whenReady(). */
 export function prepareShots(): void {
-  app.setPath('userData', join(tmpdir(), `a2bh-shots-${Date.now()}`))
+  const real = app.getPath('userData')
+  const temp = join(tmpdir(), `a2bh-shots-${Date.now()}`)
+  app.setPath('userData', temp)
+  // A2BH_SHOTS_SETTINGS=1 — снять с вашими настройками (гайд, отметки специализаций, свои названия), но в масштабе 100%.
+  if (process.env.A2BH_SHOTS_SETTINGS && existsSync(join(real, 'settings.json'))) {
+    mkdirSync(temp, { recursive: true })
+    copyFileSync(join(real, 'settings.json'), join(temp, 'settings.json'))
+  }
   // Иначе Chromium считает окно перекрытым и останавливает отрисовку — кадр ловится пустым.
   app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion')
   app.commandLine.appendSwitch('disable-renderer-backgrounding')
@@ -48,8 +55,8 @@ export async function runShots(win: BrowserWindow): Promise<void> {
   mkdirSync(out, { recursive: true })
   win.setContentSize(1440, 900)
   // A2BH_SHOTS_UI='{"themeId":"crimson","base":"asmodae","accent":"#e0525e","zoom":1.25}' — снять в другой теме и масштабе.
-  if (process.env.A2BH_SHOTS_UI) {
-    await updateUi(JSON.parse(process.env.A2BH_SHOTS_UI))
+  if (process.env.A2BH_SHOTS_UI || process.env.A2BH_SHOTS_SETTINGS) {
+    await updateUi(process.env.A2BH_SHOTS_UI ? JSON.parse(process.env.A2BH_SHOTS_UI) : { zoom: 1 })
     await applyUiToWindows()
     win.webContents.reload()
   }

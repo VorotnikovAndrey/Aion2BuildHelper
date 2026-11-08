@@ -96,7 +96,7 @@ export function SettingsPage() {
               ]}
             />
             <p className="mt-3 text-xs leading-relaxed text-ink-3">
-              Пример: {settings.nameMode === 'en' ? 'Judgment' : 'Правосудие'}
+              Пример: {settings.nameMode === 'en' ? 'Judgment' : 'Суд'}
               {settings.nameMode === 'both' && <span className="ml-1 text-[11px]">(Judgment)</span>} — английский вариант удобен, когда сверяетесь с
               англоязычным гайдом.
             </p>

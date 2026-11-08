@@ -68,14 +68,28 @@ export function HistoryPage() {
       ) : (
         <>
           <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatTile label="Снимков" value={fmt(entries.length)} sub={first ? `с ${dateTime(entries[0].savedAt)}` : undefined} />
+            <StatTile
+              label="Снимков"
+              hint="Сколько раз приложение сохранило персонажа — каждый раз, когда оверлей обновлял данные."
+              value={fmt(entries.length)}
+              sub={first ? `с ${dateTime(entries[0].savedAt)}` : undefined}
+            />
             <StatTile
               label="Рост БМ"
+              hint="Боевая мощь сейчас против первого снимка."
               value={first && last ? `${last.combatPower - first.combatPower >= 0 ? '+' : ''}${compact(last.combatPower - first.combatPower)}` : '—'}
               sub={first ? `${compact(first.combatPower)} → ${compact(last!.combatPower)}` : undefined}
             />
-            <StatTile label="Рост уровня снаряжения" value={first && last ? `+${fmt(last.gearScore - first.gearScore)}` : '—'} />
-            <StatTile label="Новых узлов досок" value={first && last ? `+${fmt(last.daevanionNodes - first.daevanionNodes)}` : '—'} />
+            <StatTile
+              label="Рост уровня снаряжения"
+              hint="Уровень снаряжения сейчас против первого снимка."
+              value={first && last ? `+${fmt(last.gearScore - first.gearScore)}` : '—'}
+            />
+            <StatTile
+              label="Новых узлов досок"
+              hint="Сколько узлов Даэваниона взято с первого снимка."
+              value={first && last ? `+${fmt(last.daevanionNodes - first.daevanionNodes)}` : '—'}
+            />
           </div>
 
           <Card

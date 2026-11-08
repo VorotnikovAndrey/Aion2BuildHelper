@@ -7,6 +7,7 @@ import { Name, WeightDots } from '@/components/game'
 import { Card } from '@/components/ui/Card'
 import { PageHeader, Segmented } from '@/components/ui/misc'
 import { cn } from '@/lib/format'
+import { Tooltip } from '@/components/ui/InfoTip'
 import { useCharacterContext } from '@/lib/report'
 
 type Filter = 'all' | 'guide'
@@ -84,16 +85,23 @@ export function StatsPage() {
                 const weight = w.stat('weapon', d.id)
                 const fromBoards = report.daevanion.stats.get(d.id)
                 return (
-                  <div key={d.id} className="flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-surface-2">
-                    <Name label={namer.stat(d.id)} className={cn('min-w-0 flex-1 text-[13px]', weight >= 4 ? 'text-ink' : 'text-ink-2')} />
-                    {fromBoards ? (
-                      <span className="tnum shrink-0 text-[10.5px] text-ink-3" title="Из них — от досок Даэваниона">
-                        {formatStatValue(d.id, fromBoards, { sign: true })}
-                      </span>
-                    ) : null}
-                    <span className="tnum w-20 shrink-0 text-right text-[13px] font-medium">{formatStatValue(d.id, values.get(d.id) ?? 0)}</span>
-                    <WeightDots weight={weight} className="w-12 shrink-0 justify-end" />
-                  </div>
+                  <Tooltip
+                    key={d.id}
+                    block
+                    wide
+                    content={`${namer.stat(d.id).main}${namer.stat(d.id).alt ? ` (${namer.stat(d.id).alt})` : ''}: ${formatStatValue(d.id, values.get(d.id) ?? 0)}.${fromBoards ? ` Из них от досок Даэваниона: ${formatStatValue(d.id, fromBoards, { sign: true })}.` : ''} ${weight ? `Важность по гайду: ${weight} из 5.` : 'Гайд этот стат не ценит.'}`}
+                  >
+                    <div className="flex w-full items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-surface-2">
+                      <Name label={namer.stat(d.id)} className={cn('min-w-0 flex-1 text-[13px]', weight >= 4 ? 'text-ink' : 'text-ink-2')} />
+                      {fromBoards ? (
+                        <span className="tnum shrink-0 text-[10.5px] text-ink-3" title="Из них — от досок Даэваниона">
+                          {formatStatValue(d.id, fromBoards, { sign: true })}
+                        </span>
+                      ) : null}
+                      <span className="tnum w-20 shrink-0 text-right text-[13px] font-medium">{formatStatValue(d.id, values.get(d.id) ?? 0)}</span>
+                      <WeightDots weight={weight} className="w-12 shrink-0 justify-end" />
+                    </div>
+                  </Tooltip>
                 )
               })}
             </Card>

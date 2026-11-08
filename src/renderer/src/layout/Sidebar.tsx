@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { classInfo } from '@shared/gamedata/classes'
 import { ClassIcon } from '@/components/game'
+import { Tooltip } from '@/components/ui/InfoTip'
 import { toneOfScore } from '@/components/ui/Pill'
 import { ago, cn, compact } from '@/lib/format'
 import { useCharacterContext } from '@/lib/report'
@@ -28,34 +29,58 @@ interface NavItem {
   to: string
   label: string
   icon: LucideIcon
+  /** Что в разделе — подсказка при наведении. */
+  tip: string
   score?: (s: NonNullable<ReturnType<typeof useCharacterContext>>['report']['scores']) => number
 }
 
 const NAV: { title?: string; items: NavItem[] }[] = [
-  { items: [{ to: '/', label: 'Обзор', icon: LayoutDashboard, score: (s) => s.overall }] },
+  {
+    items: [
+      {
+        to: '/',
+        label: 'Обзор',
+        icon: LayoutDashboard,
+        tip: 'Персонаж целиком: оценка билда и список «что сделать дальше». Число — общий балл 0–100.',
+        score: (s) => s.overall
+      }
+    ]
+  },
   {
     title: 'Билд',
     items: [
-      { to: '/skills', label: 'Умения', icon: Swords, score: (s) => s.skills },
-      { to: '/gear', label: 'Шмот', icon: Shirt, score: (s) => s.gear },
-      { to: '/arcana', label: 'Арканы', icon: Sparkles, score: (s) => s.arcana },
-      { to: '/daevanion', label: 'Даэванион', icon: Waypoints, score: (s) => s.daevanion },
-      { to: '/genus', label: 'Познание рода', icon: Layers, score: (s) => s.genus }
+      {
+        to: '/skills',
+        label: 'Умения',
+        icon: Swords,
+        tip: 'Уровни умений против гайда, откуда они берутся и какие специализации нужны. Стигмы и пассивки.',
+        score: (s) => s.skills
+      },
+      { to: '/gear', label: 'Шмот', icon: Shirt, tip: 'Каждая строка вещи и манакамни: что по гайду, что менять, что ловить.', score: (s) => s.gear },
+      { to: '/arcana', label: 'Арканы', icon: Sparkles, tip: 'Пять карт: нужные умения, шансы заточки и новой карты, сеты.', score: (s) => s.arcana },
+      {
+        to: '/daevanion',
+        label: 'Даэванион',
+        icon: Waypoints,
+        tip: 'Доски с отмеченными узлами, цели гайда и план прокачки по очкам.',
+        score: (s) => s.daevanion
+      },
+      { to: '/genus', label: 'Познание рода', icon: Layers, tip: 'Ячейки пяти родов: что как нужно, что перебросить и что ловить.', score: (s) => s.genus }
     ]
   },
   {
     title: 'Персонаж',
     items: [
-      { to: '/collections', label: 'Питомцы и коллекции', icon: PawPrint },
-      { to: '/stats', label: 'Статы', icon: Gem },
-      { to: '/history', label: 'История', icon: History }
+      { to: '/collections', label: 'Питомцы и коллекции', icon: PawPrint, tip: 'Питомцы и их уровни, крылья, титулы, облики, монолиты, персонажи аккаунта.' },
+      { to: '/stats', label: 'Статы', icon: Gem, tip: 'Полный лист характеристик с важностью по гайду и вкладом досок.' },
+      { to: '/history', label: 'История', icon: History, tip: 'График боевой мощи и лента изменений: заточки, вещи, уровни, узлы.' }
     ]
   },
   {
     title: 'Цели',
     items: [
-      { to: '/guides', label: 'Гайды', icon: BookOpen },
-      { to: '/checklist', label: 'Чек-лист', icon: ListChecks }
+      { to: '/guides', label: 'Гайды', icon: BookOpen, tip: 'Выбор гайда, свои гайды, редактор, импорт и экспорт.' },
+      { to: '/checklist', label: 'Чек-лист', icon: ListChecks, tip: 'Вехи гайда (отмечаются сами), разовые дела, свои задачи и заметки.' }
     ]
   }
 ]
@@ -93,30 +118,40 @@ export function Sidebar() {
             {group.items.map((item) => {
               const score = ctx?.guide && item.score ? item.score(ctx.report.scores) : null
               return (
-                <NavLink
+                <Tooltip
                   key={item.to}
-                  to={item.to}
-                  end={item.to === '/'}
-                  className={({ isActive }) =>
-                    cn(
-                      'group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-colors',
-                      isActive ? 'bg-accent-soft text-ink' : 'text-ink-2 hover:bg-surface hover:text-ink'
-                    )
+                  block
+                  content={
+                    <>
+                      {item.tip}
+                      {score !== null && <span className="mt-1 block text-ink-3">Оценка раздела по гайду: {score} из 100.</span>}
+                    </>
                   }
                 >
-                  {({ isActive }) => (
-                    <>
-                      <item.icon size={16} className={isActive ? 'text-accent' : 'text-ink-3 group-hover:text-ink-2'} />
-                      <span className="flex-1 truncate">{item.label}</span>
-                      {score !== null && (
-                        <span className="tnum flex items-center gap-1.5 text-[11px] text-ink-3">
-                          <span className={cn('h-1.5 w-1.5 rounded-full', DOT[toneOfScore(score)])} />
-                          {score}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </NavLink>
+                  <NavLink
+                    to={item.to}
+                    end={item.to === '/'}
+                    className={({ isActive }) =>
+                      cn(
+                        'group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-colors',
+                        isActive ? 'bg-accent-soft text-ink' : 'text-ink-2 hover:bg-surface hover:text-ink'
+                      )
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <item.icon size={16} className={isActive ? 'text-accent' : 'text-ink-3 group-hover:text-ink-2'} />
+                        <span className="flex-1 truncate">{item.label}</span>
+                        {score !== null && (
+                          <span className="tnum flex items-center gap-1.5 text-[11px] text-ink-3">
+                            <span className={cn('h-1.5 w-1.5 rounded-full', DOT[toneOfScore(score)])} />
+                            {score}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </NavLink>
+                </Tooltip>
               )
             })}
           </div>
@@ -124,17 +159,21 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-line px-3 py-3">
-        <button
-          onClick={refresh}
-          className="mb-1 flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-ink-3 transition-colors hover:bg-surface hover:text-ink-2"
-          title="Перечитать файл оверлея"
+        <Tooltip
+          block
+          content="Приложение само следит за файлом оверлея Questlog. Здесь — когда файл обновился в последний раз. Нажмите, чтобы перечитать его прямо сейчас. Зелёная точка — файл найден, красная — нет."
         >
-          <RefreshCw size={14} className={cn(spinning && 'animate-spin')} />
-          <span className="flex-1 truncate">
-            {source?.exists ? (source.modifiedAt ? `Данные: ${ago(source.modifiedAt)}` : 'Данные загружены') : 'Нет данных оверлея'}
-          </span>
-          <span className={cn('h-2 w-2 rounded-full', source?.exists && !source.error ? 'bg-good' : 'bg-critical')} />
-        </button>
+          <button
+            onClick={refresh}
+            className="mb-1 flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-ink-3 transition-colors hover:bg-surface hover:text-ink-2"
+          >
+            <RefreshCw size={14} className={cn(spinning && 'animate-spin')} />
+            <span className="flex-1 truncate">
+              {source?.exists ? (source.modifiedAt ? `Данные: ${ago(source.modifiedAt)}` : 'Данные загружены') : 'Нет данных оверлея'}
+            </span>
+            <span className={cn('h-2 w-2 rounded-full', source?.exists && !source.error ? 'bg-good' : 'bg-critical')} />
+          </button>
+        </Tooltip>
         <NavLink
           to="/settings"
           className={({ isActive }) =>

@@ -15,6 +15,9 @@ import { EmptyState, StatTile } from '@/components/ui/misc'
 import { Pill, toneOfShare } from '@/components/ui/Pill'
 import { ProgressBar, ScoreRing } from '@/components/ui/Progress'
 import { ago, cn, compact, dateTime, fmt } from '@/lib/format'
+import { levelTone, shareTone, skillTone, TONE_TEXT } from '@/lib/status'
+import { SkillIcon } from '@/components/icons'
+import { Tooltip } from '@/components/ui/InfoTip'
 import { abyssRankName, useHistory } from '@/lib/history'
 import { useCharacterContext } from '@/lib/report'
 import { api } from '@/lib/store'
@@ -26,6 +29,14 @@ const AREA_ROUTE: Record<StepArea, string> = {
   arcana: '/arcana',
   daevanion: '/daevanion',
   genus: '/genus'
+}
+
+const SCORE_TIP: Record<string, string> = {
+  Умения: 'уровни главных умений против цели (60%) и нужные специализации (40%); главные весят втрое больше поддержки.',
+  Даэванион: 'доля нужных узлов досок, взятых по целям гайда.',
+  Шмот: 'средняя польза строк на вещах по весам гайда (75%) и манакамни (25%).',
+  Арканы: 'нужные умения на картах (70%) и заточка (30%).',
+  'Познание рода': 'средняя польза статов в ячейках рода по весам гайда.'
 }
 
 const AREA_ICON: Record<StepArea, typeof Swords> = {
@@ -60,23 +71,37 @@ export function OverviewPage() {
                 {char.legion ? ` · ${char.legion}` : ''} · сервер {char.server}
                 {char.race && RACES[char.race] ? ` · ${RACES[char.race].ru}` : ''}
               </p>
-              <p className="mt-0.5 text-[11px] text-ink-3">Оверлей видел персонажа {ago(char.updatedAt)}</p>
+              <Tooltip content="Когда оверлей Questlog последний раз обновил данные этого персонажа. Обновляются при смене зоны в игре.">
+                <p className="mt-0.5 text-[11px] text-ink-3">Оверлей видел персонажа {ago(char.updatedAt)}</p>
+              </Tooltip>
             </div>
           </div>
           <GuideSwitcher char={char} />
         </div>
         <div className="relative mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatTile label="Боевая мощь" value={compact(char.combatPower)} sub={fmt(char.combatPower)} accent />
-          <StatTile label="Уровень снаряжения" value={fmt(char.gearScore)} />
+          <StatTile
+            label="Боевая мощь"
+            value={compact(char.combatPower)}
+            sub={fmt(char.combatPower)}
+            accent
+            hint="Боевая мощь из игры, как её видит оверлей. Рост по времени — на странице «История»."
+          />
+          <StatTile
+            label="Уровень снаряжения"
+            value={fmt(char.gearScore)}
+            hint="Сумма уровней надетых предметов (Gear Score). От него зависит доступ к контенту."
+          />
           <StatTile
             label="Ранг Бездны"
             value={char.abyss ? abyssRankName(char.abyss.grade) : '—'}
             sub={char.abyss ? `Очки: ${compact(char.abyss.points)}` : undefined}
+            hint="Ранг и очки Бездны в текущем сезоне."
           />
           <StatTile
             label="Сезон Бездны"
             value={char.abyss ? `${char.abyss.kills} / ${char.abyss.deaths} / ${char.abyss.assists}` : '—'}
             sub="убийства / смерти / помощь"
+            hint="Счёт PvP в текущем сезоне Бездны: убийства, смерти и помощь в убийствах."
           />
         </div>
       </section>
@@ -104,7 +129,12 @@ export function OverviewPage() {
               hint="Насколько персонаж совпадает с выбранным гайдом. Умения и Даэванион весят больше всего — от них зависят ключевые специализации."
             >
               <div className="flex items-center gap-5">
-                <ScoreRing value={report.scores.overall} size={104} label="из 100" />
+                <Tooltip
+                  content="Общий балл: умения 35%, Даэванион 20%, шмот 20%, арканы 15%, Познание рода 10%. 85+ — зелёный, 60–84 — жёлтый, ниже — красный."
+                  wide
+                >
+                  <ScoreRing value={report.scores.overall} size={104} label="из 100" />
+                </Tooltip>
                 <div className="min-w-0 flex-1 space-y-2.5">
                   {(
                     [
@@ -115,13 +145,15 @@ export function OverviewPage() {
                       ['Познание рода', report.scores.genus, '/genus']
                     ] as const
                   ).map(([label, value, to]) => (
-                    <button key={label} onClick={() => navigate(to)} className="block w-full text-left">
-                      <div className="mb-1 flex items-center justify-between text-xs">
-                        <span className="text-ink-2">{label}</span>
-                        <span className="tnum text-ink-3">{value}</span>
-                      </div>
-                      <ProgressBar value={value} height={5} />
-                    </button>
+                    <Tooltip key={label} block content={`${label}: ${value} из 100 — ${SCORE_TIP[label]} Нажмите, чтобы открыть раздел.`} wide>
+                      <button onClick={() => navigate(to)} className="block w-full text-left">
+                        <div className="mb-1 flex items-center justify-between text-xs">
+                          <span className="text-ink-2">{label}</span>
+                          <span className={cn('tnum', value >= 85 ? 'text-good' : value >= 60 ? 'text-warning' : 'text-critical')}>{value}</span>
+                        </div>
+                        <ProgressBar value={value} height={5} />
+                      </button>
+                    </Tooltip>
                   ))}
                 </div>
               </div>
@@ -155,26 +187,46 @@ function BuildGlance({ ctx }: { ctx: Ctx }) {
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
       <Card title="Главные умения" hint="Умения, вокруг которых построен гайд: уровень против цели и специализации." actions={<GoLink to="/skills" />}>
         <div className="space-y-3">
-          {core.map((s) => (
-            <div key={s.skill}>
-              <div className="mb-1 flex items-center justify-between gap-2 text-[13px]">
-                <span className="truncate">{namer.skill(s.skill).main}</span>
-                <span className="tnum shrink-0 text-xs text-ink-3">
-                  ур. <span className={s.levelGap ? 'text-warning' : 'text-good'}>{s.level}</span>
-                  {s.targetLevel ? ` / ${s.targetLevel}` : ''}
-                </span>
-              </div>
-              <ProgressBar value={s.targetLevel ? (Math.min(s.level, s.targetLevel) / s.targetLevel) * 100 : 100} height={4} />
-            </div>
-          ))}
+          {core.map((s) => {
+            const v = skillTone(s, report.specsUncertain)
+            return (
+              <Tooltip key={s.skill} block content={v.why} wide>
+                <div className="flex w-full items-center gap-3">
+                  <SkillIcon id={s.skill} size={30} tone={v.tone} />
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center justify-between gap-2 text-[13px]">
+                      <span className="truncate">{namer.skill(s.skill).main}</span>
+                      <span className="tnum shrink-0 text-xs text-ink-3">
+                        ур. <span className={TONE_TEXT[levelTone(s).tone]}>{s.level}</span>
+                        {s.targetLevel ? ` / ${s.targetLevel}` : ''}
+                      </span>
+                    </div>
+                    <ProgressBar
+                      value={s.targetLevel ? (Math.min(s.level, s.targetLevel) / s.targetLevel) * 100 : 100}
+                      height={4}
+                      color={v.tone === 'ok' ? 'var(--color-good)' : v.tone === 'warn' ? 'var(--color-warning)' : 'var(--color-critical)'}
+                    />
+                  </div>
+                </div>
+              </Tooltip>
+            )
+          })}
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {report.stigmas.equipped.map((id) => (
-              <Pill key={id} tone={report.stigmas.wanted.includes(id) ? 'good' : 'neutral'}>
-                {namer.skill(id).main}
-              </Pill>
-            ))}
+            {report.stigmas.equipped.map((id) => {
+              const wanted = report.stigmas.wanted.includes(id)
+              return (
+                <Pill
+                  key={id}
+                  tone={wanted ? 'good' : 'warning'}
+                  icon={<SkillIcon id={id} size={14} />}
+                  tip={wanted ? 'Стигма надета, и гайд держит её постоянно.' : 'Стигма надета, но гайд держит другую.'}
+                >
+                  {namer.skill(id).main}
+                </Pill>
+              )
+            })}
             {report.stigmas.missing.map((id) => (
-              <Pill key={id} tone="critical">
+              <Pill key={id} tone="critical" icon={<SkillIcon id={id} size={14} dim />} tip="Гайд держит эту стигму надетой, а у вас её нет.">
                 нет: {namer.skill(id).main}
               </Pill>
             ))}
@@ -186,16 +238,24 @@ function BuildGlance({ ctx }: { ctx: Ctx }) {
           {report.arcana.cards.map((c) => {
             const wanted = c.skills.filter((s) => s.cls === 'wanted').length
             return (
-              <div key={c.slot} className="flex items-center gap-3 text-[13px]">
-                <span className="w-28 truncate">{c.info?.ru ?? ARCANA_TYPES.find((t) => t.type === c.type)!.ru}</span>
-                <Pill tone={toneOfShare(wanted, c.desired.length)}>
-                  {wanted} из {c.desired.length}
-                </Pill>
-                <span className="tnum text-xs text-ink-3">
-                  +{c.enchant}/{c.maxEnchant}
-                </span>
-                <ProgressBar value={c.score} height={4} className="flex-1" />
-              </div>
+              <Tooltip
+                key={c.slot}
+                block
+                wide
+                content={`${c.info?.ru ?? 'Слот пуст'}: нужных по гайду умений ${wanted} из ${c.desired.length}, заточка +${c.enchant} из +${c.maxEnchant}.${c.missing.length ? ' Не хватает: ' + c.missing.map((id) => namer.skill(id).main).join(', ') + '.' : ' Набор как в гайде.'}`}
+              >
+                <div className="flex w-full items-center gap-3 text-[13px]">
+                  {c.main ? <SkillIcon id={c.main} size={22} /> : <span className="h-[22px] w-[22px]" />}
+                  <span className="w-28 truncate">{c.info?.ru ?? ARCANA_TYPES.find((t) => t.type === c.type)!.ru}</span>
+                  <Pill tone={toneOfShare(wanted, c.desired.length)}>
+                    {wanted} из {c.desired.length}
+                  </Pill>
+                  <span className={cn('tnum text-xs', c.enchant >= c.maxEnchant ? 'text-good' : 'text-warning')}>
+                    +{c.enchant}/{c.maxEnchant}
+                  </span>
+                  <ProgressBar value={c.score} height={4} className="flex-1" />
+                </div>
+              </Tooltip>
             )
           })}
         </div>
@@ -203,7 +263,7 @@ function BuildGlance({ ctx }: { ctx: Ctx }) {
           {report.arcana.sets
             .filter((s) => s.count)
             .map((s) => (
-              <Pill key={s.variant} tone={s.active ? 'accent' : 'neutral'}>
+              <Pill key={s.variant} tone={s.active ? 'accent' : 'neutral'} tip={`2 карты: ${s.bonus2}. 4 карты: ${s.bonus4}.`}>
                 {s.name}: {s.count}/4
               </Pill>
             ))}
@@ -212,30 +272,50 @@ function BuildGlance({ ctx }: { ctx: Ctx }) {
       <Card title="Даэванион" hint="Цели гайда по доскам: сколько нужных узлов взято." actions={<GoLink to="/daevanion" />}>
         <div className="space-y-3">
           {report.daevanion.goals.map((g) => (
-            <div key={g.goal.id}>
-              <div className="mb-1 flex items-center justify-between gap-2 text-[13px]">
-                <span className="truncate">{g.goal.name}</span>
-                <span className="tnum shrink-0 text-xs text-ink-3">
-                  {g.done}/{g.required.length}
-                </span>
+            <Tooltip
+              key={g.goal.id}
+              block
+              wide
+              content={`${g.goal.description ?? g.goal.name} Взято ${g.done} из ${g.required.length} нужных узлов${g.remainingCost ? `, осталось около ${g.remainingCost} очк.` : '.'}`}
+            >
+              <div className="w-full">
+                <div className="mb-1 flex items-center justify-between gap-2 text-[13px]">
+                  <span className="truncate">{g.goal.name}</span>
+                  <span className={cn('tnum shrink-0 text-xs', TONE_TEXT[shareTone(g.done, g.required.length)])}>
+                    {g.done}/{g.required.length}
+                  </span>
+                </div>
+                <ProgressBar value={g.required.length ? (g.done / g.required.length) * 100 : 100} height={4} />
               </div>
-              <ProgressBar value={g.required.length ? (g.done / g.required.length) * 100 : 100} height={4} />
-            </div>
+            </Tooltip>
           ))}
-          <p className="text-xs text-ink-3">Вложено очков: {fmt(report.daevanion.spent)}</p>
+          <Tooltip content="Сумма стоимости всех взятых узлов на всех досках.">
+            <p className="text-xs text-ink-3">Вложено очков: {fmt(report.daevanion.spent)}</p>
+          </Tooltip>
         </div>
       </Card>
       <Card title="Шмот и род" hint="Доля полезных строк на шмоте и в Познании рода." actions={<GoLink to="/gear" />}>
         <div className="space-y-3 text-[13px]">
-          <Row label="Полезных строк на шмоте" value={`${sum(report.gear.map((g) => g.useful))} из ${sum(report.gear.map((g) => g.total))}`} />
-          <Row label="Строк «менять»" value={String(sum(report.gear.map((g) => g.replace.length)))} warn />
+          <Row
+            label="Полезных строк на шмоте"
+            value={`${sum(report.gear.map((g) => g.useful))} из ${sum(report.gear.map((g) => g.total))}`}
+            tip="Строки вещей с важностью 3–5 по гайду (зелёные и жёлтые на странице «Шмот»)."
+          />
+          <Row
+            label="Строк «менять»"
+            value={String(sum(report.gear.map((g) => g.replace.length)))}
+            warn
+            tip="Строки, которые гайд совсем не ценит (красные зачёркнутые), — их стоит перековать."
+          />
           <Row
             label="Слабых манакамней"
+            tip="Манакамни со статами важностью 0–1 по гайду — их стоит заменить на АТК или Крит. удар."
             value={`${report.gear.flatMap((g) => g.manastones).filter((m) => m.weight <= 1).length} из ${report.gear.flatMap((g) => g.manastones).length}`}
             warn
           />
           <Row
             label="Ячеек рода под переброс"
+            tip="Ячейки Познания рода со статами важностью 0–1 по гайду."
             value={`${sum(report.genus.genuses.map((g) => g.reroll.length))} из ${sum(report.genus.genuses.map((g) => g.slots.length))}`}
             warn
           />
@@ -339,7 +419,11 @@ function NextSteps({ steps, onOpen }: { steps: NextStep[]; onOpen: (s: NextStep)
                   onClick={() => onOpen(s)}
                   className="group flex w-full items-start gap-3 rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-surface-2"
                 >
-                  <Icon size={16} className="mt-0.5 shrink-0 text-ink-3 group-hover:text-accent" />
+                  {s.skill ? (
+                    <SkillIcon id={s.skill} size={26} className="mt-0.5" />
+                  ) : (
+                    <Icon size={16} className="mt-0.5 shrink-0 text-ink-3 group-hover:text-accent" />
+                  )}
                   <span className="min-w-0 flex-1">
                     <span className="block text-[13px] leading-snug">{s.title}</span>
                     {s.detail && <span className="mt-0.5 block text-xs leading-relaxed text-ink-3">{s.detail}</span>}
@@ -369,12 +453,15 @@ function GoLink({ to }: { to: string }) {
   )
 }
 
-function Row({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
+function Row({ label, value, warn, tip }: { label: string; value: string; warn?: boolean; tip?: string }) {
+  const zero = value.trim().startsWith('0')
   return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-ink-2">{label}</span>
-      <span className={cn('tnum', warn && value.trim().startsWith('0') ? 'text-good' : warn ? 'text-warning' : 'text-ink')}>{value}</span>
-    </div>
+    <Tooltip content={tip} block>
+      <div className="flex w-full items-center justify-between gap-3">
+        <span className="text-ink-2">{label}</span>
+        <span className={cn('tnum', warn && zero ? 'text-good' : warn ? 'text-warning' : 'text-ink')}>{value}</span>
+      </div>
+    </Tooltip>
   )
 }
 

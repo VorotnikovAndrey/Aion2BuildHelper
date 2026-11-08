@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card'
 import { PageHeader } from '@/components/ui/misc'
 import { Pill, toneOfShare } from '@/components/ui/Pill'
 import { cn } from '@/lib/format'
+import { Tooltip } from '@/components/ui/InfoTip'
 import { useCharacterContext } from '@/lib/report'
 import { useApp, useCharacterPrefs } from '@/lib/store'
 
@@ -59,10 +60,27 @@ export function ChecklistPage() {
           ) : (
             <ul className="space-y-1.5">
               {milestones.map((m) => (
-                <li key={m.id} className="flex items-center gap-2.5 text-[13px]">
-                  {m.done ? <CheckCircle2 size={16} className="shrink-0 text-good" /> : <Circle size={16} className="shrink-0 text-ink-3" />}
-                  <span className={cn(m.done ? 'text-ink-3 line-through' : 'text-ink-2')}>{m.text}</span>
-                  {m.unsure && !m.done && <Pill tone="warning">проверьте в игре</Pill>}
+                <li key={m.id}>
+                  <Tooltip
+                    block
+                    content={
+                      m.done
+                        ? 'Сделано — проверено по данным персонажа.'
+                        : m.unsure
+                          ? 'Оверлей не знает выбранных специализаций — отметьте их на странице «Умения», и пункт проверится сам.'
+                          : 'Ещё не сделано. Отмечается само, когда данные персонажа совпадут с гайдом.'
+                    }
+                  >
+                    <div className="flex w-full items-center gap-2.5 text-[13px]">
+                      {m.done ? (
+                        <CheckCircle2 size={16} className="shrink-0 text-good" />
+                      ) : (
+                        <Circle size={16} className={cn('shrink-0', m.unsure ? 'text-warning' : 'text-critical')} />
+                      )}
+                      <span className={cn(m.done ? 'text-good' : m.unsure ? 'text-warning' : 'text-critical')}>{m.text}</span>
+                      {m.unsure && !m.done && <Pill tone="warning">проверьте в игре</Pill>}
+                    </div>
+                  </Tooltip>
                 </li>
               ))}
             </ul>
@@ -103,7 +121,7 @@ export function ChecklistPage() {
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Например: выбить Компас с Избиением"
+                placeholder="Например: выбить Компас с Градом ударов"
                 className="h-9 flex-1 rounded-lg border border-line-strong bg-surface-2 px-3 text-[13px] outline-none placeholder:text-ink-3 focus:border-accent"
               />
               <Button type="submit" icon={<Plus size={14} />}>

@@ -2,9 +2,9 @@
 
 import { useEffect, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { X } from 'lucide-react'
+import { HelpCircle, X } from 'lucide-react'
 import { cn } from '@/lib/format'
-import { InfoTip } from './InfoTip'
+import { Tooltip } from './InfoTip'
 
 export function PageHeader({ title, subtitle, actions, icon }: { title: ReactNode; subtitle?: ReactNode; actions?: ReactNode; icon?: ReactNode }) {
   return (
@@ -38,31 +38,42 @@ export function StatTile({
   sub,
   hint,
   accent,
+  valueClassName,
   onClick
 }: {
   label: string
   value: ReactNode
   sub?: ReactNode
+  /** Пояснение: показывается при наведении на всю плитку. */
   hint?: ReactNode
   accent?: boolean
+  /** Цвет значения (например, по вердикту). */
+  valueClassName?: string
   onClick?: () => void
 }) {
   const Tag = onClick ? 'button' : 'div'
-  return (
+  const tile = (
     <Tag
       onClick={onClick}
       className={cn(
-        'flex min-w-0 flex-col rounded-xl border border-line bg-surface px-4 py-3 text-left',
+        'flex w-full min-w-0 flex-col rounded-xl border border-line bg-surface px-4 py-3 text-left',
         onClick && 'transition-colors hover:border-line-strong hover:bg-surface-2'
       )}
     >
       <span className="flex items-center gap-1 text-[11px] tracking-wide text-ink-3 uppercase">
         {label}
-        {hint && <InfoTip>{hint}</InfoTip>}
+        {hint && <HelpCircle size={12} className="text-ink-3" />}
       </span>
-      <span className={cn('tnum mt-1 truncate text-xl font-semibold', accent && 'text-accent')}>{value}</span>
+      <span className={cn('tnum mt-1 truncate text-xl font-semibold', accent && 'text-accent', valueClassName)}>{value}</span>
       {sub && <span className="mt-0.5 truncate text-xs text-ink-3">{sub}</span>}
     </Tag>
+  )
+  return hint ? (
+    <Tooltip content={hint} block>
+      {tile}
+    </Tooltip>
+  ) : (
+    tile
   )
 }
 
@@ -73,41 +84,58 @@ export function Tabs<T extends string>({
 }: {
   value: T
   onChange: (v: T) => void
-  items: { id: T; label: ReactNode; badge?: ReactNode }[]
+  items: { id: T; label: ReactNode; badge?: ReactNode; tip?: ReactNode }[]
 }) {
   return (
     <div className="flex flex-wrap gap-1 border-b border-line">
       {items.map((it) => (
-        <button
-          key={it.id}
-          onClick={() => onChange(it.id)}
-          className={cn(
-            'relative -mb-px flex items-center gap-2 border-b-2 px-3 py-2 text-[13px] transition-colors',
-            value === it.id ? 'border-accent text-ink' : 'border-transparent text-ink-3 hover:text-ink-2'
-          )}
-        >
-          {it.label}
-          {it.badge}
-        </button>
+        <Tooltip key={it.id} content={it.tip}>
+          <button
+            onClick={() => onChange(it.id)}
+            className={cn(
+              'relative -mb-px flex items-center gap-2 border-b-2 px-3 py-2 text-[13px] transition-colors',
+              value === it.id ? 'border-accent text-ink' : 'border-transparent text-ink-3 hover:text-ink-2'
+            )}
+          >
+            {it.label}
+            {it.badge}
+          </button>
+        </Tooltip>
       ))}
     </div>
   )
 }
 
-export function Segmented<T extends string>({ value, onChange, items }: { value: T; onChange: (v: T) => void; items: { id: T; label: ReactNode }[] }) {
+export function Segmented<T extends string>({
+  value,
+  onChange,
+  items
+}: {
+  value: T
+  onChange: (v: T) => void
+  items: { id: T; label: ReactNode; tip?: ReactNode }[]
+}) {
   return (
     <div className="inline-flex rounded-lg border border-line bg-surface p-0.5">
       {items.map((it) => (
-        <button
-          key={it.id}
-          onClick={() => onChange(it.id)}
-          className={cn('rounded-md px-3 py-1 text-xs transition-colors', value === it.id ? 'bg-surface-3 text-ink' : 'text-ink-3 hover:text-ink-2')}
-        >
+        <SegmentButton key={it.id} tip={it.tip} active={value === it.id} onClick={() => onChange(it.id)}>
           {it.label}
-        </button>
+        </SegmentButton>
       ))}
     </div>
   )
+}
+
+function SegmentButton({ tip, active, onClick, children }: { tip?: ReactNode; active: boolean; onClick: () => void; children: ReactNode }) {
+  const btn = (
+    <button
+      onClick={onClick}
+      className={cn('rounded-md px-3 py-1 text-xs transition-colors', active ? 'bg-surface-3 text-ink' : 'text-ink-3 hover:text-ink-2')}
+    >
+      {children}
+    </button>
+  )
+  return tip ? <Tooltip content={tip}>{btn}</Tooltip> : btn
 }
 
 export function Modal({ open, onClose, title, children, wide }: { open: boolean; onClose: () => void; title: ReactNode; children: ReactNode; wide?: boolean }) {

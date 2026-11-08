@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/format'
+import { Tooltip } from './InfoTip'
 
 export type Tone = 'neutral' | 'accent' | 'good' | 'warning' | 'critical' | 'info' | 'aether' | 'teal'
 
@@ -14,8 +15,21 @@ const TONES: Record<Tone, string> = {
   teal: 'bg-teal/10 text-teal border-teal/30'
 }
 
-export function Pill({ tone = 'neutral', children, className, icon }: { tone?: Tone; children: ReactNode; className?: string; icon?: ReactNode }) {
-  return (
+export function Pill({
+  tone = 'neutral',
+  children,
+  className,
+  icon,
+  tip
+}: {
+  tone?: Tone
+  children: ReactNode
+  className?: string
+  icon?: ReactNode
+  /** Подсказка при наведении: что значит эта метка. */
+  tip?: ReactNode
+}) {
+  const pill = (
     <span
       className={cn(
         'inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] leading-4 font-medium whitespace-nowrap',
@@ -27,6 +41,7 @@ export function Pill({ tone = 'neutral', children, className, icon }: { tone?: T
       {children}
     </span>
   )
+  return tip ? <Tooltip content={tip}>{pill}</Tooltip> : pill
 }
 
 /** Тон по доле готовности: зелёный — всё, жёлтый — больше половины, красный — меньше. */

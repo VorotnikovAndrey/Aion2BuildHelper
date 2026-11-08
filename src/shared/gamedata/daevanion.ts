@@ -31,7 +31,7 @@ export interface DaevanionBoard {
 }
 
 const BOARD_RU: Record<string, string> = {
-  Nezekan: 'Незекан',
+  Nezekan: 'Неджакан',
   Zikel: 'Зикель',
   Vaizel: 'Вайзель',
   Triniel: 'Триниэль',

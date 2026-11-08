@@ -21,6 +21,8 @@ export interface NextStep {
   impact: Impact
   title: string
   detail?: string
+  /** Умение, о котором шаг (для иконки в интерфейсе). */
+  skill?: number
 }
 
 export interface SectionScores {
@@ -120,6 +122,7 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
       } else {
         steps.push({
           id: `spec-${s.skill}`,
+          skill: s.skill,
           area: 'skills',
           impact: important ? 'high' : 'medium',
           title: `${name(s.skill)}: поставить ${s.specs.missing.length > 1 ? 'специализации' : 'специализацию'} ${specList(s.skill, s.specs.missing)}`,
@@ -133,6 +136,7 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
       const nextLock = s.specs?.locked[0]
       steps.push({
         id: `lvl-${s.skill}`,
+        skill: s.skill,
         area: 'skills',
         impact: important ? (s.levelGap <= 3 ? 'high' : 'medium') : 'low',
         title: `${name(s.skill)}: ур. ${s.level} → ${s.targetLevel}`,
@@ -165,12 +169,20 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
 
   // ── Стигмы
   for (const id of r.stigmas.missing) {
-    steps.push({ id: `stigma-${id}`, area: 'stigmas', impact: 'high', title: `Надеть стигму «${name(id)}»`, detail: 'Гайд держит её надетой постоянно.' })
+    steps.push({
+      id: `stigma-${id}`,
+      skill: id,
+      area: 'stigmas',
+      impact: 'high',
+      title: `Надеть стигму «${name(id)}»`,
+      detail: 'Гайд держит её надетой постоянно.'
+    })
   }
   for (const s of r.skills) {
     if (s.role === 'stigma' && s.target?.equip && s.equipped && s.levelGap > 0) {
       steps.push({
         id: `stigma-lvl-${s.skill}`,
+        skill: s.skill,
         area: 'stigmas',
         impact: 'medium',
         title: `Стигма «${name(s.skill)}»: ур. ${s.level} → ${s.targetLevel}`,
@@ -185,6 +197,7 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
     for (const step of goal.plan.slice(0, 3)) {
       steps.push({
         id: `daev-${step.node.id}`,
+        skill: step.node.skill,
         area: 'daevanion',
         impact: step.cost <= 6 ? 'high' : 'medium',
         title: `${step.board.ru}: взять «${n.node(step.node)}»`,
@@ -211,6 +224,7 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
         .join(', ')
       steps.push({
         id: `arc-enchant-${c.slot}`,
+        skill: c.main ?? undefined,
         area: 'arcana',
         impact: 'medium',
         title: `${title}: заточить (+${c.enchant}/${c.maxEnchant})`,

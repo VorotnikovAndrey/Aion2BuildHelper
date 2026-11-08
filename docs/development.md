@@ -11,6 +11,7 @@
 | `npm test` | Тесты логики (vitest) |
 | `npm run typecheck` | Проверка типов main + renderer |
 | `npm run shots` | Сборка и автоскриншоты всех экранов в `out/shots` (временная папка настроек, реальные данные оверлея). В другой теме и масштабе: `A2BH_SHOTS_UI='{"base":"asmodae","accent":"#e0525e","zoom":1.25}' node scripts/shots.mjs` |
+| `A2BH_SHOTS_SETTINGS=1 node scripts/shots.mjs` | То же, но с вашими настройками (гайд, отметки специализаций, названия), масштаб 100% |
 | `npm run format` | Prettier |
 | `npm run build` | Сборка в `out/` |
 | `npm run gamedata` | Обновить справочники (см. [data-sources.md](data-sources.md)) |

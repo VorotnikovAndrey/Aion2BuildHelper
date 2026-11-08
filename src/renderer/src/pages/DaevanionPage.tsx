@@ -9,6 +9,9 @@ import { EmptyState, Legend, PageHeader } from '@/components/ui/misc'
 import { Pill, toneOfShare } from '@/components/ui/Pill'
 import { ProgressBar } from '@/components/ui/Progress'
 import { cn, fmt } from '@/lib/format'
+import { shareTone, TONE_TEXT, type Tone } from '@/lib/status'
+import { SkillIcon } from '@/components/icons'
+import { Tooltip } from '@/components/ui/InfoTip'
 import { useCharacterContext } from '@/lib/report'
 
 type Ctx = NonNullable<ReturnType<typeof useCharacterContext>>
@@ -19,6 +22,7 @@ export function DaevanionPage() {
   const d = report.daevanion
   const [boardId, setBoardId] = useState<number>(d.boards[0]?.board.id ?? 0)
   const board = d.boards.find((b) => b.board.id === boardId) ?? d.boards[0]
+  const neededIds = new Set(d.goals.flatMap((g) => g.required.map((r) => r.node.id)))
 
   if (!d.available) {
     return (
@@ -41,25 +45,42 @@ export function DaevanionPage() {
       />
 
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-6">
-        {d.boards.map((b) => (
-          <button
-            key={b.board.id}
-            onClick={() => setBoardId(b.board.id)}
-            className={cn(
-              'rounded-xl border px-3 py-2.5 text-left transition-colors',
-              b.board.id === board.board.id ? 'border-accent/60 bg-accent-soft' : 'border-line bg-surface hover:border-line-strong'
-            )}
-          >
-            <div className="flex items-center justify-between gap-1">
-              <span className="text-[13px] font-semibold">{b.board.ru}</span>
-              {!b.open && <Lock size={12} className="text-ink-3" />}
-            </div>
-            <div className="tnum mt-1 text-[11px] text-ink-3">
-              {b.takenCount}/{b.totalCount} узлов · {b.spent}/{b.total} очк.
-            </div>
-            <ProgressBar value={(b.spent / b.total) * 100} height={3} className="mt-1.5" color="var(--color-accent)" />
-          </button>
-        ))}
+        {d.boards.map((b) => {
+          const need = d.goals.flatMap((g) => g.required.filter((r) => r.board.id === b.board.id))
+          const needDone = need.filter((r) => r.taken).length
+          const tone = shareTone(needDone, need.length)
+          return (
+            <Tooltip
+              key={b.board.id}
+              block
+              wide
+              content={`${b.board.ru} (${b.board.en}): открывается на ур. ${b.board.needLevel}, оплата — ${BOARD_CURRENCY[b.board.en] ?? 'кристаллы'}. Взято ${b.takenCount} из ${b.totalCount} узлов, вложено ${b.spent} из ${b.total} очк.${need.length ? ` Нужных по гайду узлов: ${needDone} из ${need.length}.` : ' Гайд на этой доске ничего не требует.'}`}
+            >
+              <button
+                onClick={() => setBoardId(b.board.id)}
+                className={cn(
+                  'w-full rounded-xl border px-3 py-2.5 text-left transition-colors',
+                  b.board.id === board.board.id ? 'border-accent/60 bg-accent-soft' : 'border-line bg-surface hover:border-line-strong'
+                )}
+              >
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-[13px] font-semibold">{b.board.ru}</span>
+                  {!b.open ? (
+                    <Lock size={12} className="text-ink-3" />
+                  ) : need.length ? (
+                    <span className={cn('tnum text-[11px]', TONE_TEXT[tone])}>
+                      {needDone}/{need.length}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="tnum mt-1 text-[11px] text-ink-3">
+                  {b.takenCount}/{b.totalCount} узлов · {b.spent}/{b.total} очк.
+                </div>
+                <ProgressBar value={(b.spent / b.total) * 100} height={3} className="mt-1.5" color="var(--color-accent)" />
+              </button>
+            </Tooltip>
+          )
+        })}
       </div>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -67,7 +88,7 @@ export function DaevanionPage() {
           title={`${board.board.ru} · ${board.board.en}`}
           hint={`Открывается с ур. ${board.board.needLevel}. Оплата: ${BOARD_CURRENCY[board.board.en] ?? 'кристаллы'}.`}
           actions={
-            <Pill tone={board.open ? 'accent' : 'neutral'}>
+            <Pill tone={board.open ? 'accent' : 'neutral'} tip="Сколько очков вложено в эту доску из стоимости всех её узлов.">
               {board.open ? `вложено ${board.spent} из ${board.total}` : `откроется на ур. ${board.board.needLevel}`}
             </Pill>
           }
@@ -78,7 +99,7 @@ export function DaevanionPage() {
               { swatch: <Swatch className="bg-accent" />, text: 'взят: +1 к умению' },
               { swatch: <Swatch className="bg-teal" />, text: 'взят: стат' },
               { swatch: <Swatch className="bg-grade-epic" />, text: 'взят: крупный стат' },
-              { swatch: <Swatch className="border-2 border-aether bg-transparent" />, text: 'нужен по гайду' },
+              { swatch: <Swatch className="border-2 border-aether bg-transparent" />, text: 'нужен по гайду (ещё не взят)' },
               { swatch: <Swatch className="border border-dashed border-aether bg-transparent" />, text: 'путь к нужному' }
             ]}
           />
@@ -89,16 +110,30 @@ export function DaevanionPage() {
             <div className="-mx-2 max-h-80 overflow-y-auto">
               {board.skillNodes
                 .slice()
-                .sort((a, b) => Number(b.taken) - Number(a.taken))
-                .map(({ node, taken }) => (
-                  <div key={node.id} className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-[13px] hover:bg-surface-2">
-                    <span className={taken ? 'text-ink' : 'text-ink-3'}>
-                      {taken ? '✓ ' : ''}
-                      {namer.node(node)}
-                    </span>
-                    <span className="tnum shrink-0 text-[11px] text-ink-3">{node.cost} очк.</span>
-                  </div>
-                ))}
+                .sort((a, b) => Number(neededIds.has(b.node.id)) - Number(neededIds.has(a.node.id)) || Number(b.taken) - Number(a.taken))
+                .map(({ node, taken }) => {
+                  const needed = neededIds.has(node.id)
+                  const tone: Tone = needed ? (taken ? 'ok' : 'bad') : 'neutral'
+                  const why = needed
+                    ? taken
+                      ? 'Взят — гайд его просит.'
+                      : `Не взят, а гайд его просит. Стоит ${node.cost} очк. (плюс узлы по пути — см. план ниже).`
+                    : taken
+                      ? 'Взят; гайд этот узел не требует.'
+                      : 'Не взят; гайд этот узел не требует.'
+                  return (
+                    <Tooltip key={node.id} block content={`${namer.node(node)}. ${why}`} wide>
+                      <div className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] hover:bg-surface-2">
+                        {node.skill && <SkillIcon id={node.skill} size={22} tone={tone} dim={!taken} />}
+                        <span className={cn('min-w-0 flex-1', needed ? TONE_TEXT[tone] : taken ? 'text-ink-2' : 'text-ink-3')}>
+                          {taken ? '✓ ' : ''}
+                          {namer.node(node)}
+                        </span>
+                        <span className="tnum shrink-0 text-[11px] text-ink-3">{node.cost} очк.</span>
+                      </div>
+                    </Tooltip>
+                  )
+                })}
               {board.skillNodes.length === 0 && <p className="px-2 text-[13px] text-ink-3">На этой доске нет узлов умений — только статы.</p>}
             </div>
           </Card>
@@ -107,10 +142,12 @@ export function DaevanionPage() {
               {[...d.stats.entries()]
                 .sort((a, b) => b[1] - a[1])
                 .map(([stat, value]) => (
-                  <div key={stat} className="flex items-center justify-between rounded-lg px-2 py-1 text-[13px] hover:bg-surface-2">
-                    <span className="text-ink-2">{namer.stat(stat).main}</span>
-                    <span className="tnum">{formatStatValue(stat, value, { sign: true })}</span>
-                  </div>
+                  <Tooltip key={stat} block content={`${namer.stat(stat).main}: столько дают все взятые узлы на всех досках.`}>
+                    <div className="flex w-full items-center justify-between rounded-lg px-2 py-1 text-[13px] hover:bg-surface-2">
+                      <span className="text-ink-2">{namer.stat(stat).main}</span>
+                      <span className="tnum">{formatStatValue(stat, value, { sign: true })}</span>
+                    </div>
+                  </Tooltip>
                 ))}
             </div>
           </Card>
@@ -139,7 +176,7 @@ function GoalCard({ g, ctx, onBoard }: { g: GoalReport; ctx: Ctx; onBoard: (id: 
     <Card
       title={g.goal.name}
       actions={
-        <Pill tone={toneOfShare(g.done, g.required.length)}>
+        <Pill tone={toneOfShare(g.done, g.required.length)} tip={`Взято ${g.done} из ${g.required.length} узлов, которые просит эта цель.`}>
           {g.done} / {g.required.length}
         </Pill>
       }
@@ -151,24 +188,35 @@ function GoalCard({ g, ctx, onBoard }: { g: GoalReport; ctx: Ctx; onBoard: (id: 
       ) : (
         <>
           <div className="mt-3 mb-1.5 flex items-center justify-between text-xs text-ink-3">
-            <span>План: сначала самое дешёвое</span>
-            <span className="tnum">всего {fmt(g.remainingCost)} очк.</span>
+            <Tooltip content="Порядок взятия: каждый раз самый дешёвый оставшийся узел с учётом уже купленного пути. Нажмите на шаг — откроется его доска.">
+              <span>План: сначала самое дешёвое</span>
+            </Tooltip>
+            <Tooltip content="Сколько очков (кристаллов) нужно на все оставшиеся узлы цели, включая узлы по пути.">
+              <span className="tnum">всего {fmt(g.remainingCost)} очк.</span>
+            </Tooltip>
           </div>
           <ol className="-mx-2 max-h-72 overflow-y-auto">
             {g.plan.map((step, i) => (
               <li key={step.node.id}>
-                <button
-                  onClick={() => onBoard(step.board.id)}
-                  className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] hover:bg-surface-2"
+                <Tooltip
+                  block
+                  wide
+                  content={`${step.board.ru}: «${ctx.namer.node(step.node)}» — ${step.cost} очк.${step.via ? `, из них ${step.via} промежуточных узл. по пути` : ''}. Нажмите, чтобы открыть доску — нужный узел обведён голубым.`}
                 >
-                  <span className="tnum w-5 shrink-0 text-[11px] text-ink-3">{i + 1}.</span>
-                  <span className="min-w-0 flex-1 truncate">
-                    <span className="text-ink-3">{step.board.ru}:</span> {ctx.namer.node(step.node)}
-                  </span>
-                  <span className="tnum shrink-0 text-[11px] text-ink-3">
-                    {step.cost} очк.{step.via ? ` (+${step.via} по пути)` : ''}
-                  </span>
-                </button>
+                  <button
+                    onClick={() => onBoard(step.board.id)}
+                    className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] hover:bg-surface-2"
+                  >
+                    <span className="tnum w-5 shrink-0 text-[11px] text-ink-3">{i + 1}.</span>
+                    {step.node.skill && <SkillIcon id={step.node.skill} size={20} />}
+                    <span className="min-w-0 flex-1 truncate">
+                      <span className="text-ink-3">{step.board.ru}:</span> {ctx.namer.node(step.node)}
+                    </span>
+                    <span className="tnum shrink-0 text-[11px] text-ink-3">
+                      {step.cost} очк.{step.via ? ` (+${step.via} по пути)` : ''}
+                    </span>
+                  </button>
+                </Tooltip>
               </li>
             ))}
           </ol>

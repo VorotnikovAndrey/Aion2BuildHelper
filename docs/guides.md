@@ -42,7 +42,7 @@
   "mode": "pve",
   "source": { "title": "Aion 2 Templar PvE Build", "url": "https://mobalytics.gg/gamebase/guides/aion-2-templar-pve-build" },
   "skills": [
-    { "skill": 12240000, "role": "core", "level": 16, "specs": [5, 3], "earlySpecs": [3], "note": "Правосудие: снятие перезарядки + доп. урон" },
+    { "skill": 12240000, "role": "core", "level": 16, "specs": [5, 3], "earlySpecs": [3], "note": "Суд: снятие перезарядки + доп. урон" },
     { "skill": 12110000, "role": "stigma", "equip": true, "level": 5 }
   ],
   "stats": [

@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card'
 import { PageHeader, StatTile } from '@/components/ui/misc'
 import { Pill } from '@/components/ui/Pill'
 import { ScoreRing } from '@/components/ui/Progress'
+import { Tooltip } from '@/components/ui/InfoTip'
 import { ago, cn, compact, fmt } from '@/lib/format'
 import { useCharacterContext } from '@/lib/report'
 import { useApp } from '@/lib/store'
@@ -32,12 +33,14 @@ export function CollectionsPage() {
           hint="У каждого питомца уровень 1–3. Чем больше питомцев рода и чем выше их уровни, тем выше уровень Познания рода и тем больше ячеек открыто."
         >
           <div className="flex items-center gap-6">
-            <ScoreRing value={pets.progress} size={110} label="уровней" />
+            <Tooltip content="Доля набранных уровней у собранных питомцев: каждый питомец качается до ур. 3." wide>
+              <ScoreRing value={pets.progress} size={110} label="уровней" />
+            </Tooltip>
             <div className="min-w-0 flex-1 space-y-3">
               <div className="grid grid-cols-3 gap-2">
-                <StatTile label="Собрано" value={fmt(pets.owned)} />
-                <StatTile label="Макс. ур." value={fmt(pets.maxed)} />
-                <StatTile label="Ещё уровней" value={fmt(pets.levelsLeft)} />
+                <StatTile label="Собрано" value={fmt(pets.owned)} hint="Сколько разных питомцев в коллекции." />
+                <StatTile label="Макс. ур." value={fmt(pets.maxed)} hint="Питомцы, прокачанные до ур. 3." />
+                <StatTile label="Ещё уровней" value={fmt(pets.levelsLeft)} hint="Сколько уровней ещё можно поднять у уже собранных питомцев (души питомцев)." />
               </div>
               <div>
                 <div className="flex h-3 overflow-hidden rounded-full bg-surface-3">
@@ -66,21 +69,36 @@ export function CollectionsPage() {
           <BigTile
             icon={<Feather size={18} />}
             label="Крылья"
+            tip="Сколько крыльев собрано и какие надеты (номер из данных игры — названий в оверлее нет)."
             value={char.wings.length}
             sub={char.equippedWing ? `надеты #${char.equippedWing}` : 'не надеты'}
           />
-          <BigTile icon={<Trophy size={18} />} label="Титулы" value={char.ownedTitles.length} sub={`надето: ${char.titles.length}`} />
-          <BigTile icon={<Shirt size={18} />} label="Облики" value={char.skinsOwned} sub="предметов внешнего вида" />
-          <BigTile icon={<Home size={18} />} label="Украшения легиона" value={char.pantheon.length} sub="поставлено в зале" />
+          <BigTile
+            icon={<Trophy size={18} />}
+            label="Титулы"
+            tip="Собрано титулов и сколько из них надето (до трёх)."
+            value={char.ownedTitles.length}
+            sub={`надето: ${char.titles.length}`}
+          />
+          <BigTile icon={<Shirt size={18} />} label="Облики" tip="Предметы внешнего вида в коллекции." value={char.skinsOwned} sub="предметов внешнего вида" />
+          <BigTile
+            icon={<Home size={18} />}
+            label="Украшения легиона"
+            tip="Украшения, поставленные в зале легиона — каждое даёт небольшой стат."
+            value={char.pantheon.length}
+            sub="поставлено в зале"
+          />
           <BigTile
             icon={<Gem size={18} />}
             label="Монолиты"
+            tip="Знаки монолитов: копятся для постоянных бонусов к статам."
             value={char.monoliths.reduce((s, m) => s + m.tokens, 0)}
             sub={char.monoliths.map((m) => `#${m.monolith}: ${m.tokens}`).join(' · ') || 'нет данных'}
           />
           <BigTile
             icon={<Trophy size={18} />}
             label="Очки Бездны"
+            tip="Очки Бездны текущего сезона и счёт: убийства / смерти / помощь."
             value={char.abyss ? compact(char.abyss.points) : '—'}
             sub={char.abyss ? `${char.abyss.kills} / ${char.abyss.deaths} / ${char.abyss.assists}` : undefined}
           />
@@ -116,15 +134,17 @@ export function CollectionsPage() {
   )
 }
 
-function BigTile({ icon, label, value, sub }: { icon: React.ReactNode; label: string; value: React.ReactNode; sub?: string }) {
+function BigTile({ icon, label, value, sub, tip }: { icon: React.ReactNode; label: string; value: React.ReactNode; sub?: string; tip?: string }) {
   return (
-    <div className="rounded-xl border border-line bg-surface px-4 py-3">
-      <div className="flex items-center gap-2 text-[11px] tracking-wide text-ink-3 uppercase">
-        <span className="text-accent">{icon}</span>
-        {label}
+    <Tooltip content={tip} block>
+      <div className="w-full rounded-xl border border-line bg-surface px-4 py-3">
+        <div className="flex items-center gap-2 text-[11px] tracking-wide text-ink-3 uppercase">
+          <span className="text-accent">{icon}</span>
+          {label}
+        </div>
+        <div className="tnum mt-1.5 text-2xl font-semibold">{typeof value === 'number' ? fmt(value) : value}</div>
+        {sub && <div className="mt-0.5 truncate text-xs text-ink-3">{sub}</div>}
       </div>
-      <div className="tnum mt-1.5 text-2xl font-semibold">{typeof value === 'number' ? fmt(value) : value}</div>
-      {sub && <div className="mt-0.5 truncate text-xs text-ink-3">{sub}</div>}
-    </div>
+    </Tooltip>
   )
 }

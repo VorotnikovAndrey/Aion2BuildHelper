@@ -114,7 +114,7 @@ describe('род, питомцы, итог', () => {
     expect(r.scores.overall).toBeLessThan(100)
     expect(r.steps[0].impact).toBe('high')
     expect(r.steps.some((s) => s.id === 'spec-12240000')).toBe(true)
-    expect(r.steps.find((s) => s.id === 'spec-12240000')!.title).toContain('Снятие перезарядки')
+    expect(r.steps.find((s) => s.id === 'spec-12240000')!.title).toContain('Убирает перезарядку')
   })
 
   it('без гайда шагов нет', () => {

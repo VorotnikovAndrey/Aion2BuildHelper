@@ -13,6 +13,9 @@
 //   npm run gamedata                         — классы по умолчанию (страж)
 //   npm run gamedata -- --classes templar,chanter
 //   npm run gamedata -- --classes all --refresh
+//
+// Иконки умений и специализаций (родной арт игры, 256×256) кладутся в src/renderer/public/icons —
+// они нужны интерфейсу без интернета. Уже скачанные не перекачиваются.
 
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
@@ -22,6 +25,8 @@ import { homedir } from 'node:os'
 const ROOT = resolve(import.meta.dirname, '../..')
 const CACHE = join(ROOT, '.cache/gamedata')
 const OUT = join(ROOT, 'src/shared/gamedata/generated')
+const ICONS = join(ROOT, 'src/renderer/public/icons')
+const ICON_BASE = 'https://metabot.gg/web/aion2'
 const BASE = 'https://metabot.gg/en/aion-2'
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36'
 const CLASSES = ['gladiator', 'templar', 'assassin', 'ranger', 'sorcerer', 'spiritmaster', 'cleric', 'chanter']
@@ -233,6 +238,37 @@ async function buildArcanaPools(skills) {
   console.log('✓ пулы аркан:', Object.keys(pools).length, 'классов')
 }
 
+// ───────────────────────── Иконки ─────────────────────────
+
+async function download(url, file) {
+  if (existsSync(file)) return false
+  for (let attempt = 1; ; attempt++) {
+    await sleep(400 * attempt)
+    const res = await fetch(url, { headers: { 'user-agent': UA, accept: 'image/webp,image/*' } })
+    if (res.ok) {
+      await mkdir(join(file, '..'), { recursive: true })
+      await writeFile(file, Buffer.from(await res.arrayBuffer()))
+      return true
+    }
+    if (res.status === 404 || res.status === 403) return false // такой иконки на сайте нет
+    if (attempt >= 3) throw new Error(`${url}: HTTP ${res.status}`)
+  }
+}
+
+async function buildIcons(skills, classes) {
+  const specs = await readJsonSafe('specs.json')
+  let count = 0
+  for (const s of skills.filter((x) => classes.includes(x.cls))) {
+    if (await download(`${ICON_BASE}/skills/${s.id}.webp`, join(ICONS, 'skills', `${s.id}.webp`))) count++
+    // Значки специализаций одинаковы у всех умений: пять цветных щитов у активных и золотой у стигм.
+    for (const sp of specs[s.id] ?? []) {
+      const name = s.type === 'stigma' ? 'spec-stigma' : `spec-${sp.n}`
+      if (await download(`${ICON_BASE}/stigma/${s.id + sp.n * 10}.webp`, join(ICONS, 'specs', `${name}.webp`))) count++
+    }
+  }
+  console.log('✓ иконки: скачано новых', count)
+}
+
 // ───────────────────────── Вспомогательное ─────────────────────────
 
 async function writeJson(name, data) {
@@ -255,4 +291,5 @@ const skills = await buildSkills()
 await buildArcanaPools(skills)
 await buildSpecs(skills, wanted)
 for (const cls of wanted) await buildDaevanion(cls)
+await buildIcons(skills, wanted)
 console.log('Готово →', OUT)

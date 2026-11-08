@@ -32,7 +32,7 @@ export interface Namer {
   /** Название предмета; slot нужен, чтобы назвать вещь без имени по слоту. */
   item(itemId: number, slot: number): Label
   board(id: number): Label
-  /** Подпись узла Даэваниона: «Правосудие +1» или «Увелич. урона в PvE +1,5%». */
+  /** Подпись узла Даэваниона: «Суд +1» или «Увелич. урона в PvE +1,5%». */
   node(node: DaevanionNode): string
   text(label: Label): string
 }

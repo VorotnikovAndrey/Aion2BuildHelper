@@ -67,8 +67,9 @@ function analyzeItem(item: GearItem, w: GuideWeights, known?: KnownOptions): Ite
   })
   const present = new Set(lines.map((l) => `${l.kind}:${l.id}`))
   const hasSkills = item.skills.length > 0
-  const wishlist: Wish[] = w
-    .topStats(group)
+  // Вещь без случайных строк (браслеты, пояс…) и без известных опций слота — ловить на ней нечего.
+  const canRoll = item.stats.length > 0 || item.skills.length > 0 || !!possible
+  const wishlist: Wish[] = (canRoll ? w.topStats(group) : [])
     .filter((s) => s.weight >= 3 && !present.has(`stat:${s.stat}`) && (!possible || possible.has(s.stat)))
     .slice(0, WISHLIST_SIZE)
     .map((s) => ({ kind: 'stat' as const, id: s.stat, weight: s.weight }))

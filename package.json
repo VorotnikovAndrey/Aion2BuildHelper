@@ -1,7 +1,7 @@
 {
   "name": "aion2-build-helper",
   "productName": "Aion2 Build Helper",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Десктоп-помощник для сборки персонажа в AION 2: что надето, что заменить и чего не хватает по выбранному гайду",
   "main": "./out/main/index.js",
   "private": true,

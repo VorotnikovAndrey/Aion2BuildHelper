@@ -4,6 +4,7 @@ import { BookOpen, Check, ChevronDown } from 'lucide-react'
 import { MODE_LABEL } from '@shared/guide/types'
 import type { Character } from '@shared/types'
 import { cn } from '@/lib/format'
+import { Tooltip } from '@/components/ui/InfoTip'
 import { useActiveGuide, useApp, useGuides } from '@/lib/store'
 
 /** Какой гайд ведёт персонажа — с быстрым переключением. Стоит в шапке страниц билда. */
@@ -16,14 +17,16 @@ export function GuideSwitcher({ char }: { char: Character }) {
 
   return (
     <div className="relative">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-lg border border-line-strong bg-surface px-3 py-1.5 text-left transition-colors hover:bg-surface-2"
-      >
-        <BookOpen size={14} className="text-accent" />
-        <span className="max-w-72 truncate text-[13px]">{active ? active.name : 'Без гайда'}</span>
-        <ChevronDown size={14} className="text-ink-3" />
-      </button>
+      <Tooltip content="Гайд, с которым приложение сравнивает этого персонажа. Нажмите, чтобы выбрать другой — у каждого персонажа свой.">
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="flex items-center gap-2 rounded-lg border border-line-strong bg-surface px-3 py-1.5 text-left transition-colors hover:bg-surface-2"
+        >
+          <BookOpen size={14} className="text-accent" />
+          <span className="max-w-72 truncate text-[13px]">{active ? active.name : 'Без гайда'}</span>
+          <ChevronDown size={14} className="text-ink-3" />
+        </button>
+      </Tooltip>
       {open && (
         <>
           <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />

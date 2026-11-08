@@ -21,18 +21,19 @@ export function Name({ label, className, altClassName, inline }: { label: Label;
   )
 }
 
+// Зелёный — как в гайде, жёлтый — приемлемо/слабо (обратить внимание), красный — не по гайду. См. lib/status.ts.
 const VERDICT: Record<Verdict, string> = {
   great: 'bg-good-soft text-good border-good/35',
-  good: 'bg-teal/10 text-teal border-teal/30',
-  weak: 'bg-surface-2 text-ink-3 border-line-strong',
+  good: 'bg-warning-soft text-warning border-warning/35',
+  weak: 'bg-warning/5 text-warning/75 border-warning/20 border-dashed',
   bad: 'bg-critical-soft text-critical border-critical/30 line-through decoration-critical/70'
 }
 
 export const VERDICT_TEXT: Record<Verdict, string> = {
   great: 'нужно по гайду',
-  good: 'полезно',
-  weak: 'слабо',
-  bad: 'бесполезно — менять'
+  good: 'приемлемо',
+  weak: 'слабо — при случае заменить',
+  bad: 'не по гайду — менять'
 }
 
 /** Строка вещи / ячейка рода / манакамень, окрашенные по пользе. */
@@ -82,14 +83,18 @@ export const gradeBorder = (grade: ItemGrade) =>
     unknown: 'border-line-strong'
   })[grade]
 
-const IMPACT: Record<Impact, { tone: 'critical' | 'warning' | 'neutral'; text: string }> = {
-  high: { tone: 'critical', text: 'Важно' },
-  medium: { tone: 'warning', text: 'Стоит' },
-  low: { tone: 'neutral', text: 'Мелочь' }
+const IMPACT: Record<Impact, { tone: 'critical' | 'warning' | 'neutral'; text: string; tip: string }> = {
+  high: { tone: 'critical', text: 'Важно', tip: 'Сильно влияет на билд: ключевые умения, специализации, дешёвые узлы досок. Делать в первую очередь.' },
+  medium: { tone: 'warning', text: 'Стоит', tip: 'Заметно улучшит билд, но не горит: заточка аркан, перековка строк, вторичные умения.' },
+  low: { tone: 'neutral', text: 'Мелочь', tip: 'Небольшая польза: манакамни, ячейки рода, поиск карты лучше. Когда будет время и ресурсы.' }
 }
 
 export function ImpactPill({ impact }: { impact: Impact }) {
-  return <Pill tone={IMPACT[impact].tone}>{IMPACT[impact].text}</Pill>
+  return (
+    <Pill tone={IMPACT[impact].tone} tip={IMPACT[impact].tip}>
+      {IMPACT[impact].text}
+    </Pill>
+  )
 }
 
 const CLASS_ICON: Record<ClassKey, LucideIcon> = {
@@ -111,7 +116,7 @@ export function ClassIcon({ cls, size = 16, className }: { cls: ClassKey | null;
 /** Вес из гайда точками: ●●●○○. */
 export function WeightDots({ weight, className }: { weight: number; className?: string }) {
   return (
-    <Tooltip content={weight ? `Важность по гайду: ${weight} из 5` : 'Гайд этот стат не ценит'}>
+    <Tooltip content={weight ? `Важность по гайду: ${weight} из 5 (5 — главное, 1 — лучше, чем ничего).` : 'Гайд этот стат не ценит (важность 0).'}>
       <span className={cn('inline-flex gap-0.5', className)}>
         {[1, 2, 3, 4, 5].map((i) => (
           <span key={i} className={cn('h-1.5 w-1.5 rounded-full', i <= weight ? 'bg-accent' : 'bg-surface-3')} />
