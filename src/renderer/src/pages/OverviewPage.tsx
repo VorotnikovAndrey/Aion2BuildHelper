@@ -10,6 +10,7 @@ import { MODE_LABEL } from '@shared/guide/types'
 import { ArcanaCardArt, ItemIcon, TitleEmblem } from '@/components/art'
 import { titleName } from '@/components/collections'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
+import { StaleBoardsNotice } from '@/components/StaleBoardsNotice'
 import { ClassIcon, ImpactPill } from '@/components/game'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -126,6 +127,7 @@ export function OverviewPage() {
       ) : (
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_380px]">
           <div className="flex min-w-0 flex-col gap-5">
+            <StaleBoardsNotice list={report.boardsStale} namer={ctx.namer} />
             <NextSteps steps={report.steps} onOpen={(s) => navigate(AREA_ROUTE[s.area])} />
             <BuildGlance ctx={ctx} />
           </div>

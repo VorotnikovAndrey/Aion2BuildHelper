@@ -4,6 +4,7 @@ import type { SkillReport } from '@shared/analysis/skills'
 import { skillSpecs } from '@shared/gamedata/skills'
 import { ROLE_LABEL } from '@shared/guide/types'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
+import { StaleBoardsNotice } from '@/components/StaleBoardsNotice'
 import { SkillIcon, SpecIcon } from '@/components/icons'
 import { Name } from '@/components/game'
 import { Card } from '@/components/ui/Card'
@@ -57,6 +58,8 @@ export function SkillsPage() {
           </div>
         </div>
       )}
+
+      <StaleBoardsNotice list={report.boardsStale} namer={ctx.namer} className="mb-5" />
 
       {core.length > 0 && (
         <Section title="Главные умения" hint="Вокруг них построен гайд: их уровень и специализации важнее всего остального.">

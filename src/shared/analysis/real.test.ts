@@ -9,7 +9,7 @@ import { parseQuestlogCharacters } from '../questlog/parse'
 import { analyzeBuild } from './build'
 import { learnGearOptions } from '../gamedata/gearOptions'
 
-const file = resolve(import.meta.dirname, '../../../samples/private/characters.json')
+const file = process.env.A2BH_FILE ?? resolve(import.meta.dirname, '../../../samples/private/characters.json')
 
 describe.skipIf(!existsSync(file))('реальные данные (samples/private)', () => {
   it('разбирается без ошибок', () => {
@@ -20,6 +20,7 @@ describe.skipIf(!existsSync(file))('реальные данные (samples/priva
     const r = analyzeBuild(char!, templarPveConsensus, n, { knownOptions: learnGearOptions(data.characters) })
     if (process.env.SHOW) {
       console.log(char!.name, r.scores)
+      for (const u of r.boardsStale) console.log(`доски устарели? ${n.skill(u.skill).main}: ур. ${u.level}, объяснено ${u.explained}`)
       for (const s of r.steps) console.log(`[${s.impact}] ${s.title} — ${s.detail ?? ''}`)
       for (const c of r.arcana.cards) console.log(c.info?.ru, '+' + c.enchant, c.skills.map((s) => `${n.skill(s.skill).main}:${s.level}:${s.cls}`).join(' | '))
       for (const g of r.daevanion.goals) console.log(g.goal.name, g.done + '/' + g.required.length, 'осталось очков', g.remainingCost, 'закрыто', g.lockedCount)

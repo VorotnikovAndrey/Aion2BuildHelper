@@ -9,7 +9,7 @@ import { analyzeGear } from './gear'
 import { analyzeGenus } from './genus'
 import { describeChange, diffCharacters } from './history'
 import { analyzePets } from './pets'
-import { analyzeSkills, checkSpecs, skillBonuses, stigmaLoadout } from './skills'
+import { analyzeSkills, checkSpecs, skillBonuses, stigmaLoadout, unexplainedLevels } from './skills'
 
 const guide = templarPveMobalytics
 const namer = createNamer('ru')
@@ -139,5 +139,22 @@ describe('история', () => {
 
   it('одинаковые снимки — без изменений', () => {
     expect(diffCharacters(makeTemplar(), makeTemplar())).toEqual([])
+  })
+})
+
+describe('устаревшие доски в файле оверлея', () => {
+  it('уровень выше, чем объясняют очки (до 10) и бонусы, — значит, доски в файле старые', () => {
+    const base = makeTemplar()
+    // Суд: очки 10 + доска 1 (узел 210050) + арканы — ровно объясняется
+    const ok = { ...base, daevanion: [{ board: 21, nodes: [210113, 210050] }], skills: [{ skill: 12240000, level: 11 + 3, equipped: true, specs: [] }] }
+    expect(unexplainedLevels(ok)).toEqual([])
+    // Тот же персонаж, но уровень на 1 выше — узла, который его даёт, в файле нет
+    const stale = { ...ok, skills: [{ skill: 12240000, level: 15, equipped: true, specs: [] }] }
+    expect(unexplainedLevels(stale)).toEqual([{ skill: 12240000, level: 15, explained: 14 }])
+  })
+
+  it('стигмы не проверяются: их уровни — из своих очков', () => {
+    const char = { ...makeTemplar(), skills: [{ skill: 12070000, level: 20, equipped: true, specs: [] }] }
+    expect(unexplainedLevels(char)).toEqual([])
   })
 })

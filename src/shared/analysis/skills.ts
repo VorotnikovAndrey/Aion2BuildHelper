@@ -35,6 +35,31 @@ export function skillBonuses(char: Character): Map<number, SkillBonus> {
   return map
 }
 
+/** До какого уровня умение качается очками умений; выше — только бонусы досок, аркан и шмота. */
+export const MAX_POINT_LEVEL = 10
+
+export interface UnexplainedLevel {
+  skill: number
+  level: number
+  /** Сколько объясняют очки (до 10) и все бонусы, которые видны в данных. */
+  explained: number
+}
+
+/**
+ * Умения, чей уровень выше, чем объясняют очки и видимые бонусы. Так бывает, когда оверлей уже
+ * обновил уровни умений, а доски Даэваниона в файле ещё старые (например, после перестановки узлов).
+ */
+export function unexplainedLevels(char: Character): UnexplainedLevel[] {
+  const bonuses = skillBonuses(char)
+  return char.skills.flatMap((s) => {
+    const def = skillDef(s.skill)
+    if (!def || def.type === 'stigma') return []
+    const b = bonuses.get(s.skill)
+    const explained = MAX_POINT_LEVEL + (b ? b.daevanion + b.arcana + b.gear : 0)
+    return s.level > explained ? [{ skill: s.skill, level: s.level, explained }] : []
+  })
+}
+
 export type SkillStatus = 'done' | 'progress' | 'missing' | 'info'
 
 export interface SpecCheck {

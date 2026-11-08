@@ -9,7 +9,7 @@ import { analyzeDaevanion, type DaevanionReport } from './daevanion'
 import { analyzeGear, gearScore, type ItemReport } from './gear'
 import { analyzeGenus } from './genus'
 import { analyzePets, type PetsReport } from './pets'
-import { analyzeSkills, skillsScore, specsLookLikeSlots, stigmaLoadout, type SkillReport } from './skills'
+import { analyzeSkills, skillsScore, specsLookLikeSlots, stigmaLoadout, unexplainedLevels, type SkillReport, type UnexplainedLevel } from './skills'
 import { analyzeTitles, type TitlesReport } from './titles'
 import type { KnownOptions } from '../gamedata/gearOptions'
 
@@ -39,6 +39,8 @@ export interface BuildReport {
   guide: Guide | null
   /** Оверлей, похоже, не знает выбранных специализаций (см. specsLookLikeSlots). */
   specsUncertain: boolean
+  /** Уровни умений, которые не объясняются видимыми досками, — доски в файле, похоже, устарели. */
+  boardsStale: UnexplainedLevel[]
   skills: SkillReport[]
   stigmas: ReturnType<typeof stigmaLoadout>
   gear: ItemReport[]
@@ -90,6 +92,7 @@ export function analyzeBuild(char: Character, guide: Guide | null, namer: Namer,
   const report: BuildReport = {
     guide,
     specsUncertain,
+    boardsStale: unexplainedLevels(char),
     skills,
     stigmas,
     gear,

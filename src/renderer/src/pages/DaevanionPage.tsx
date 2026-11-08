@@ -5,6 +5,7 @@ import { BOARD_CURRENCY, neighbors, type DaevanionNode } from '@shared/gamedata/
 import { skillIconSrc } from '@shared/gamedata/art'
 import { formatStatValue } from '@shared/gamedata/stats'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
+import { StaleBoardsNotice } from '@/components/StaleBoardsNotice'
 import { Card } from '@/components/ui/Card'
 import { EmptyState, Legend, PageHeader } from '@/components/ui/misc'
 import { Pill, toneOfShare } from '@/components/ui/Pill'
@@ -44,6 +45,8 @@ export function DaevanionPage() {
         subtitle="Шесть досок: узел можно взять, только если он соединён со взятым. Голубая обводка — узлы, которые просит гайд; пунктир — самый дешёвый путь к ним."
         actions={<GuideSwitcher char={char} />}
       />
+
+      <StaleBoardsNotice list={ctx.report.boardsStale} namer={ctx.namer} className="mb-5" />
 
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-6">
         {d.boards.map((b) => {
