@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Lock, Waypoints } from 'lucide-react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Lock, Maximize2, Minus, Plus, Waypoints } from 'lucide-react'
 import type { BoardReport, GoalReport } from '@shared/analysis/daevanion'
 import { BOARD_CURRENCY, neighbors, type DaevanionNode } from '@shared/gamedata/daevanion'
 import { skillIconSrc } from '@shared/gamedata/art'
@@ -232,7 +232,97 @@ function GoalCard({ g, ctx, onBoard }: { g: GoalReport; ctx: Ctx; onBoard: (id: 
   )
 }
 
+/** Размер клетки в «единицах доски»: SVG рисуется в них и растягивается под нужный масштаб. */
 const CELL = 36
+/** Доска по умолчанию — по ширине карточки, но не выше этой высоты (в пикселях). */
+const FIT_MAX_HEIGHT = 680
+const ZOOM_MIN = 0.6
+const ZOOM_MAX = 4
+const ZOOM_STEP = 1.25
+
+/** Масштаб доски: «вписать» по ширине карточки, кнопки, Ctrl+колесо и перетаскивание мышью. */
+function useBoardZoom(w: number, h: number) {
+  const wrap = useRef<HTMLDivElement>(null)
+  const [width, setWidth] = useState(0)
+  const [zoom, setZoom] = useState(1)
+  const drag = useRef<{ x: number; y: number; left: number; top: number } | null>(null)
+
+  useLayoutEffect(() => {
+    const el = wrap.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setWidth(el.clientWidth))
+    ro.observe(el)
+    setWidth(el.clientWidth)
+    return () => ro.disconnect()
+  }, [])
+
+  const fit = width ? Math.max(1, Math.min((width - 8) / w, FIT_MAX_HEIGHT / h)) : 1
+  const scale = fit * zoom
+
+  // Ctrl+колесо — масштаб вокруг курсора; обычное колесо прокручивает страницу как обычно.
+  useEffect(() => {
+    const el = wrap.current
+    if (!el) return
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey) return
+      e.preventDefault()
+      e.stopPropagation()
+      const rect = el.getBoundingClientRect()
+      const px = e.clientX - rect.left + el.scrollLeft
+      const py = e.clientY - rect.top + el.scrollTop
+      setZoom((z) => {
+        const next = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, e.deltaY < 0 ? z * 1.12 : z / 1.12))
+        const k = next / z
+        requestAnimationFrame(() => {
+          el.scrollLeft = px * k - (e.clientX - rect.left)
+          el.scrollTop = py * k - (e.clientY - rect.top)
+        })
+        return next
+      })
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [])
+
+  const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const el = wrap.current
+    if (!el || e.button !== 0) return
+    drag.current = { x: e.clientX, y: e.clientY, left: el.scrollLeft, top: el.scrollTop }
+  }, [])
+  const onPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const el = wrap.current
+    const d = drag.current
+    if (!el || !d) return
+    el.scrollLeft = d.left - (e.clientX - d.x)
+    el.scrollTop = d.top - (e.clientY - d.y)
+  }, [])
+  const onPointerUp = useCallback(() => {
+    drag.current = null
+  }, [])
+
+  return {
+    wrap,
+    scale,
+    zoom,
+    zoomIn: () => setZoom((z) => Math.min(ZOOM_MAX, z * ZOOM_STEP)),
+    zoomOut: () => setZoom((z) => Math.max(ZOOM_MIN, z / ZOOM_STEP)),
+    reset: () => setZoom(1),
+    pan: { onPointerDown, onPointerMove, onPointerUp, onPointerLeave: onPointerUp }
+  }
+}
+
+function ZoomButton({ onClick, tip, children }: { onClick: () => void; tip: string; children: React.ReactNode }) {
+  return (
+    <Tooltip content={tip}>
+      <button
+        onClick={onClick}
+        className="flex h-7 min-w-7 items-center justify-center rounded-md border border-line-strong bg-surface-2 px-1.5 text-ink-2 hover:border-accent/50 hover:text-ink"
+      >
+        {children}
+      </button>
+    </Tooltip>
+  )
+}
 
 function BoardView({ board, goals, ctx }: { board: BoardReport; goals: GoalReport[]; ctx: Ctx }) {
   const [hover, setHover] = useState<DaevanionNode | null>(null)
@@ -270,112 +360,138 @@ function BoardView({ board, goals, ctx }: { board: BoardReport; goals: GoalRepor
     return 'var(--color-teal)'
   }
 
+  const z = useBoardZoom(w, h)
+  const W = w * z.scale
+  const H = h * z.scale
+  const zoomed = z.zoom > 1.001
+
   return (
-    <div className="relative overflow-x-auto">
-      <div className="relative mx-auto" style={{ width: w, height: h }}>
-        <svg width={w} height={h} className="absolute inset-0">
-          <defs>
-            <filter id="node-glow" x="-60%" y="-60%" width="220%" height="220%">
-              <feGaussianBlur stdDeviation="2.4" />
-            </filter>
-          </defs>
-          {edges.map(([a, b]) => {
-            const lit = board.taken.has(a.id) && board.taken.has(b.id)
-            return (
-              <line
-                key={`${a.id}-${b.id}`}
-                x1={x(a)}
-                y1={y(a)}
-                x2={x(b)}
-                y2={y(b)}
-                stroke={lit ? 'var(--color-accent)' : 'var(--color-line-strong)'}
-                strokeOpacity={lit ? 0.75 : 1}
-                strokeWidth={lit ? 2.2 : 1}
-              />
-            )
-          })}
-          {nodes.map((n) => {
-            const taken = board.taken.has(n.id) || n.type === 'Start'
-            const skill = n.type === 'SkillLevel' && n.skill
-            const diamond = n.grade === 'Unique' || n.grade === 'Legend'
-            const r = n.type === 'Start' ? 12 : skill ? 13 : diamond ? 10 : 6.5
-            const dim = !board.open && !taken
-            return (
-              <g key={n.id} onMouseEnter={() => setHover(n)} onMouseLeave={() => setHover(null)} className="cursor-default" opacity={dim ? 0.45 : 1}>
-                {wanted.has(n.id) && <circle cx={x(n)} cy={y(n)} r={r + 5} fill="none" stroke="var(--color-aether)" strokeWidth={2} />}
-                {path.has(n.id) && !wanted.has(n.id) && (
-                  <circle cx={x(n)} cy={y(n)} r={r + 4} fill="none" stroke="var(--color-aether)" strokeWidth={1.2} strokeDasharray="3 2" />
-                )}
-                {/* Свечение взятых крупных узлов — как подсветка в окне Даэваниона */}
-                {taken && (diamond || skill || n.type === 'Start') && (
-                  <rect
-                    x={x(n) - r}
-                    y={y(n) - r}
-                    width={r * 2}
-                    height={r * 2}
-                    rx={skill ? 5 : 2}
-                    transform={diamond ? `rotate(45 ${x(n)} ${y(n)})` : undefined}
-                    fill={skill ? 'var(--color-good)' : fill(n)}
-                    opacity={0.55}
-                    filter="url(#node-glow)"
-                  />
-                )}
-                {skill ? (
-                  <>
+    <div className="relative">
+      <div className="absolute top-0 right-0 z-20 flex items-center gap-1">
+        <ZoomButton onClick={z.zoomOut} tip="Уменьшить (Ctrl + колесо вниз)">
+          <Minus size={14} />
+        </ZoomButton>
+        <ZoomButton onClick={z.reset} tip="Вписать доску по ширине">
+          <span className="tnum text-[11px] font-semibold">{Math.round(z.zoom * 100)}%</span>
+        </ZoomButton>
+        <ZoomButton onClick={z.zoomIn} tip="Увеличить (Ctrl + колесо вверх)">
+          <Plus size={14} />
+        </ZoomButton>
+        <ZoomButton onClick={z.reset} tip="Вписать">
+          <Maximize2 size={13} />
+        </ZoomButton>
+      </div>
+      <div
+        ref={z.wrap}
+        {...z.pan}
+        className={cn('relative overflow-auto pt-9', zoomed ? 'cursor-grab active:cursor-grabbing' : null)}
+        style={{ maxHeight: zoomed ? '75vh' : undefined }}
+      >
+        <div className="relative mx-auto" style={{ width: W, height: H }}>
+          <svg width={W} height={H} viewBox={`0 0 ${w} ${h}`} className="absolute inset-0 select-none">
+            <defs>
+              <filter id="node-glow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="2.4" />
+              </filter>
+            </defs>
+            {edges.map(([a, b]) => {
+              const lit = board.taken.has(a.id) && board.taken.has(b.id)
+              return (
+                <line
+                  key={`${a.id}-${b.id}`}
+                  x1={x(a)}
+                  y1={y(a)}
+                  x2={x(b)}
+                  y2={y(b)}
+                  stroke={lit ? 'var(--color-accent)' : 'var(--color-line-strong)'}
+                  strokeOpacity={lit ? 0.75 : 1}
+                  strokeWidth={lit ? 2.2 : 1}
+                />
+              )
+            })}
+            {nodes.map((n) => {
+              const taken = board.taken.has(n.id) || n.type === 'Start'
+              const skill = n.type === 'SkillLevel' && n.skill
+              const diamond = n.grade === 'Unique' || n.grade === 'Legend'
+              const r = n.type === 'Start' ? 12 : skill ? 13 : diamond ? 10 : 6.5
+              const dim = !board.open && !taken
+              return (
+                <g key={n.id} onMouseEnter={() => setHover(n)} onMouseLeave={() => setHover(null)} className="cursor-default" opacity={dim ? 0.45 : 1}>
+                  {wanted.has(n.id) && <circle cx={x(n)} cy={y(n)} r={r + 5} fill="none" stroke="var(--color-aether)" strokeWidth={2} />}
+                  {path.has(n.id) && !wanted.has(n.id) && (
+                    <circle cx={x(n)} cy={y(n)} r={r + 4} fill="none" stroke="var(--color-aether)" strokeWidth={1.2} strokeDasharray="3 2" />
+                  )}
+                  {/* Свечение взятых крупных узлов — как подсветка в окне Даэваниона */}
+                  {taken && (diamond || skill || n.type === 'Start') && (
                     <rect
-                      x={x(n) - r - 1.5}
-                      y={y(n) - r - 1.5}
-                      width={r * 2 + 3}
-                      height={r * 2 + 3}
-                      rx={6}
-                      fill="var(--color-bg)"
-                      stroke={taken ? 'var(--color-good)' : 'var(--color-line-strong)'}
-                      strokeWidth={1.5}
-                    />
-                    <image
-                      href={skillIconSrc(n.skill!)}
                       x={x(n) - r}
                       y={y(n) - r}
                       width={r * 2}
                       height={r * 2}
-                      preserveAspectRatio="xMidYMid slice"
-                      style={{ clipPath: 'inset(0 round 4.5px)', filter: taken ? undefined : 'grayscale(1) brightness(0.55)' }}
+                      rx={skill ? 5 : 2}
+                      transform={diamond ? `rotate(45 ${x(n)} ${y(n)})` : undefined}
+                      fill={skill ? 'var(--color-good)' : fill(n)}
+                      opacity={0.55}
+                      filter="url(#node-glow)"
                     />
-                  </>
-                ) : (
-                  <rect
-                    x={x(n) - r}
-                    y={y(n) - r}
-                    width={r * 2}
-                    height={r * 2}
-                    rx={diamond ? 2 : 2.5}
-                    transform={diamond ? `rotate(45 ${x(n)} ${y(n)})` : undefined}
-                    fill={fill(n)}
-                    stroke={taken ? 'rgb(255 255 255 / 0.35)' : 'var(--color-line-strong)'}
-                    strokeWidth={taken ? 1 : 1}
-                  />
-                )}
-                {n.type === 'Start' && (
-                  <text x={x(n)} y={y(n) + 4} textAnchor="middle" fontSize="12" fill="var(--color-on-accent)" fontWeight={700}>
-                    ★
-                  </text>
-                )}
-              </g>
-            )
-          })}
-        </svg>
-        {hover && (
-          <div
-            className="pointer-events-none absolute z-10 w-56 rounded-lg border border-line-strong bg-surface-3 px-3 py-2 text-xs shadow-xl shadow-black/40"
-            style={{ left: Math.min(x(hover) + 14, w - 230), top: Math.max(0, y(hover) - 10) }}
-          >
-            <div className="font-semibold text-ink">{ctx.namer.node(hover)}</div>
-            <div className="mt-0.5 text-ink-3">
-              {hover.type === 'Start' ? 'Стартовый узел' : `${hover.cost} очк. · ${board.taken.has(hover.id) ? 'взят' : 'не взят'}`}
-              {wanted.has(hover.id) ? ' · нужен по гайду' : path.has(hover.id) ? ' · по пути к нужному' : ''}
+                  )}
+                  {skill ? (
+                    <>
+                      <rect
+                        x={x(n) - r - 1.5}
+                        y={y(n) - r - 1.5}
+                        width={r * 2 + 3}
+                        height={r * 2 + 3}
+                        rx={6}
+                        fill="var(--color-bg)"
+                        stroke={taken ? 'var(--color-good)' : 'var(--color-line-strong)'}
+                        strokeWidth={1.5}
+                      />
+                      <image
+                        href={skillIconSrc(n.skill!)}
+                        x={x(n) - r}
+                        y={y(n) - r}
+                        width={r * 2}
+                        height={r * 2}
+                        preserveAspectRatio="xMidYMid slice"
+                        style={{ clipPath: 'inset(0 round 4.5px)', filter: taken ? undefined : 'grayscale(1) brightness(0.55)' }}
+                      />
+                    </>
+                  ) : (
+                    <rect
+                      x={x(n) - r}
+                      y={y(n) - r}
+                      width={r * 2}
+                      height={r * 2}
+                      rx={diamond ? 2 : 2.5}
+                      transform={diamond ? `rotate(45 ${x(n)} ${y(n)})` : undefined}
+                      fill={fill(n)}
+                      stroke={taken ? 'rgb(255 255 255 / 0.35)' : 'var(--color-line-strong)'}
+                      strokeWidth={taken ? 1 : 1}
+                    />
+                  )}
+                  {n.type === 'Start' && (
+                    <text x={x(n)} y={y(n) + 4} textAnchor="middle" fontSize="12" fill="var(--color-on-accent)" fontWeight={700}>
+                      ★
+                    </text>
+                  )}
+                </g>
+              )
+            })}
+          </svg>
+          {hover && (
+            <div
+              className="pointer-events-none absolute z-10 w-56 rounded-lg border border-line-strong bg-surface-3 px-3 py-2 text-xs shadow-xl shadow-black/40"
+              style={{ left: Math.min(x(hover) * z.scale + 14 * z.scale, W - 230), top: Math.max(0, (y(hover) - 10) * z.scale) }}
+            >
+              <div className="font-semibold text-ink">{ctx.namer.node(hover)}</div>
+              <div className="mt-0.5 text-ink-3">
+                {hover.type === 'Start' ? 'Стартовый узел' : `${hover.cost} очк. · ${board.taken.has(hover.id) ? 'взят' : 'не взят'}`}
+                {wanted.has(hover.id) ? ' · нужен по гайду' : path.has(hover.id) ? ' · по пути к нужному' : ''}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

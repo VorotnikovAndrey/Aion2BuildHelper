@@ -4,7 +4,7 @@ import type { TitleSlotReport } from '@shared/analysis/titles'
 import { pantheonArt, pantheonKind, type PantheonKind } from '@shared/gamedata/art'
 import { GRADES } from '@shared/gamedata/slots'
 import { formatStatValue } from '@shared/gamedata/stats'
-import type { TitleDef } from '@shared/gamedata/titles'
+import { TRACK_RU, type TitleDef } from '@shared/gamedata/titles'
 import type { Namer } from '@shared/names'
 import { gradeColorVar, PantheonPiece, TitleEmblem } from '@/components/art'
 import { Tooltip } from '@/components/ui/InfoTip'
@@ -86,22 +86,49 @@ export function TitleCard({ slot, namer }: { slot: TitleSlotReport; namer: Namer
           </div>
         </Tooltip>
       )}
-      {slot.goal && (
-        <Tooltip
-          block
-          wide
-          content={
-            <>
-              <b className="text-ink">{titleName(slot.goal)}</b> — лучший титул этой категории по гайду, его пока нет в коллекции. Даёт:{' '}
-              {statText(slot.goal.equip, namer)}.
-              {slot.goal.source && slot.goal.source !== '—' && <span className="mt-1 block text-ink-3">Где взять: {slot.goal.source}.</span>}
-            </>
-          }
-        >
-          <div className="mt-2 flex w-full items-center gap-2 rounded-lg border border-aether/30 bg-aether-soft px-2.5 py-1.5 text-[12px] text-aether">
-            <TitleEmblem category={slot.goal.category} grade={slot.goal.grade} size={20} dim />
-            <span className="min-w-0">
-              Цель: <b>{titleName(slot.goal)}</b> — ещё не получен
+      {slot.goal && <TitleGoal slot={slot} namer={namer} />}
+    </div>
+  )
+}
+
+/** Цель-титул: что даёт, как получить и сколько уже набрано. */
+function TitleGoal({ slot, namer }: { slot: TitleSlotReport; namer: Namer }) {
+  const goal = slot.goal!
+  const how = slot.goalHow
+  const p = how?.progress
+  const done = p && p.current >= p.goal
+  return (
+    <div className="mt-2 w-full rounded-lg border border-aether/30 bg-aether-soft px-2.5 py-2 text-[12px]">
+      <Tooltip
+        block
+        wide
+        content={
+          <>
+            <b className="text-ink">{titleName(goal)}</b> — лучший титул этой категории по гайду, его пока нет в коллекции. Даёт: {statText(goal.equip, namer)}.
+            {goal.collection.length > 0 && <span className="mt-1 block text-ink-3">При наличии: {statText(goal.collection, namer)}.</span>}
+          </>
+        }
+      >
+        <div className="flex w-full items-center gap-2 text-aether">
+          <TitleEmblem category={goal.category} grade={goal.grade} size={20} dim />
+          <span className="min-w-0">
+            Цель: <b>{titleName(goal)}</b> — ещё не получен
+          </span>
+        </div>
+      </Tooltip>
+      <div className="mt-1.5 text-[11.5px] leading-relaxed text-ink-2">Даёт: {statText(goal.equip, namer)}.</div>
+      {how && <div className="mt-1 text-[11.5px] leading-relaxed text-ink-2">{how.ru}</div>}
+      {p && how?.track && (
+        <Tooltip block content={`${TRACK_RU[how.track]}: ${p.current} из ${p.goal}.`}>
+          <div className="mt-1.5 flex w-full items-center gap-2 text-[11px]">
+            <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-bg/60">
+              <span
+                className={cn('block h-full rounded-full', done ? 'bg-good' : 'bg-aether')}
+                style={{ width: `${Math.min(100, (p.current / p.goal) * 100)}%` }}
+              />
+            </span>
+            <span className={cn('tnum shrink-0 font-semibold', done ? 'text-good' : 'text-aether')}>
+              {p.current} / {p.goal}
             </span>
           </div>
         </Tooltip>

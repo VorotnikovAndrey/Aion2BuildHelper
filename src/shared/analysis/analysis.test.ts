@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { classBoards, routeTo } from '../gamedata/daevanion'
+import { templarPveConsensus } from '../guide/builtin/templarPveConsensus'
 import { templarPveMobalytics } from '../guide/builtin/templarPveMobalytics'
 import { createNamer } from '../names'
 import { makeTemplar } from '../testing/fixtures'
@@ -183,5 +184,26 @@ describe('цель по вещи: что на что перековать', () =
 
   it('без кандидатов замен нет', () => {
     expect(planSwaps([line(52, 0)], [], [])).toEqual([])
+  })
+})
+
+describe('Знание о видах: цель переброса', () => {
+  it('слабая ячейка получает лучший стат рода, хорошая — нет', () => {
+    const char = {
+      ...makeTemplar(),
+      genus: [
+        {
+          genus: 'intellect',
+          level: 7,
+          effects: [
+            { slot: 0, grade: 3, stat: 199, value: 19 }, // ОМ — гайду не нужен
+            { slot: 1, grade: 3, stat: 31, value: 16 } // Макс. АТК — то, что надо
+          ]
+        }
+      ]
+    }
+    const [g] = analyzeGenus(char, templarPveConsensus).genuses
+    expect(g.slots[0].target?.stat).toBe(31)
+    expect(g.slots[1].target).toBeNull()
   })
 })

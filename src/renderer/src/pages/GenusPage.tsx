@@ -1,34 +1,46 @@
-import { Layers } from 'lucide-react'
-import { GENUS_GRADES, GENUS_MAX } from '@shared/gamedata/genus'
+import { ArrowRight, Brain, Layers, Leaf, Dna, PawPrint, Sparkles, type LucideIcon } from 'lucide-react'
+import type { GenusReport, GenusSlotReport } from '@shared/analysis/genus'
+import { GENUS_GRADE_COLOR, GENUS_GRADES, GENUS_LEVEL_GOAL, GENUS_MAX } from '@shared/gamedata/genus'
 import { formatStatValue } from '@shared/gamedata/stats'
+import { gradeColorVar, StatusBadge } from '@/components/art'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
-import { VerdictChip, WeightDots, WishChip } from '@/components/game'
+import { Card } from '@/components/ui/Card'
 import { Tooltip } from '@/components/ui/InfoTip'
-import { EmptyState, Legend, PageHeader } from '@/components/ui/misc'
+import { EmptyState, Legend, PageHeader, StatTile } from '@/components/ui/misc'
 import { Pill, toneOfShare } from '@/components/ui/Pill'
 import { cn } from '@/lib/format'
-import { TONE_BOX, TONE_TEXT, verdictTone, verdictWhy } from '@/lib/status'
 import { useCharacterContext } from '@/lib/report'
+import { verdictTone, verdictWhy } from '@/lib/status'
 
-const GRADE_DOT: Record<number, string> = {
-  1: 'bg-grade-common',
-  2: 'bg-good',
-  3: 'bg-grade-legend',
-  4: 'bg-grade-epic',
-  5: 'bg-grade-unique'
+type Ctx = NonNullable<ReturnType<typeof useCharacterContext>>
+
+const GENUS_ICON: Record<string, LucideIcon> = {
+  intellect: Brain,
+  feral: PawPrint,
+  nature: Leaf,
+  trans: Dna,
+  special: Sparkles
 }
+
+/** Ячейка «как нужно» — важность 4–5; «можно лучше» — 2–3; «перебросить» — 0–1. */
+const bucket = (s: GenusSlotReport) => (s.weight >= 4 ? 'ok' : s.weight >= 2 ? 'better' : 'reroll')
 
 export function GenusPage() {
   const ctx = useCharacterContext()!
   const { char, report, namer, guide } = ctx
   const g = report.genus
+  const all = g.genuses.flatMap((x) => x.slots)
+  const ok = all.filter((s) => bucket(s) === 'ok').length
+  const better = all.filter((s) => bucket(s) === 'better').length
+  const reroll = all.filter((s) => bucket(s) === 'reroll').length
+  const lowLevel = g.genuses.filter((x) => x.level < GENUS_LEVEL_GOAL)
 
   return (
     <>
       <PageHeader
         icon={<Layers size={22} />}
         title="Знание о видах"
-        subtitle="Пять родов питомцев, в каждом — ячейки со случайным статом. Уровень рода растёт с коллекцией питомцев этого рода. Зелёное — уже как нужно по гайду, серое — можно лучше, зачёркнутое — перебросить."
+        subtitle="Пять родов питомцев, в каждом — ячейки со случайным статом. Уровень рода растёт с коллекцией питомцев этого рода, с ним открываются ячейки и растёт их грейд. У каждой ячейки — итог по гайду и, если стоит перебросить, на что."
         actions={<GuideSwitcher char={char} />}
       />
 
@@ -36,107 +48,219 @@ export function GenusPage() {
         <EmptyState title="Оверлей ещё не видел Знание о видах">Откройте окно Знания о видах в игре или смените зону — оверлей обновит данные.</EmptyState>
       ) : (
         <>
-          {g.wishlist.length > 0 && (
-            <div className="mb-5 flex flex-wrap items-center gap-2 rounded-xl border border-line bg-surface px-4 py-3">
-              <span className="text-xs text-ink-3">Что ловить при перебросе:</span>
-              {g.wishlist.map((w) => (
-                <WishChip key={w.stat} tip={`Вес в гайде: ${w.weight}`}>
-                  {namer.stat(w.stat).main}
-                  {GENUS_MAX[w.stat] ? <span className="ml-1 opacity-70">до {formatStatValue(w.stat, GENUS_MAX[w.stat])}</span> : null}
-                </WishChip>
-              ))}
-            </div>
-          )}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-5">
-            {g.genuses.map((genus) => (
-              <section key={genus.def.key} className="rounded-2xl border border-line bg-surface p-3.5">
-                <header className="mb-3 flex items-start justify-between gap-2">
-                  <div>
-                    <Tooltip
-                      content={`Род «${genus.def.ru}» (${genus.def.en}), уровень ${genus.level}. Уровень растёт с коллекцией питомцев этого рода — с ним открываются новые ячейки.`}
-                      wide
-                    >
-                      <h3 className="text-[15px] font-semibold text-accent-2">{genus.def.ru}</h3>
-                    </Tooltip>
-                    <div className="text-[11px] text-ink-3">
-                      {genus.def.en} · ур. {genus.level}
-                    </div>
-                  </div>
-                  <Pill
-                    tone={toneOfShare(genus.useful, genus.slots.length)}
-                    tip={`Ячеек со статами, важными по гайду (3+): ${genus.useful} из ${genus.slots.length}. Под переброс: ${genus.reroll.length}.`}
-                  >
-                    {genus.useful} из {genus.slots.length}
-                  </Pill>
-                </header>
-                <div className="space-y-1.5">
-                  {genus.slots.map((s) => (
-                    <Tooltip
-                      key={s.slot}
-                      block
-                      wide
-                      content={
-                        <>
-                          <b className="text-ink">
-                            Ячейка {s.slot + 1}: {namer.stat(s.stat).main} {formatStatValue(s.stat, s.value)}
-                          </b>
-                          <span className="mt-1 block">{verdictWhy(s.verdict, s.weight)}</span>
-                          <span className="mt-1 block text-ink-3">
-                            Грейд ячейки: {GENUS_GRADES[s.grade] ?? s.grade}.
-                            {GENUS_MAX[s.stat] ? ` Максимум этого стата в роде — ${formatStatValue(s.stat, GENUS_MAX[s.stat])}.` : ''}
-                          </span>
-                        </>
-                      }
-                    >
-                      <div className={cn('w-full rounded-lg border px-2.5 py-1.5', TONE_BOX[verdictTone(s.verdict)], s.verdict === 'weak' && 'border-dashed')}>
-                        <div className="flex items-center gap-2 text-[13px]">
-                          <span className="tnum w-3 shrink-0 text-[11px] text-ink-3">{s.slot + 1}</span>
-                          <span
-                            className={cn(
-                              'min-w-0 flex-1 truncate',
-                              TONE_TEXT[verdictTone(s.verdict)],
-                              s.verdict === 'bad' && 'line-through',
-                              s.verdict === 'weak' && 'opacity-80'
-                            )}
-                          >
-                            {namer.stat(s.stat).main} <span className="tnum opacity-80">{formatStatValue(s.stat, s.value)}</span>
-                          </span>
-                          <Tooltip content={`Грейд ячейки: ${GENUS_GRADES[s.grade] ?? s.grade}`}>
-                            <span className={cn('h-2 w-2 shrink-0 rounded-full', GRADE_DOT[s.grade] ?? 'bg-ink-3')} />
-                          </Tooltip>
-                        </div>
-                        <div className="mt-0.5 flex items-center justify-between pl-5">
-                          <WeightDots weight={s.weight} />
-                          {(s.verdict === 'weak' || s.verdict === 'bad') && g.wishlist[0] && (
-                            <span className="truncate text-[10.5px] text-ink-3">
-                              ловить:{' '}
-                              <span className="text-aether">
-                                {g.wishlist
-                                  .slice(0, 2)
-                                  .map((w) => namer.stat(w.stat).main)
-                                  .join(', ')}
-                              </span>
-                            </span>
+          <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <StatTile
+              label="Оценка"
+              value={`${g.score} / 100`}
+              valueClassName={g.score >= 85 ? 'text-good' : g.score >= 60 ? 'text-warning' : 'text-critical'}
+              hint="Средняя польза статов во всех ячейках по весам гайда."
+            />
+            <StatTile
+              label="Как нужно"
+              value={`${ok} из ${all.length}`}
+              valueClassName="text-good"
+              hint="Ячейки со статами, важными по гайду (4–5 из 5). Их стоит запереть, если значение верхнее."
+            />
+            <StatTile
+              label="Можно лучше"
+              value={better}
+              valueClassName={better ? 'text-warning' : 'text-good'}
+              hint="Ячейки со статами средней важности (2–3): перебросить при случае."
+            />
+            <StatTile
+              label="Перебросить"
+              value={reroll}
+              valueClassName={reroll ? 'text-critical' : 'text-good'}
+              hint="Ячейки со статами, которые гайд почти не ценит (0–1): ОМ, удары с тыла и т.п. Перебрасывать в первую очередь."
+            />
+          </div>
+
+          <Card title="Как улучшать" className="mb-5" hint="Порядок из гайдов ExpCarry и SolAshur.">
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+              <ol className="space-y-2 text-[13px] leading-relaxed text-ink-2">
+                <Step n={1}>
+                  Поднимайте каждый род до ур. {GENUS_LEVEL_GOAL} — с уровнем открываются ячейки и растёт их грейд. Все пять родов на ур. 10 — это ещё и
+                  достижение «Genus Genius» с титулом «Unbound by Genus» (лучший атакующий титул по гайду).
+                  {lowLevel.length > 0 && <span className="text-warning"> Сейчас ниже: {lowLevel.map((x) => `${x.def.ru} (${x.level})`).join(', ')}.</span>}
+                </Step>
+                <Step n={2}>Перебрасывайте сначала красные ячейки (в них показано, что ловить), потом жёлтые — цель в подсказке ячейки.</Step>
+                <Step n={3}>Запирайте только верхние значения хорошего стата: золотую ячейку — сейчас, оранжевую — позже.</Step>
+              </ol>
+              {g.wishlist.length > 0 && (
+                <div>
+                  <Tooltip content="Самые важные по гайду статы, которые встречаются в Знании о видах, и их максимум в ячейке.">
+                    <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Что ловить при перебросе</div>
+                  </Tooltip>
+                  <div className="flex flex-wrap gap-1.5">
+                    {g.wishlist.map((w, i) => (
+                      <Tooltip
+                        key={w.stat}
+                        content={`Важность по гайду: ${w.weight} из 5.${GENUS_MAX[w.stat] ? ` Максимум в ячейке — ${formatStatValue(w.stat, GENUS_MAX[w.stat])}.` : ''}`}
+                      >
+                        <span
+                          className={cn(
+                            'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs',
+                            i === 0 ? 'border-aether/60 bg-aether-soft font-medium text-aether' : 'border-aether/30 text-aether'
                           )}
-                        </div>
-                      </div>
-                    </Tooltip>
-                  ))}
+                        >
+                          {namer.stat(w.stat).main}
+                          {GENUS_MAX[w.stat] ? <span className="opacity-70">до {formatStatValue(w.stat, GENUS_MAX[w.stat])}</span> : null}
+                        </span>
+                      </Tooltip>
+                    ))}
+                  </div>
+                  {guide?.genus.notes && <p className="mt-3 text-xs leading-relaxed text-ink-3">{guide.genus.notes}</p>}
                 </div>
-              </section>
+              )}
+            </div>
+          </Card>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
+            {g.genuses.map((genus) => (
+              <GenusCard key={genus.def.key} genus={genus} ctx={ctx} />
             ))}
           </div>
+
           <Legend
             items={[
-              { swatch: <VerdictChip verdict="great">зелёное</VerdictChip>, text: 'как нужно по гайду' },
-              { swatch: <VerdictChip verdict="good">жёлтое</VerdictChip>, text: 'приемлемо или слабо — при случае заменить' },
-              { swatch: <VerdictChip verdict="bad">зачёркнутое</VerdictChip>, text: 'не по гайду — перебросить' },
-              { swatch: <span className="h-2 w-2 rounded-full bg-grade-legend" />, text: 'цвет точки — грейд ячейки' }
+              { swatch: <StatusBadge tone="ok" />, text: 'как нужно по гайду' },
+              { swatch: <StatusBadge tone="warn" />, text: 'можно лучше' },
+              { swatch: <StatusBadge tone="bad" />, text: 'перебросить' },
+              {
+                swatch: (
+                  <span className="inline-flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <span key={n} className="h-2.5 w-2.5 rounded-sm" style={{ background: gradeColorVar(GENUS_GRADE_COLOR[n]) }} />
+                    ))}
+                  </span>
+                ),
+                text: 'цвет номера ячейки — грейд, от обычной до эпической'
+              }
             ]}
           />
-          {guide?.genus.notes && <p className="mt-3 text-xs text-ink-3">{guide.genus.notes}</p>}
         </>
       )}
     </>
+  )
+}
+
+function Step({ n, children }: { n: number; children: React.ReactNode }) {
+  return (
+    <li className="flex gap-2.5">
+      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-soft text-[11px] font-semibold text-accent">{n}</span>
+      <span>{children}</span>
+    </li>
+  )
+}
+
+function GenusCard({ genus, ctx }: { genus: GenusReport; ctx: Ctx }) {
+  const Icon = GENUS_ICON[genus.def.key] ?? Layers
+  const levelPct = Math.min(100, (genus.level / GENUS_LEVEL_GOAL) * 100)
+  return (
+    <section className="flex flex-col rounded-2xl border border-line bg-surface p-3.5">
+      <header className="mb-3 flex items-center gap-3">
+        <Tooltip
+          content={`Род «${genus.def.ru}» (${genus.def.en}). Уровень растёт с коллекцией питомцев этого рода — с ним открываются ячейки и растёт их грейд.`}
+          wide
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-gradient-to-br from-surface-3 to-surface-2 text-accent-2 shadow-[0_0_14px_-4px_var(--color-accent)]">
+            <Icon size={20} strokeWidth={1.7} />
+          </span>
+        </Tooltip>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="truncate text-[15px] font-semibold text-ink">{genus.def.ru}</h3>
+            <Pill
+              tone={toneOfShare(genus.useful, genus.slots.length)}
+              tip={`Ячеек со статами, полезными по гайду (3+): ${genus.useful} из ${genus.slots.length}.`}
+            >
+              {genus.useful} из {genus.slots.length}
+            </Pill>
+          </div>
+          <Tooltip block content={`Уровень рода ${genus.level} из ${GENUS_LEVEL_GOAL}: до ${GENUS_LEVEL_GOAL} — перед тем как запирать ячейки.`}>
+            <div className="mt-1 flex w-full items-center gap-2 text-[11px] text-ink-3">
+              <span className="tnum shrink-0">
+                ур. {genus.level}/{GENUS_LEVEL_GOAL}
+              </span>
+              <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-3">
+                <span
+                  className={cn('block h-full rounded-full', genus.level >= GENUS_LEVEL_GOAL ? 'bg-good' : 'bg-accent')}
+                  style={{ width: `${levelPct}%` }}
+                />
+              </span>
+            </div>
+          </Tooltip>
+        </div>
+      </header>
+      <div className="space-y-1.5">
+        {genus.slots.map((s) => (
+          <SlotTile key={s.slot} s={s} ctx={ctx} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function SlotTile({ s, ctx }: { s: GenusSlotReport; ctx: Ctx }) {
+  const { namer } = ctx
+  const b = bucket(s)
+  const tone = b === 'ok' ? 'ok' : b === 'better' ? 'warn' : 'bad'
+  const grade = GENUS_GRADE_COLOR[s.grade] ?? 'common'
+  return (
+    <Tooltip
+      block
+      wide
+      content={
+        <>
+          <b className="text-ink">
+            Ячейка {s.slot + 1}: {namer.stat(s.stat).main} {formatStatValue(s.stat, s.value)}
+          </b>
+          <span className="mt-1 block">{verdictWhy(s.verdict, s.weight)}</span>
+          <span className="mt-1 block text-ink-3">
+            Грейд ячейки: {GENUS_GRADES[s.grade] ?? s.grade}.{GENUS_MAX[s.stat] ? ` Максимум этого стата — ${formatStatValue(s.stat, GENUS_MAX[s.stat])}.` : ''}
+          </span>
+          {s.target && (
+            <span className="mt-1 block text-aether">
+              Перебросить на «{namer.stat(s.target.stat).main}» (важность {s.weight} → {s.target.weight}). Какие статы бывают именно в этой ячейке, в данных нет
+              — это лучший стат из встречающихся в Знании о видах.
+            </span>
+          )}
+        </>
+      }
+    >
+      <div
+        className={cn(
+          'w-full rounded-lg border-l-2 bg-surface-2/60 px-2.5 py-1.5',
+          tone === 'ok' ? 'border-good/70' : tone === 'warn' ? 'border-warning/70' : 'border-critical/70'
+        )}
+      >
+        <div className="flex items-start gap-2">
+          <span
+            className="tnum mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded text-[10.5px] font-bold text-bg"
+            style={{ background: gradeColorVar(grade) }}
+          >
+            {s.slot + 1}
+          </span>
+          <span
+            className={cn(
+              'min-w-0 flex-1 text-[13px] leading-snug',
+              tone === 'ok' ? 'text-ink' : tone === 'warn' ? 'text-ink-2' : 'text-critical line-through decoration-1',
+              verdictTone(s.verdict) === 'neutral' && 'text-ink-3'
+            )}
+          >
+            {namer.stat(s.stat).main}
+          </span>
+          <span className={cn('tnum shrink-0 text-[13px] font-semibold', tone === 'ok' ? 'text-good' : tone === 'warn' ? 'text-warning' : 'text-critical')}>
+            {formatStatValue(s.stat, s.value)}
+          </span>
+        </div>
+        {s.target && b === 'reroll' && (
+          <div className="mt-1 flex items-center gap-1.5 pl-7 text-[11.5px]">
+            <ArrowRight size={12} className="shrink-0 text-ink-3" />
+            <span className="rounded-full border border-aether/40 bg-aether-soft px-2 py-px font-medium text-aether">{namer.stat(s.target.stat).main}</span>
+          </div>
+        )}
+      </div>
+    </Tooltip>
   )
 }

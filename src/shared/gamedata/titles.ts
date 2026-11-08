@@ -65,3 +65,63 @@ export const TITLES: TitleDef[] = (titlesJson as Omit<TitleDef, 'ru'>[]).map((t)
 const byId = new Map(TITLES.map((t) => [t.id, t]))
 
 export const titleDef = (id: number): TitleDef | undefined => byId.get(id)
+
+/** Что считать для прогресса к титулу: минимальный уровень родов, питомцы, крылья, облики, заточка. */
+export type TitleTrack = 'genusMin' | 'pets' | 'wings' | 'skins' | 'uniqueEnchant'
+
+export interface TitleHow {
+  /** Как получить — по-русски. */
+  ru: string
+  /** Название достижения в клиенте (английское — русских названий достижений в данных нет). */
+  achievement?: string
+  track?: TitleTrack
+  goal?: number
+}
+
+/**
+ * Как получить титулы, на которые указывают встроенные гайды (страницы титулов на metabot.gg,
+ * 9 ноября 2026). Для остальных титулов — короткая строка `source` из справочника.
+ */
+export const TITLE_HOW: Record<number, TitleHow> = {
+  13010021: {
+    achievement: 'Genus Genius',
+    ru: 'Достижение «Genus Genius»: поднять все пять родов Знания о видах до ур. 10 (5 ступеней). Награда — титул и 20 000 кинара.',
+    track: 'genusMin',
+    goal: 10
+  },
+  13050017: {
+    achievement: 'Tailor-Made V',
+    ru: 'Достижение «Tailor-Made V»: заточить уникальную вещь до +15.',
+    track: 'uniqueEnchant',
+    goal: 15
+  },
+  12030003: { ru: 'Награда монолитов (раздел «Монолиты» в игре) — за Элийцев.' },
+  22030003: { ru: 'Награда монолитов (раздел «Монолиты» в игре) — за Асмодиан.' },
+  13050011: {
+    achievement: 'Veteran Wing Collector V',
+    ru: 'Достижение «Veteran Wing Collector V»: собрать 25 крыльев.',
+    track: 'wings',
+    goal: 25
+  },
+  13010025: {
+    achievement: 'My Reliable Friends VII',
+    ru: 'Достижение «My Reliable Friends VII»: собрать 200 питомцев (ступени 3, 10, 30, 50, 100, 150, 200 — на каждой свой титул).',
+    track: 'pets',
+    goal: 200
+  },
+  13050009: {
+    achievement: 'Fashionista VII',
+    ru: 'Достижение «Fashionista VII»: собрать 700 обликов.',
+    track: 'skins',
+    goal: 700
+  },
+  12010061: { ru: 'Титул приключений; способ получения в справочнике не указан.' }
+}
+
+export const TRACK_RU: Record<TitleTrack, string> = {
+  genusMin: 'самый низкий род Знания о видах',
+  pets: 'питомцев собрано',
+  wings: 'крыльев собрано',
+  skins: 'обликов собрано',
+  uniqueEnchant: 'лучшая заточка уникальной вещи'
+}

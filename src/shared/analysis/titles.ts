@@ -1,7 +1,8 @@
 // Титулы: что надето, что дают собранные титулы и нет ли в коллекции титула полезнее надетого.
 
 import type { TitleCategory } from '../gamedata/art'
-import { TITLE_CATEGORIES, titleDef, TITLES, type TitleDef } from '../gamedata/titles'
+import { gradeOfItem } from '../gamedata/slots'
+import { TITLE_CATEGORIES, TITLE_HOW, titleDef, TITLES, type TitleDef, type TitleHow, type TitleTrack } from '../gamedata/titles'
 import type { Guide } from '../guide/types'
 import type { Character } from '../types'
 import { guideWeights } from './weights'
@@ -20,6 +21,31 @@ export interface TitleSlotReport {
   better: { title: TitleDef; score: number; reason: 'guide' | 'score' } | null
   /** Лучший титул категории по гайду, если его ещё нет в коллекции, — цель на будущее. */
   goal: TitleDef | null
+  /** Как получить цель и сколько уже есть. */
+  goalHow: (TitleHow & { progress?: { current: number; goal: number } }) | null
+}
+
+/** Сколько уже набрано по условию титула (уровень родов, питомцы, крылья, облики, заточка). */
+export function trackValue(char: Character, track: TitleTrack): number {
+  switch (track) {
+    case 'genusMin':
+      return char.genus.length ? Math.min(...char.genus.map((g) => g.level)) : 0
+    case 'pets':
+      return char.pets.length
+    case 'wings':
+      return char.wings.length
+    case 'skins':
+      return char.skinsOwned
+    case 'uniqueEnchant':
+      return Math.max(0, ...char.gear.filter((g) => g.slot < 41 && gradeOfItem(g.item) === 'unique').map((g) => g.enchant))
+  }
+}
+
+function howFor(char: Character, t: TitleDef | null): TitleSlotReport['goalHow'] {
+  if (!t) return null
+  const how = TITLE_HOW[t.id]
+  if (!how) return t.source && t.source !== '—' ? { ru: `Где взять: ${t.source}.` } : null
+  return how.track && how.goal ? { ...how, progress: { current: trackValue(char, how.track), goal: how.goal } } : how
 }
 
 export interface TitlesReport {
@@ -59,7 +85,7 @@ export function analyzeTitles(char: Character, guide: Guide | null): TitlesRepor
         pick && pick.id !== on?.id && (onRank === -1 || rank(pick) < onRank) ? { title: pick, score: titleScore(pick, weight), reason: 'guide' as const } : null
       const top = list[0]
       const goal = !owned.has(top.id) && top.id !== on?.id ? top : null
-      return { category: id, ru, equipped: on, score, better, goal }
+      return { category: id, ru, equipped: on, score, better, goal, goalHow: howFor(char, goal) }
     }
 
     let better: TitleSlotReport['better'] = null
@@ -71,7 +97,7 @@ export function analyzeTitles(char: Character, guide: Guide | null): TitlesRepor
         if (s >= score + 1 && s >= score * 1.25 && (!better || s > better.score)) better = { title: t, score: s, reason: 'score' }
       }
     }
-    return { category: id, ru, equipped: on, score, better, goal: null }
+    return { category: id, ru, equipped: on, score, better, goal: null, goalHow: null }
   })
 
   const collection = new Map<number, number>()

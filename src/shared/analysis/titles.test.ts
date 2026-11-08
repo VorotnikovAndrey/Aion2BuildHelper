@@ -65,4 +65,20 @@ describe('титулы', () => {
     expect(attack.better).toBeNull()
     expect(attack.goal?.id).toBe(13010021)
   })
+
+  it('у цели — как её получить и сколько уже набрано', () => {
+    const char = {
+      ...makeTemplar(),
+      titles: [12030002, 12030003, 13010010],
+      ownedTitles: [12030002, 12030003, 13010010],
+      genus: [
+        { genus: 'intellect', level: 7, effects: [] },
+        { genus: 'special', level: 9, effects: [] }
+      ]
+    }
+    const [attack] = analyzeTitles(char, templarPveConsensus).slots
+    expect(attack.goal?.id).toBe(13010021)
+    expect(attack.goalHow?.achievement).toBe('Genus Genius')
+    expect(attack.goalHow?.progress).toEqual({ current: 7, goal: 10 }) // самый низкий род — 7
+  })
 })

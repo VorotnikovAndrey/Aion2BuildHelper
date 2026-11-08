@@ -58,11 +58,17 @@ export async function runShots(win: BrowserWindow): Promise<void> {
   if (process.env.A2BH_SHOTS_UI || process.env.A2BH_SHOTS_SETTINGS) {
     await updateUi(process.env.A2BH_SHOTS_UI ? JSON.parse(process.env.A2BH_SHOTS_UI) : { zoom: 1 })
     await applyUiToWindows()
+    const loaded = new Promise((r) => win.webContents.once('did-finish-load', () => r(null)))
     win.webContents.reload()
+    await loaded
   }
   await sleep(2000)
+  const title = () => win.webContents.executeJavaScript(`document.querySelector('main h1')?.textContent ?? ''`) as Promise<string>
   for (const [name, route] of ROUTES) {
+    // Ждём, пока страница действительно сменится (заголовок другой), иначе снимок может достаться прошлой странице.
+    const before = await title()
     await win.webContents.executeJavaScript(`location.hash = ${JSON.stringify('#' + route)}`)
+    for (let i = 0; i < 40 && (await title()) === before; i++) await sleep(100)
     await sleep(900)
     // Длинные страницы снимаем целиком: временно растягиваем окно по высоте содержимого.
     const height = await win.webContents.executeJavaScript(`document.querySelector('main')?.scrollHeight ?? 900`)
