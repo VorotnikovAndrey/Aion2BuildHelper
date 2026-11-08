@@ -1,12 +1,13 @@
 import { useState, type ReactNode } from 'react'
 import { ArrowRight, Check, Pencil, Shirt } from 'lucide-react'
-import type { GearLine, ItemReport, LineSwap } from '@shared/analysis/gear'
+import type { GearLine, ItemReport, LineSwap, ManastoneLine, StoneSwap } from '@shared/analysis/gear'
 import { stoneInfo } from '@shared/gamedata/art'
 import { godstoneDef, godstoneEffectRu, godstoneIconSrc } from '@shared/gamedata/godstones'
 import { formatStatValue } from '@shared/gamedata/stats'
 import { GRADES, slotDef, type SlotGroup } from '@shared/gamedata/slots'
 import { GameSlot, ItemIcon, StatusBadge, StoneIcon } from '@/components/art'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
+import { TargetBar } from '@/components/targets'
 import { SkillIcon } from '@/components/icons'
 import { GradeText, VERDICT_TEXT, VerdictChip } from '@/components/game'
 import { Card } from '@/components/ui/Card'
@@ -123,6 +124,8 @@ export function GearPage() {
           })}
         </div>
       </Card>
+
+      <StonePlan ctx={ctx} />
 
       <Card
         bodyClassName="p-0"
@@ -326,7 +329,8 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
 
 /** Цель по вещи в рамке: «что → на что» колонками, с выигрышем по важности; или «цель достигнута». */
 function Target({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
-  if (!item.swaps.length) {
+  const stoneGroups = groupStoneSwaps(item.stoneSwaps)
+  if (!item.swaps.length && !stoneGroups.length) {
     const noBetter = item.replace.length > 0
     return (
       <Tray>
@@ -335,7 +339,7 @@ function Target({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
           tip={
             noBetter
               ? 'Эти строки гайд не ценит, но заметно лучшего стата для этого слота в данных нет — перековать при случае.'
-              : 'Все строки — лучшее по гайду из того, что бывает на этом слоте: любая замена дала бы меньше 2 по важности.'
+              : 'Все строки и камни — лучшее по гайду из того, что бывает на этом слоте: любая замена дала бы меньше 2 по важности.'
           }
         >
           {noBetter ? (
@@ -354,18 +358,98 @@ function Target({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
   }
   return (
     <Tray>
-      <Tooltip
-        wide
-        content="Что на что перековать: слева текущая строка, справа — важнее по гайду и бывает на этом слоте. Метка — важность «было → станет» (из 5). Сверху — то, что менять в первую очередь."
-      >
-        <div className="text-[10px] font-semibold tracking-wider text-ink-3 uppercase">Перековать · {item.swaps.length}</div>
-      </Tooltip>
-      <div className="space-y-1.5">
-        {item.swaps.map((x, i) => (
-          <SwapRow key={i} swap={x} ctx={ctx} />
-        ))}
-      </div>
+      {item.swaps.length > 0 && (
+        <div>
+          <Tooltip
+            wide
+            content="Что на что перековать: сверху текущая строка, ниже — важнее по гайду и бывает на этом слоте. Метка — важность «было → станет» (из 5). Сверху — то, что менять в первую очередь."
+          >
+            <div className="mb-1.5 text-[10px] font-semibold tracking-wider text-ink-3 uppercase">Перековать строки · {item.swaps.length}</div>
+          </Tooltip>
+          <div className="space-y-1.5">
+            {item.swaps.map((x, i) => (
+              <SwapRow key={i} swap={x} ctx={ctx} />
+            ))}
+          </div>
+        </div>
+      )}
+      {stoneGroups.length > 0 && (
+        <div className={cn(item.swaps.length > 0 && 'border-t border-line pt-2')}>
+          <Tooltip
+            wide
+            content="Камни, которые стоит перековать, и во что. Пока меткость ниже порога контента, самые слабые камни — в доп. меткость; остальные слабые — в лучший по гайду стат. Приемлемые камни (блок, ОЗ) не трогаем."
+          >
+            <div className="mb-1.5 text-[10px] font-semibold tracking-wider text-ink-3 uppercase">Перековать камни · {item.stoneSwaps.length}</div>
+          </Tooltip>
+          <div className="space-y-1.5">
+            {stoneGroups.map((g) => (
+              <StoneSwapRow key={g.to} group={g} ctx={ctx} />
+            ))}
+          </div>
+        </div>
+      )}
     </Tray>
+  )
+}
+
+interface StoneGroup {
+  to: number
+  weight: number
+  reason?: string
+  from: ManastoneLine[]
+}
+
+/** Камни одной вещи, которые идут в один стат, — одной карточкой. */
+function groupStoneSwaps(list: StoneSwap[]): StoneGroup[] {
+  const map = new Map<number, StoneGroup>()
+  for (const x of list) {
+    const g = map.get(x.to) ?? { to: x.to, weight: x.weight, reason: x.reason, from: [] }
+    g.from.push(x.from)
+    map.set(x.to, g)
+  }
+  return [...map.values()].sort((a, b) => b.from.length - a.from.length)
+}
+
+function StoneSwapRow({ group, ctx }: { group: StoneGroup; ctx: Ctx }) {
+  const { namer } = ctx
+  const worst = Math.min(...group.from.map((m) => m.weight))
+  const bad = worst <= 1
+  return (
+    <Tooltip
+      block
+      wide
+      content={
+        <>
+          Перековать {group.from.length === 1 ? 'камень' : `${group.from.length} ${stonesWord(group.from.length)}`}:{' '}
+          <b className="text-ink">{group.from.map((m) => namer.stat(m.stat).main).join(', ')}</b> → <b className="text-aether">{namer.stat(group.to).main}</b>.
+          {group.reason && <span className="mt-1 block">{group.reason}.</span>}
+          <span className="mt-1 block text-ink-3">
+            Важность по гайду: {worst} → {group.weight} из 5.
+          </span>
+        </>
+      }
+    >
+      <div className={cn('w-full rounded-lg border-l-2 bg-surface-2/50 py-1.5 pr-2 pl-2.5', bad ? 'border-critical/70' : 'border-warning/70')}>
+        <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+          {group.from.map((m, i) => (
+            <span key={i} className={cn('text-[11px] leading-snug line-through decoration-1', m.weight <= 1 ? 'text-critical' : 'text-warning')}>
+              {namer.stat(m.stat).main}
+              <span className="opacity-60"> {'•'.repeat(m.grade)}</span>
+            </span>
+          ))}
+        </div>
+        <div className="mt-1 flex items-center gap-1.5">
+          <ArrowRight size={13} className="shrink-0 text-ink-3" />
+          <span className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-aether/45 bg-aether-soft px-2 py-0.5 text-xs font-medium text-aether">
+            {namer.stat(group.to).main}
+            {group.from.length > 1 && <span className="tnum opacity-80">×{group.from.length}</span>}
+          </span>
+          <span className="tnum ml-auto shrink-0 rounded bg-bg/60 px-1.5 py-0.5 text-[10px] font-semibold text-ink-2">
+            {worst} → {group.weight}
+          </span>
+        </div>
+      </div>
+    </Tooltip>
   )
 }
 
@@ -553,5 +637,94 @@ function Sockets({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
         </TraySection>
       )}
     </Tray>
+  )
+}
+
+/** «1 камень», «3 камня», «21 камень», «5 камней». */
+function stonesWord(n: number): string {
+  const d = n % 10
+  const dd = n % 100
+  if (d === 1 && dd !== 11) return 'камень'
+  if (d >= 2 && d <= 4 && (dd < 12 || dd > 14)) return 'камня'
+  return 'камней'
+}
+
+/** План по камням на всю экипировку: порог меткости, во что перековать, что оставить, что бесполезно в PvE. */
+function StonePlan({ ctx }: { ctx: Ctx }) {
+  const { report, namer } = ctx
+  const stones = report.gear.flatMap((i) => i.manastones)
+  if (!stones.length) return null
+  const swaps = report.gear.flatMap((i) => i.stoneSwaps)
+  const groups = groupStoneSwaps(swaps)
+  const swapped = new Set(swaps.map((x) => x.from))
+  const count = (list: ManastoneLine[]) => {
+    const m = new Map<number, number>()
+    for (const x of list) m.set(x.stat, (m.get(x.stat) ?? 0) + 1)
+    return [...m.entries()].sort((a, b) => b[1] - a[1])
+  }
+  const keep = count(stones.filter((m) => !swapped.has(m) && m.weight >= 3))
+  const useless = count(stones.filter((m) => m.weight <= 1))
+  const stoneStats = new Set(stones.map((m) => m.stat))
+  const targets = report.statTargets.filter(
+    (t) => t.target.kind !== 'top' && t.target.stats.some((s) => stoneStats.has(s) || t.target.raise?.some((r) => stoneStats.has(r)))
+  )
+  return (
+    <Card
+      title="Камни: что ставить"
+      className="mb-5"
+      hint="Совет по камням маны и духовным камням с учётом ваших статов: пока меткость ниже порога контента, слабые камни — в доп. меткость (примерно столько, сколько нужно до порога), остальные слабые — в лучший по гайду стат. Только PvE."
+    >
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
+        <div className="space-y-4">
+          {targets.map((t) => (
+            <TargetBar key={t.target.id} t={t} />
+          ))}
+          {!targets.length && <p className="text-xs text-ink-3">В гайде нет порогов для статов камней — советы только по важности статов.</p>}
+        </div>
+        <div className="space-y-3">
+          {groups.length > 0 ? (
+            <div>
+              <div className="mb-1.5 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Перековать · {swaps.length}</div>
+              <div className="space-y-1.5">
+                {groups.map((g) => (
+                  <Tooltip key={g.to} block wide content={g.reason ? `${g.reason}.` : `Лучший по гайду стат для камней (важность ${g.weight} из 5).`}>
+                    <div className="flex w-full flex-wrap items-center gap-2 text-[13px]">
+                      <span className="tnum font-semibold text-ink">{g.from.length}</span>
+                      <span className="text-ink-3">{stonesWord(g.from.length)} →</span>
+                      <span className="rounded-full border border-aether/45 bg-aether-soft px-2.5 py-0.5 text-xs font-medium text-aether">
+                        {namer.stat(g.to).main}
+                      </span>
+                      {g.reason && <span className="text-xs text-ink-3">{g.reason}</span>}
+                    </div>
+                  </Tooltip>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-[13px] text-good">
+              <Check size={14} strokeWidth={2.5} /> Камни — как нужно
+            </span>
+          )}
+          {keep.length > 0 && (
+            <Tooltip block wide content="Приемлемые камни (важность 3+): менять не обязательно. Блок запускает Ярость — бафф урона всей группе.">
+              <div className="w-full text-xs text-ink-3">
+                <span className="text-good">Оставить:</span> {keep.map(([stat, n]) => `${namer.stat(stat).main} ×${n}`).join(', ')}
+              </div>
+            </Tooltip>
+          )}
+          {useless.length > 0 && (
+            <Tooltip
+              block
+              wide
+              content="Эти статы в PvE почти ничего не дают стражу (ОМ, уклонение, сопротивление криту) — их и стоит перековывать в первую очередь."
+            >
+              <div className="w-full text-xs text-ink-3">
+                <span className="text-critical">Бесполезно в PvE:</span> {useless.map(([stat, n]) => `${namer.stat(stat).main} ×${n}`).join(', ')}
+              </div>
+            </Tooltip>
+          )}
+        </div>
+      </div>
+    </Card>
   )
 }

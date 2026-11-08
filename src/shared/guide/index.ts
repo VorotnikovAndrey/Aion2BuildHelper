@@ -4,7 +4,7 @@ import { classInfo } from '../gamedata/classes'
 import { toClassKey } from '../questlog/parse'
 import { templarPveConsensus } from './builtin/templarPveConsensus'
 import { templarPveMobalytics } from './builtin/templarPveMobalytics'
-import { GUIDE_SCHEMA, type Guide, type GuideMode, type GuideSource, type SkillRole, type SkillTarget, type StatWeight } from './types'
+import { GUIDE_SCHEMA, type Guide, type GuideMode, type GuideSource, type StatTarget, type SkillRole, type SkillTarget, type StatWeight } from './types'
 
 export * from './types'
 
@@ -118,6 +118,26 @@ export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
           utility: nums(titles.utility).length ? nums(titles.utility) : undefined,
           notes: str(titles.notes)
         }
+      : undefined,
+    statTargets: Array.isArray(raw.statTargets)
+      ? raw.statTargets.filter(isObj).flatMap((t, i): StatTarget[] => {
+          const goals = (Array.isArray(t.goals) ? t.goals : [])
+            .filter(isObj)
+            .flatMap((g) => (typeof g.value === 'number' ? [{ value: g.value, label: str(g.label) ?? String(g.value) }] : []))
+            .sort((a, b) => a.value - b.value)
+          if (!nums(t.stats).length || !goals.length) return []
+          return [
+            {
+              id: str(t.id) ?? `target-${i + 1}`,
+              name: str(t.name) ?? `Порог ${i + 1}`,
+              stats: nums(t.stats),
+              goals,
+              raise: nums(t.raise).length ? nums(t.raise) : undefined,
+              kind: t.kind === 'top' ? 'top' : 'content',
+              note: str(t.note)
+            }
+          ]
+        })
       : undefined,
     rotation: Array.isArray(raw.rotation) ? raw.rotation.filter((x): x is string => typeof x === 'string') : undefined,
     tips: Array.isArray(raw.tips)

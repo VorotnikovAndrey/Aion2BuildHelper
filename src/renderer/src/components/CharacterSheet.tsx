@@ -2,6 +2,7 @@
 // снизу — основные боевые показатели.
 
 import { BicepsFlexed, BookOpen, Eye, Feather, Heart, Sparkles, type LucideIcon } from 'lucide-react'
+import type { TargetStatus } from '@shared/analysis/targets'
 import { formatStatValue, statByKey } from '@shared/gamedata/stats'
 import type { Namer } from '@shared/names'
 import { Tooltip } from '@/components/ui/InfoTip'
@@ -38,13 +39,27 @@ export function CharacterSheet({
   values,
   fromBoards,
   namer,
+  refs,
   size = 380
 }: {
   values: Map<number, number>
   fromBoards: Map<number, number>
   namer: Namer
+  /** Ориентиры «в среднем у топ-игроков» по ID стата. */
+  refs?: Map<number, TargetStatus>
   size?: number
 }) {
+  const refText = (id: number) => {
+    const r = refs?.get(id)
+    if (!r) return ''
+    return `В среднем у топ-стражей: ${r.target.goals[0].value.toLocaleString('ru-RU')} — у вас ${r.next ? 'ниже' : 'не ниже'}.`
+  }
+  /** Цвет числа или рамки по ориентиру: зелёный — не ниже среднего у топ-стражей, жёлтый — ниже. */
+  const refTone = (id: number): 'ok' | 'warn' | null => {
+    const r = refs?.get(id)
+    return r ? (r.next ? 'warn' : 'ok') : null
+  }
+
   const at = (r: number, angle: number) => {
     const rad = (angle * Math.PI) / 180
     return { left: size / 2 + Math.cos(rad) * r * size, top: size / 2 + Math.sin(rad) * r * size }
@@ -104,11 +119,18 @@ export function CharacterSheet({
           const label = v ? namer.stat(v.def.id).main : a.key
           return (
             <div key={a.key} className="absolute -translate-x-1/2 -translate-y-1/2" style={pos}>
-              <Tooltip content={`${a.tip} У вас: ${v?.value ?? 0}.`}>
+              <Tooltip content={`${a.tip} У вас: ${v?.value ?? 0}. ${v ? refText(v.def.id) : ''}`}>
                 <div className="flex w-[78px] flex-col items-center text-center">
                   <Icon size={18} strokeWidth={1.6} className="text-ink-2" />
                   <span className="mt-0.5 text-[11.5px] leading-tight font-semibold text-aether">{label}</span>
-                  <span className="tnum text-[12px] text-ink">{v?.value ?? 0}</span>
+                  <span
+                    className={cn(
+                      'tnum text-[12px]',
+                      v && refTone(v.def.id) === 'warn' ? 'text-warning' : v && refTone(v.def.id) === 'ok' ? 'text-good' : 'text-ink'
+                    )}
+                  >
+                    {v?.value ?? 0}
+                  </span>
                 </div>
               </Tooltip>
             </div>
@@ -129,6 +151,7 @@ export function CharacterSheet({
                   <>
                     <b className="text-ink">{namer.stat(v.def.id).main}</b>: {v.value ?? 0}
                     {boards ? <span className="block text-ink-3">из них от досок Даэваниона: +{boards}</span> : null}
+                    {refText(v.def.id) && <span className="block text-ink-3">{refText(v.def.id)}</span>}
                     <span className="mt-1 block text-ink-3">Стат бога{deity ? ` ${deity}` : ''}: растёт от досок Даэваниона, аркан и пантеона.</span>
                   </>
                 }
@@ -136,7 +159,13 @@ export function CharacterSheet({
                 <div
                   className={cn(
                     'flex h-[52px] w-[52px] flex-col items-center justify-center rounded-full border text-center',
-                    has ? 'border-accent/45 bg-surface-2 shadow-[0_0_14px_-4px_var(--color-accent)]' : 'border-line bg-surface-2/60'
+                    !has
+                      ? 'border-line bg-surface-2/60'
+                      : refTone(v.def.id) === 'warn'
+                        ? 'border-warning/60 bg-surface-2 shadow-[0_0_14px_-4px_var(--color-warning)]'
+                        : refTone(v.def.id) === 'ok'
+                          ? 'border-good/60 bg-surface-2 shadow-[0_0_14px_-4px_var(--color-good)]'
+                          : 'border-accent/45 bg-surface-2 shadow-[0_0_14px_-4px_var(--color-accent)]'
                   )}
                 >
                   <span className={cn('tnum text-[15px] leading-none font-bold', has ? 'text-accent-2' : 'text-ink-3')}>{has ? v.value : '—'}</span>

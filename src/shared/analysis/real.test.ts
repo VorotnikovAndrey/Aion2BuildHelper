@@ -27,6 +27,12 @@ describe.skipIf(!existsSync(file))('реальные данные (samples/priva
         console.log(
           `${n.item(g.item.item, g.slot).main}: ${g.swaps.map((x) => `${ln(x.from)}(${x.from.weight}) → ${ln(x.to)}(${x.to.weight})`).join(', ') || '—'}`
         )
+      for (const t of r.statTargets) console.log(`порог ${t.target.name}: ${t.current} → ${t.next ? `${t.next.value} (${t.next.label})` : 'взят'}`)
+      for (const g of r.gear)
+        if (g.stoneSwaps.length)
+          console.log(
+            `камни ${n.item(g.item.item, g.slot).main}: ${g.stoneSwaps.map((x) => `${n.stat(x.from.stat).main}(${x.from.weight})→${n.stat(x.to).main}(${x.weight})`).join(', ')}`
+          )
       for (const c of r.arcana.cards) console.log(c.info?.ru, '+' + c.enchant, c.skills.map((s) => `${n.skill(s.skill).main}:${s.level}:${s.cls}`).join(' | '))
       for (const g of r.daevanion.goals) console.log(g.goal.name, g.done + '/' + g.required.length, 'осталось очков', g.remainingCost, 'закрыто', g.lockedCount)
       for (const s of r.skills.filter((x) => x.target))

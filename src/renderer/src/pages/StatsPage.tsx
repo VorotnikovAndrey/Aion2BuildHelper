@@ -3,6 +3,7 @@ import { Gem, Search } from 'lucide-react'
 import { guideWeights } from '@shared/analysis/weights'
 import { formatStatValue, statByKey, statDef, STAT_GROUPS } from '@shared/gamedata/stats'
 import { CharacterSheet } from '@/components/CharacterSheet'
+import { TargetBar } from '@/components/targets'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
 import { Name, WeightDots } from '@/components/game'
 import { Card } from '@/components/ui/Card'
@@ -20,6 +21,9 @@ export function StatsPage() {
   const [q, setQ] = useState('')
   const w = useMemo(() => guideWeights(guide), [guide])
   const values = useMemo(() => new Map(char.stats.map((s) => [s.stat, s.value])), [char.stats])
+  const content = report.statTargets.filter((t) => t.target.kind !== 'top')
+  const top = report.statTargets.filter((t) => t.target.kind === 'top')
+  const refs = useMemo(() => new Map(top.map((t) => [t.target.stats[0], t])), [top])
 
   const groups = useMemo(() => {
     const used = new Set<number>()
@@ -60,10 +64,35 @@ export function StatsPage() {
       <Card
         title="Показатели персонажа"
         className="mb-5"
-        hint="Как окно «Показатели персонажа» в игре: шесть характеристик в центре, вокруг — статы богов. Наведите на любой круг — там пояснение."
+        hint="Как окно «Показатели персонажа» в игре: шесть характеристик в центре, вокруг — статы богов. Рамка круга: зелёная — не ниже среднего у топ-стражей, жёлтая — ниже. Наведите на любой круг — там пояснение."
       >
-        <CharacterSheet values={values} fromBoards={report.daevanion.stats} namer={namer} />
+        <CharacterSheet values={values} fromBoards={report.daevanion.stats} namer={namer} refs={refs} />
       </Card>
+
+      {report.statTargets.length > 0 && (
+        <Card
+          title="Где хватает и к чему стремиться"
+          className="mb-5"
+          hint="Пороги для контента — сколько нужно (по отчётам игроков глобальной версии). Ориентиры — сколько в среднем у 3 916 топ-стражей. Отметка на шкале — цель; зелёное — хватает, жёлтое — не хватает."
+        >
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+            <div className="space-y-4">
+              <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Для контента (PvE)</div>
+              {content.map((t) => (
+                <TargetBar key={t.target.id} t={t} />
+              ))}
+            </div>
+            <div className="space-y-4">
+              <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Ориентир: в среднем у топ-стражей</div>
+              <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+                {top.map((t) => (
+                  <TargetBar key={t.target.id} t={t} compact />
+                ))}
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <div className="relative">

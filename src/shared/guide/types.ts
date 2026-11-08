@@ -64,6 +64,22 @@ export interface GuideSource {
   note?: string
 }
 
+/**
+ * Порог стата: сколько нужно для контента. Текущее значение — сумма статов `stats` персонажа.
+ * Пока ниже ближайшего порога, статы из `raise` (например, камни «Доп. меткость») важнее всего.
+ */
+export interface StatTarget {
+  id: string
+  name: string
+  stats: number[]
+  goals: { value: number; label: string }[]
+  /** Какие статы поднимают этот показатель (их приоритет растёт, пока порог не взят). */
+  raise?: number[]
+  /** content — сколько нужно для контента; top — сколько в среднем у топ-игроков класса (ориентир). */
+  kind?: 'content' | 'top'
+  note?: string
+}
+
 /** Рекомендуемые титулы по категориям — в порядке предпочтения (ID титулов). */
 export interface GuideTitles {
   attack?: number[]
@@ -118,6 +134,8 @@ export interface Guide {
   daevanion: { goals: DaevanionGoal[]; notes?: string }
   genus: { stats?: StatWeight[]; notes?: string }
   titles?: GuideTitles
+  /** Пороги статов для контента (меткость, крит) — по ним камни советуются с учётом ваших цифр. */
+  statTargets?: StatTarget[]
   rotation?: string[]
   tips?: GuideTip[]
   /** Собственные пункты для чек-листа («сделать один раз»). */

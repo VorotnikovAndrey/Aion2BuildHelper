@@ -10,6 +10,7 @@ import { analyzeGear, gearScore, type ItemReport } from './gear'
 import { analyzeGenus } from './genus'
 import { analyzePets, type PetsReport } from './pets'
 import { analyzeSkills, skillsScore, specsLookLikeSlots, stigmaLoadout, unexplainedLevels, type SkillReport, type UnexplainedLevel } from './skills'
+import { statTargetStatus, type TargetStatus } from './targets'
 import { analyzeTitles, type TitlesReport } from './titles'
 import type { KnownOptions } from '../gamedata/gearOptions'
 
@@ -49,6 +50,8 @@ export interface BuildReport {
   daevanion: DaevanionReport
   pets: PetsReport
   titles: TitlesReport
+  /** Пороги статов из гайда и где персонаж сейчас. */
+  statTargets: TargetStatus[]
   scores: SectionScores
   steps: NextStep[]
 }
@@ -101,6 +104,7 @@ export function analyzeBuild(char: Character, guide: Guide | null, namer: Namer,
     daevanion,
     pets,
     titles,
+    statTargets: statTargetStatus(char, guide),
     scores: { ...parts, overall },
     steps: []
   }
@@ -273,15 +277,20 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
       })
     }
   }
-  const badStones = r.gear.flatMap((i) => i.manastones.filter((m) => m.weight <= 1))
-  if (badStones.length) {
-    const kinds = [...new Set(badStones.map((m) => n.stat(m.stat).main))]
+  // Камни: во что перековывать слабые — с учётом порогов (пока меткость ниже порога, сначала в неё).
+  const stoneSwaps = r.gear.flatMap((i) => i.stoneSwaps)
+  if (stoneSwaps.length) {
+    const groups = new Map<number, typeof stoneSwaps>()
+    for (const x of stoneSwaps) groups.set(x.to, [...(groups.get(x.to) ?? []), x])
+    const sorted = [...groups.entries()].sort((a, b) => b[1].length - a[1].length)
+    const reason = sorted.find(([, list]) => list[0].reason)?.[1][0].reason
+    const kinds = [...new Set(stoneSwaps.map((x) => n.stat(x.from.stat).main))]
     steps.push({
       id: 'manastones',
       area: 'gear',
-      impact: 'low',
-      title: `Манакамни: ${badStones.length} слабых`,
-      detail: `${kinds.join(', ')} — по гайду почти бесполезны.`
+      impact: stoneSwaps.some((x) => x.from.weight <= 1) ? 'medium' : 'low',
+      title: `Камни: ${sorted.map(([to, list]) => `${list.length} → ${n.stat(to).main}`).join(', ')}`,
+      detail: `Перековать слабые: ${kinds.join(', ')}.${reason ? ` ${reason}.` : ''}`
     })
   }
 
