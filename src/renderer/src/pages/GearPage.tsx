@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { ArrowRight, Check, Pencil, Shirt } from 'lucide-react'
 import type { GearLine, ItemReport, LineSwap } from '@shared/analysis/gear'
 import { stoneInfo } from '@shared/gamedata/art'
@@ -312,60 +312,67 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
         </Pill>
       </div>
 
-      <div className="min-w-0">
-        <div className="flex flex-wrap gap-1.5">
-          {item.lines.map((l, i) => (
-            <VerdictChip
-              key={i}
-              verdict={l.verdict}
-              tip={
-                <>
-                  <b className="text-ink">{l.kind === 'stat' ? namer.stat(l.id).main : namer.skill(l.id).main}</b>
-                  {l.kind === 'skill' && <span className="block text-ink-3">Умение строкой на вещи: +{l.value} к уровню.</span>}
-                  <span className="mt-1 block">{verdictWhy(l.verdict, l.weight)}</span>
-                </>
-              }
-            >
-              {l.kind === 'stat' ? (
-                <>
-                  {namer.stat(l.id).main} <span className="tnum opacity-80">{formatStatValue(l.id, l.value)}</span>
-                </>
-              ) : (
-                <>
-                  <SkillIcon id={l.id} size={16} />
-                  {namer.skill(l.id).main} <span className="opacity-70">ур. {l.value}</span>
-                </>
-              )}
-            </VerdictChip>
-          ))}
-        </div>
+      <div className="min-w-0 space-y-2">
+        <Lines item={item} ctx={ctx} />
         <Sockets item={item} ctx={ctx} />
       </div>
 
-      <div className="min-w-0 space-y-1.5 pt-0.5">
-        {item.swaps.map((x, i) => (
-          <SwapRow key={i} swap={x} ctx={ctx} />
-        ))}
-        {item.swaps.length === 0 &&
-          (item.replace.length ? (
-            <Tooltip wide content="Эти строки гайд не ценит, но заметно лучшего стата для этого слота в данных нет — перековать при случае.">
-              <span className="text-xs text-warning">Строки не по гайду — лучшей замены на этом слоте не нашлось</span>
-            </Tooltip>
-          ) : (
-            <Tooltip wide content="Все строки — лучшее по гайду из того, что бывает на этом слоте: любая замена дала бы меньше 2 по важности.">
-              <span className="inline-flex items-center gap-1 text-xs text-good">
-                <Check size={13} strokeWidth={2.5} /> Цель достигнута
-              </span>
-            </Tooltip>
-          ))}
+      <div className="min-w-0">
+        <Target item={item} ctx={ctx} />
       </div>
     </div>
   )
 }
 
-/** Одна замена: «Блок 52 → СКР боя». */
+/** Цель по вещи в рамке: «что → на что» колонками, с выигрышем по важности; или «цель достигнута». */
+function Target({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
+  if (!item.swaps.length) {
+    const noBetter = item.replace.length > 0
+    return (
+      <Tray>
+        <TraySection
+          title="Цель"
+          tip={
+            noBetter
+              ? 'Эти строки гайд не ценит, но заметно лучшего стата для этого слота в данных нет — перековать при случае.'
+              : 'Все строки — лучшее по гайду из того, что бывает на этом слоте: любая замена дала бы меньше 2 по важности.'
+          }
+        >
+          {noBetter ? (
+            <span className="text-xs leading-relaxed text-warning">Строки не по гайду — лучшей замены на этом слоте не нашлось</span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-good">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-good text-bg">
+                <Check size={11} strokeWidth={3} />
+              </span>
+              Цель достигнута
+            </span>
+          )}
+        </TraySection>
+      </Tray>
+    )
+  }
+  return (
+    <Tray>
+      <Tooltip
+        wide
+        content="Что на что перековать: слева текущая строка, справа — важнее по гайду и бывает на этом слоте. Метка — важность «было → станет» (из 5). Сверху — то, что менять в первую очередь."
+      >
+        <div className="text-[10px] font-semibold tracking-wider text-ink-3 uppercase">Перековать · {item.swaps.length}</div>
+      </Tooltip>
+      <div className="space-y-1.5">
+        {item.swaps.map((x, i) => (
+          <SwapRow key={i} swap={x} ctx={ctx} />
+        ))}
+      </div>
+    </Tray>
+  )
+}
+
+/** Одна замена карточкой в две строки: сверху «что было», под ним — «на что» с важностью «было → станет». */
 function SwapRow({ swap, ctx }: { swap: LineSwap; ctx: Ctx }) {
   const { from, to } = swap
+  const bad = from.verdict === 'bad'
   return (
     <Tooltip
       block
@@ -376,22 +383,96 @@ function SwapRow({ swap, ctx }: { swap: LineSwap; ctx: Ctx }) {
           <b className="text-aether">{lineLabel(to, ctx)}</b> (важность {to.weight} из 5).
           <span className="mt-1 block text-ink-3">
             {to.kind === 'skill' ? 'Это умение бывает строкой на вещах этого слота.' : 'Этот стат встречается строкой на этом слоте.'}
-            {from.verdict === 'bad' ? ' Текущая строка гайду не нужна — менять в первую очередь.' : ''}
+            {bad ? ' Текущая строка гайду не нужна — менять в первую очередь.' : ''}
           </span>
         </>
       }
     >
-      <div className="flex w-full flex-wrap items-center gap-1.5 text-xs">
-        <span className={cn('line-through decoration-1', from.verdict === 'bad' ? 'text-critical' : 'text-warning')}>
+      <div className={cn('w-full rounded-lg border-l-2 bg-surface-2/50 py-1.5 pr-2 pl-2.5', bad ? 'border-critical/70' : 'border-warning/70')}>
+        <div className={cn('text-[11px] leading-snug line-through decoration-1', bad ? 'text-critical' : 'text-warning')}>
           {lineLabel(from, ctx)} <span className="tnum opacity-80">{lineValue(from)}</span>
-        </span>
-        <ArrowRight size={13} className="shrink-0 text-ink-3" />
-        <span className="inline-flex items-center gap-1 rounded-md border border-aether/40 bg-aether-soft px-2 py-0.5 font-medium text-aether">
-          {to.kind === 'skill' && <SkillIcon id={to.id} size={14} />}
-          {lineLabel(to, ctx)}
-        </span>
+        </div>
+        <div className="mt-1 flex items-center gap-1.5">
+          <ArrowRight size={13} className="shrink-0 text-ink-3" />
+          <span className="inline-flex min-w-0 items-center gap-1.5 rounded-md border border-aether/45 bg-aether-soft px-2 py-0.5 text-xs font-medium text-aether">
+            {to.kind === 'skill' && <SkillIcon id={to.id} size={14} />}
+            {lineLabel(to, ctx)}
+          </span>
+          <span className="tnum ml-auto shrink-0 rounded bg-bg/60 px-1.5 py-0.5 text-[10px] font-semibold text-ink-2">
+            {from.weight} → {to.weight}
+          </span>
+        </div>
       </div>
     </Tooltip>
+  )
+}
+
+/** Рамка в духе окна вещи: тёмная плашка с подписанными разделами. */
+function Tray({ children }: { children: ReactNode }) {
+  return <div className="flex flex-col gap-2 rounded-xl border border-line bg-bg/40 px-3 py-2">{children}</div>
+}
+
+function TraySection({ title, tip, divided, children }: { title: string; tip: string; divided?: boolean; children: ReactNode }) {
+  return (
+    <div className={cn('min-w-0', divided && 'border-t border-line pt-2')}>
+      <Tooltip content={tip} wide>
+        <div className="mb-1 text-[10px] font-semibold tracking-wider text-ink-3 uppercase">{title}</div>
+      </Tooltip>
+      <div className="flex flex-wrap gap-1.5">{children}</div>
+    </div>
+  )
+}
+
+/** Случайные строки вещи: статы и умения — отдельными разделами одной рамки. */
+function Lines({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
+  const { namer } = ctx
+  if (!item.lines.length) return null
+  const stats = item.lines.filter((l) => l.kind === 'stat')
+  const skills = item.lines.filter((l) => l.kind === 'skill')
+  const chip = (l: GearLine, i: number) => (
+    <VerdictChip
+      key={i}
+      verdict={l.verdict}
+      tip={
+        <>
+          <b className="text-ink">{lineLabel(l, ctx)}</b>
+          {l.kind === 'skill' && <span className="block text-ink-3">Умение строкой на вещи: +{l.value} к уровню.</span>}
+          <span className="mt-1 block">{verdictWhy(l.verdict, l.weight)}</span>
+        </>
+      }
+    >
+      {l.kind === 'stat' ? (
+        <>
+          {namer.stat(l.id).main} <span className="tnum opacity-80">{formatStatValue(l.id, l.value)}</span>
+        </>
+      ) : (
+        <>
+          <SkillIcon id={l.id} size={16} />
+          {namer.skill(l.id).main} <span className="opacity-70">ур. {l.value}</span>
+        </>
+      )}
+    </VerdictChip>
+  )
+  return (
+    <Tray>
+      {stats.length > 0 && (
+        <TraySection
+          title={`Доп. характеристики · ${stats.length}`}
+          tip="Случайные строки вещи — в окне вещи это «Доп. характеристики». Их можно перековать. Цвет — польза стата по гайду, наведите на строку для пояснения."
+        >
+          {stats.map(chip)}
+        </TraySection>
+      )}
+      {skills.length > 0 && (
+        <TraySection
+          divided={stats.length > 0}
+          title={`Умения · ${skills.length}`}
+          tip="Строки «+N к уровню умения». Цвет — нужно ли это умение по гайду: такие строки помогают дотянуть главные умения до ур. 16 и 20."
+        >
+          {skills.map(chip)}
+        </TraySection>
+      )}
+    </Tray>
   )
 }
 
@@ -403,52 +484,49 @@ function Sockets({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
   const god = item.godstones[0]
   const godDef = god ? godstoneDef(god) : undefined
   return (
-    <div className="mt-2.5 flex flex-col gap-2 rounded-xl border border-line bg-bg/40 px-3 py-2">
+    <Tray>
       {item.manastones.length > 0 && (
-        <div className="min-w-0">
-          <Tooltip
-            content={
-              soul
-                ? 'Духовные камни — гнёзда украшений. Цвет — польза стата по гайду, точки — сила строки (1–3).'
-                : 'Камни маны — гнёзда оружия и брони. Цвет — польза стата по гайду, точки — сила строки (1–3).'
-            }
-          >
-            <div className="mb-1 text-[10px] font-semibold tracking-wider text-ink-3 uppercase">
-              {soul ? 'Духовные камни' : 'Камни маны'} · {item.manastones.length}
-            </div>
-          </Tooltip>
-          <div className="flex flex-wrap gap-1.5">
-            {item.manastones.map((m, i) => {
-              const info = stoneInfo(m.stone)
-              return (
-                <VerdictChip
-                  key={i}
-                  verdict={m.verdict}
-                  className="gap-1 rounded-full py-0.5 pr-2.5 pl-0.5 text-[11px]"
-                  tip={
-                    <>
-                      <b className="text-ink">{info.ru}</b>
-                      <span className="block">
-                        {namer.stat(m.stat).main}, сила строки {m.grade} из 3.
-                      </span>
-                      <span className="mt-1 block">
-                        {verdictWhy(m.verdict, m.weight)} ({VERDICT_TEXT[m.verdict]})
-                      </span>
-                    </>
-                  }
-                >
-                  <StoneIcon stoneId={m.stone} size={18} className="rounded-full" />
-                  {namer.stat(m.stat).main}
-                  <span className="opacity-60">{'•'.repeat(m.grade)}</span>
-                </VerdictChip>
-              )
-            })}
-          </div>
-        </div>
+        <TraySection
+          title={`${soul ? 'Духовные камни' : 'Камни маны'} · ${item.manastones.length}`}
+          tip={
+            soul
+              ? 'Духовные камни — гнёзда украшений. Цвет — польза стата по гайду, точки — сила строки (1–3).'
+              : 'Камни маны — гнёзда оружия и брони. Цвет — польза стата по гайду, точки — сила строки (1–3).'
+          }
+        >
+          {item.manastones.map((m, i) => {
+            const info = stoneInfo(m.stone)
+            return (
+              <VerdictChip
+                key={i}
+                verdict={m.verdict}
+                className="gap-1 rounded-full py-0.5 pr-2.5 pl-0.5 text-[11px]"
+                tip={
+                  <>
+                    <b className="text-ink">{info.ru}</b>
+                    <span className="block">
+                      {namer.stat(m.stat).main}, сила строки {m.grade} из 3.
+                    </span>
+                    <span className="mt-1 block">
+                      {verdictWhy(m.verdict, m.weight)} ({VERDICT_TEXT[m.verdict]})
+                    </span>
+                  </>
+                }
+              >
+                <StoneIcon stoneId={m.stone} size={18} className="rounded-full" />
+                {namer.stat(m.stat).main}
+                <span className="opacity-60">{'•'.repeat(m.grade)}</span>
+              </VerdictChip>
+            )
+          })}
+        </TraySection>
       )}
       {item.godstoneSlots > 0 && (
-        <div className={cn('min-w-0', item.manastones.length > 0 && 'border-t border-line pt-2')}>
-          <div className="mb-1 text-[10px] font-semibold tracking-wider text-ink-3 uppercase">Священный камень</div>
+        <TraySection
+          divided={item.manastones.length > 0}
+          title="Священный камень"
+          tip="Гнездо священного камня: в оружии и наручах по одному. Камень даёт шанс дополнительного эффекта при атаке."
+        >
           {god ? (
             <Tooltip
               wide
@@ -472,8 +550,8 @@ function Sockets({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
               </span>
             </Tooltip>
           )}
-        </div>
+        </TraySection>
       )}
-    </div>
+    </Tray>
   )
 }
