@@ -37,12 +37,14 @@
   --color-critical-soft: color-mix(in srgb, var(--color-critical) 14%, transparent);
   --color-info: #58a6ff;
 
-  /* Грейды предметов — как в игре */
-  --color-grade-mythic: #ec7c3f;
-  --color-grade-unique: #e3b341;
-  --color-grade-epic: #b383ff;
-  --color-grade-rare: #4aa8ff;
-  --color-grade-common: #9aa3b2;
+  /* Грейды предметов — цвета названий из игры */
+  --color-grade-mythic: #ff4f6d;
+  --color-grade-epic: #ff7a1f;
+  --color-grade-unique: #ffd02b;
+  --color-grade-legend: #4ba3ff;
+  --color-grade-rare: #34dc5f;
+  --color-grade-common: #c3c6cc;
+  --color-grade-special: #22e6cc;
 
   /* Фон карт аркан: «магия» — холодный, «жизнь» — тёплый */
   --color-card-magic-1: #1b2a44;
@@ -121,6 +123,51 @@ textarea,
 /* Цифры одинаковой ширины — колонки чисел не прыгают */
 .tnum {
   font-variant-numeric: tabular-nums;
+}
+
+/* Ячейка предмета как в инвентаре игры: подложка грейда, арт, тонкая светлая кромка и тень */
+.game-slot {
+  position: relative;
+  overflow: hidden;
+  border-radius: 7px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.45);
+}
+.game-slot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.16),
+    inset 0 -12px 14px -12px rgb(0 0 0 / 0.7);
+  pointer-events: none;
+}
+
+/* Цифры поверх арта (заточка): белые с тёмной обводкой, как в игре */
+.game-num {
+  color: var(--color-ink);
+  font-weight: 700;
+  text-shadow:
+    0 0 2px rgb(0 0 0 / 0.95),
+    0 0 3px rgb(0 0 0 / 0.9),
+    0 1px 2px rgb(0 0 0 / 0.9);
+}
+
+/* Плашка заточки арканы — тёмный диск с кромкой, как в окне аркан */
+.game-enchant {
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 35%, var(--color-surface-3), var(--color-bg) 70%);
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, var(--color-accent) 70%, transparent),
+    0 2px 8px rgb(0 0 0 / 0.6);
+}
+
+/* Свечение карт аркан: «магия» — холодное, «жизнь» — золотое */
+.card-glow-magic {
+  filter: drop-shadow(0 6px 18px color-mix(in srgb, var(--color-aether) 28%, transparent));
+}
+.card-glow-vigor {
+  filter: drop-shadow(0 6px 18px color-mix(in srgb, var(--color-accent) 30%, transparent));
 }
 
 /* Мягкое свечение для золотых рамок (арканы, активный пункт меню) */

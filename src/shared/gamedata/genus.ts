@@ -1,4 +1,4 @@
-// Познание рода (Genus Insight): пять родов питомцев, у каждого — ячейки со случайными статами.
+// Знание о видах (Genus Insight): пять родов питомцев, у каждого — ячейки со случайными статами.
 // Уровень рода растёт с коллекцией питомцев этого рода; ячейки открываются с уровнем.
 
 export interface GenusDef {
@@ -8,10 +8,10 @@ export interface GenusDef {
 }
 
 export const GENUSES: GenusDef[] = [
-  { key: 'intellect', ru: 'Когни', en: 'Cogni' },
-  { key: 'feral', ru: 'Фера', en: 'Fera' },
-  { key: 'nature', ru: 'Натура', en: 'Natura' },
-  { key: 'trans', ru: 'Вариан', en: 'Varian' },
+  { key: 'intellect', ru: 'Разум', en: 'Cogni' },
+  { key: 'feral', ru: 'Дикие', en: 'Fera' },
+  { key: 'nature', ru: 'Природа', en: 'Natura' },
+  { key: 'trans', ru: 'Мутанты', en: 'Varian' },
   { key: 'special', ru: 'Особый', en: 'Special' }
 ]
 

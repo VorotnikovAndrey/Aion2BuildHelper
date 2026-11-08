@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { Axe, Crosshair, Flame, HeartPulse, Music, Shield, Sparkles, Swords, type LucideIcon } from 'lucide-react'
 import type { Impact } from '@shared/analysis/build'
 import type { Verdict } from '@shared/analysis/weights'
+import { classArt } from '@shared/gamedata/art'
 import { GRADES, type ItemGrade } from '@shared/gamedata/slots'
 import type { Label } from '@shared/names'
 import type { ClassKey } from '@shared/types'
@@ -58,10 +59,12 @@ export function WishChip({ children, tip }: { children: ReactNode; tip?: ReactNo
 
 const GRADE_COLOR: Record<ItemGrade, string> = {
   mythic: 'text-grade-mythic',
-  unique: 'text-grade-unique',
   epic: 'text-grade-epic',
+  unique: 'text-grade-unique',
+  legend: 'text-grade-legend',
   rare: 'text-grade-rare',
   common: 'text-grade-common',
+  special: 'text-grade-special',
   unknown: 'text-ink'
 }
 
@@ -76,10 +79,12 @@ export function GradeText({ grade, children, className }: { grade: ItemGrade; ch
 export const gradeBorder = (grade: ItemGrade) =>
   ({
     mythic: 'border-grade-mythic/60',
-    unique: 'border-grade-unique/60',
     epic: 'border-grade-epic/60',
+    unique: 'border-grade-unique/60',
+    legend: 'border-grade-legend/60',
     rare: 'border-grade-rare/60',
     common: 'border-grade-common/40',
+    special: 'border-grade-special/60',
     unknown: 'border-line-strong'
   })[grade]
 
@@ -108,7 +113,21 @@ const CLASS_ICON: Record<ClassKey, LucideIcon> = {
   chanter: Music
 }
 
+/** Эмблема класса из игры; если её нет — значок по смыслу. */
 export function ClassIcon({ cls, size = 16, className }: { cls: ClassKey | null; size?: number; className?: string }) {
+  const src = classArt(cls)
+  if (src)
+    return (
+      <img
+        src={src}
+        alt=""
+        width={size}
+        height={size}
+        draggable={false}
+        className={cn('shrink-0 object-contain', className)}
+        style={{ width: size, height: size }}
+      />
+    )
   const Icon = cls ? CLASS_ICON[cls] : Shield
   return <Icon size={size} className={className} />
 }

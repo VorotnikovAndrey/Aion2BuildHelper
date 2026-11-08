@@ -12,11 +12,11 @@ export interface SlotDef {
 
 export const SLOTS: SlotDef[] = [
   { slot: 1, key: 'weapon', ru: 'Оружие', en: 'Weapon', group: 'weapon' },
-  { slot: 2, key: 'guarder', ru: 'Гарда', en: 'Guard', group: 'weapon' },
+  { slot: 2, key: 'guarder', ru: 'Наручи', en: 'Guard', group: 'weapon' },
   { slot: 3, key: 'helmet', ru: 'Шлем', en: 'Helmet', group: 'armor' },
   { slot: 4, key: 'shoulder', ru: 'Наплечники', en: 'Pauldrons', group: 'armor' },
   { slot: 5, key: 'torso', ru: 'Нагрудник', en: 'Top', group: 'armor' },
-  { slot: 6, key: 'pants', ru: 'Поножи', en: 'Legs', group: 'armor' },
+  { slot: 6, key: 'pants', ru: 'Набедренники', en: 'Legs', group: 'armor' },
   { slot: 7, key: 'gloves', ru: 'Перчатки', en: 'Gloves', group: 'armor' },
   { slot: 8, key: 'boots', ru: 'Сапоги', en: 'Shoes', group: 'armor' },
   { slot: 19, key: 'cape', ru: 'Плащ', en: 'Cloak', group: 'armor' },
@@ -62,21 +62,24 @@ export const SLOT_GROUPS: { id: SlotGroup; ru: string }[] = [
 export const SLOT_ORDER = SLOTS.map((s) => s.slot)
 
 /**
- * Грейд предмета по ID. В ID экипировки третья с конца группа — грейд:
- * 210330053 → «3», у аркан 810130002 → «3». Чем меньше цифра, тем выше грейд.
+ * Грейд предмета. Ключи — как во внутренних данных игры (так же названы рамки иконок):
+ * Common серый, Rare зелёный, Legend синий, Unique золотой, Epic оранжевый, Mythic красный, Special бирюзовый.
+ * В ID экипировки пятая цифра — грейд: 210330053 → «3» (уникальный). Чем меньше цифра, тем выше грейд.
  */
-export type ItemGrade = 'mythic' | 'unique' | 'epic' | 'rare' | 'common' | 'unknown'
+export type ItemGrade = 'mythic' | 'epic' | 'unique' | 'legend' | 'rare' | 'common' | 'special' | 'unknown'
 
-export const GRADES: Record<ItemGrade, { ru: string; en: string; tone: string }> = {
-  mythic: { ru: 'Мифический', en: 'Mythic', tone: 'mythic' },
-  unique: { ru: 'Уникальный', en: 'Unique', tone: 'unique' },
-  epic: { ru: 'Эпический', en: 'Epic', tone: 'epic' },
-  rare: { ru: 'Редкий', en: 'Rare', tone: 'rare' },
-  common: { ru: 'Обычный', en: 'Common', tone: 'common' },
-  unknown: { ru: '—', en: '—', tone: 'common' }
+export const GRADES: Record<ItemGrade, { ru: string; en: string }> = {
+  mythic: { ru: 'Мифический', en: 'Mythic' },
+  epic: { ru: 'Эпический', en: 'Epic' },
+  unique: { ru: 'Уникальный', en: 'Unique' },
+  legend: { ru: 'Легендарный', en: 'Legend' },
+  rare: { ru: 'Редкий', en: 'Rare' },
+  common: { ru: 'Обычный', en: 'Common' },
+  special: { ru: 'Особый', en: 'Special' },
+  unknown: { ru: '—', en: '—' }
 }
 
 export function gradeOfItem(itemId: number): ItemGrade {
   const digit = Math.floor(itemId / 10000) % 10
-  return ({ 2: 'mythic', 3: 'unique', 4: 'epic', 5: 'rare', 6: 'common' } as Record<number, ItemGrade>)[digit] ?? 'unknown'
+  return ({ 1: 'mythic', 2: 'epic', 3: 'unique', 4: 'legend', 5: 'rare', 6: 'common' } as Record<number, ItemGrade>)[digit] ?? 'unknown'
 }

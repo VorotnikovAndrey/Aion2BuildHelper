@@ -32,14 +32,14 @@ export interface DaevanionBoard {
 
 const BOARD_RU: Record<string, string> = {
   Nezekan: 'Неджакан',
-  Zikel: 'Зикель',
-  Vaizel: 'Вайзель',
+  Zikel: 'Джикел',
+  Vaizel: 'Байзел',
   Triniel: 'Триниэль',
   Ariel: 'Ариэль',
-  Azphel: 'Азфель'
+  Azphel: 'Асфель'
 }
 
-/** Чем оплачиваются узлы досок: первые четыре — кристаллы Даэваниона, Ариэль и Азфель — свои. */
+/** Чем оплачиваются узлы досок: первые четыре — кристаллы Даэваниона, Ариэль и Асфель — свои. */
 export const BOARD_CURRENCY: Record<string, string> = {
   Nezekan: 'Кристаллы Даэваниона',
   Zikel: 'Кристаллы Даэваниона',

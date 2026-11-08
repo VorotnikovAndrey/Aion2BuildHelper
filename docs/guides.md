@@ -14,7 +14,7 @@
 | `manastones[]` | Веса статов для манакамней (иначе — общие) |
 | `arcana` | `attack[]` и `passive[]` — умения по важности; `useless[]`; `preferredSet` (`magic` / `vigor`); `notes` |
 | `daevanion.goals[]` | Цели: `name`, `description`, `skills[]` — у каких умений брать узлы «+1», `boards[]` — на каких досках (21–26 у стража), `nodes[]` — конкретные узлы |
-| `genus.stats[]` | Веса статов для Познания рода (иначе — общие) |
+| `genus.stats[]` | Веса статов для Знания о видах (иначе — общие) |
 | `rotation[]`, `tips[]`, `checklist[]` | Ротация по шагам, советы `{ title, text }`, разовые дела `{ id, text }` |
 
 ### Специализации

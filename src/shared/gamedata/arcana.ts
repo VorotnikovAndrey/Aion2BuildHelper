@@ -1,6 +1,6 @@
 // Арканы — карты в слотах 41–45. Как они устроены (по данным клиента, см. docs/game-mechanics.md):
 //   • 5 типов карт; у каждого типа свой пул умений класса (Грааль — все 22, остальные — 5–6);
-//   • грейд карты = число разных умений на ней: обычная 1, редкая 2, эпическая 3, уникальная 4;
+//   • грейд карты = число разных умений на ней: обычная 1, редкая 2, легендарная 3, уникальная 4;
 //   • заточка до +2 / +3 / +4 / +5 (по грейду); каждая заточка даёт +1 случайному умению карты, поровну;
 //   • потолок умения на карте — ур. 4;
 //   • у каждой карты главный эффект — стат божества; карты «магии» и «жизни» собираются в два сета.
@@ -10,7 +10,7 @@ import poolsJson from './generated/arcana-pools.json'
 
 export type ArcanaType = 'chalice' | 'parchment' | 'compass' | 'bell' | 'mirror'
 export type ArcanaVariant = 'magic' | 'vigor'
-export type ArcanaGrade = 'unique' | 'epic' | 'rare' | 'common'
+export type ArcanaGrade = 'unique' | 'legend' | 'rare' | 'common'
 
 export const ARCANA_TYPES: { type: ArcanaType; slot: number; ru: string; en: string; pool: 'all' | 'attack' | 'passive' }[] = [
   { type: 'chalice', slot: 41, ru: 'Грааль', en: 'Chalice', pool: 'all' },
@@ -22,7 +22,7 @@ export const ARCANA_TYPES: { type: ArcanaType; slot: number; ru: string; en: str
 
 export const ARCANA_GRADES: Record<ArcanaGrade, { ru: string; skills: number; maxEnchant: number; mainStat: number }> = {
   unique: { ru: 'Уникальная', skills: 4, maxEnchant: 5, mainStat: 20 },
-  epic: { ru: 'Эпическая', skills: 3, maxEnchant: 4, mainStat: 16 },
+  legend: { ru: 'Легендарная', skills: 3, maxEnchant: 4, mainStat: 16 },
   rare: { ru: 'Редкая', skills: 2, maxEnchant: 3, mainStat: 12 },
   common: { ru: 'Обычная', skills: 1, maxEnchant: 2, mainStat: 8 }
 }
@@ -41,13 +41,13 @@ const MAIN_EFFECT: Record<ArcanaType, Record<ArcanaVariant, string>> = {
 
 export const ARCANA_SETS: Record<ArcanaVariant, { ru: string; en: string; bonus2: string; bonus4: string }> = {
   magic: {
-    ru: 'Магический доспех',
+    ru: 'Магические доспехи',
     en: 'Magic Armor',
     bonus2: '+1 500 ОМ, когда ОМ ≤ 20% (раз в 30 с)',
     bonus4: '+1 000 ЗЩТ в PvE, когда ОМ ≥ 50%'
   },
   vigor: {
-    ru: 'Первобытная сила',
+    ru: 'Рождение жизни',
     en: 'Primal Vigor',
     bonus2: '+60 АТК в PvE, когда ОЗ ≥ 70%',
     bonus4: '+150 АТК в PvE, когда ОЗ ≥ 70%'
@@ -65,7 +65,7 @@ export interface ArcanaInfo {
 
 /**
  * Карта по ID предмета: 81 TT G 000V — TT тип (01 Грааль … 05 Зеркало),
- * G грейд (3 уникальная, 4 эпическая, 5 редкая, 6 обычная), V вариант (1 жизни, 2 магии).
+ * G грейд (3 уникальная, 4 легендарная, 5 редкая, 6 обычная), V вариант (1 жизни, 2 магии).
  */
 export function arcanaInfo(itemId: number): ArcanaInfo | null {
   if (Math.floor(itemId / 10_000_000) !== 81) return null
@@ -73,7 +73,7 @@ export function arcanaInfo(itemId: number): ArcanaInfo | null {
   const g = Math.floor(itemId / 10_000) % 10
   const v = itemId % 10
   const type = ARCANA_TYPES[t - 1]
-  const grade = ({ 3: 'unique', 4: 'epic', 5: 'rare', 6: 'common' } as Record<number, ArcanaGrade>)[g]
+  const grade = ({ 3: 'unique', 4: 'legend', 5: 'rare', 6: 'common' } as Record<number, ArcanaGrade>)[g]
   const variant: ArcanaVariant | undefined = v === 1 ? 'vigor' : v === 2 ? 'magic' : undefined
   if (!type || !grade || !variant) return null
   return {

@@ -311,7 +311,7 @@ function StatsSection({ g, set }: SectionProps) {
           items={[
             { id: 'stats', label: 'Общие (шмот)' },
             { id: 'manastones', label: 'Манакамни' },
-            { id: 'genus', label: 'Познание рода' }
+            { id: 'genus', label: 'Знание о видах' }
           ]}
         />
       }

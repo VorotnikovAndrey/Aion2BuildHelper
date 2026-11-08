@@ -1,4 +1,4 @@
-// Познание рода: каждая ячейка — случайный стат; сверяем с приоритетами гайда.
+// Знание о видах: каждая ячейка — случайный стат; сверяем с приоритетами гайда.
 
 import { GENUSES, genusDef, genusOptions, type GenusDef } from '../gamedata/genus'
 import type { Guide } from '../guide/types'

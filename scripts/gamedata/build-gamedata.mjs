@@ -3,8 +3,8 @@
 // Откуда что берётся (подробно — docs/data-sources.md):
 //   • статы (id → ключ, английское название, категория) — из локального файла оверлея Questlog
 //     %APPDATA%/Questlog/aion-2/game-data-v2.json (он лежит на диске у каждого, кто ставил оверлей);
-//   • умения всех классов, специализации, доски Даэваниона, пулы умений аркан — с публичных страниц
-//     metabot.gg (база, собранная из клиента глобальной версии игры).
+//   • умения всех классов, специализации, доски Даэваниона, пулы умений аркан, титулы — с публичных
+//     страниц metabot.gg (база, собранная из клиента глобальной версии игры).
 //
 // Скачанные страницы кэшируются в .cache/gamedata (не в git), между запросами — пауза,
 // чтобы не нагружать чужой сайт. Повторный запуск без --refresh берёт всё из кэша.
@@ -269,6 +269,53 @@ async function buildIcons(skills, classes) {
   console.log('✓ иконки: скачано новых', count)
 }
 
+// ───────────────────────── Титулы ─────────────────────────
+
+/**
+ * Таблица всех титулов: ID, грейд, категория, бонус при ношении и «эффект при наличии».
+ * Названия статов на metabot — официальные английские, поэтому они переводятся в наши ID статов.
+ */
+async function buildTitles() {
+  const html = await page('/titles')
+  const stats = await readJsonSafe('stats.json')
+  const byEn = new Map((Array.isArray(stats) ? stats : []).map((s) => [s.en.toLowerCase(), s]))
+  const CATEGORY = { Offensive: 'attack', Defensive: 'defense', Utility: 'utility' }
+  const RACE = { Elyos: 'light', Asmodians: 'dark' }
+  const parseStats = (text) =>
+    decode(text)
+      .split(', ')
+      .map((part) => part.trim().match(/^(.+?) \+([\d.,]+)(%?)$/))
+      .filter(Boolean)
+      .map((m) => {
+        const def = byEn.get(m[1].toLowerCase())
+        if (!def) return null
+        const n = Number(m[2].replace(/,/g, ''))
+        return [def.id, def.percent ? Math.round(n * 100) : n]
+      })
+      .filter(Boolean)
+  const titles = []
+  for (const row of html.matchAll(/<tr><th scope="row">([\s\S]*?)<\/tr>/g)) {
+    const r = row[1]
+    const id = r.match(/own:t:(\d+)" data-g="(\w+)"/)
+    const name = r.match(/nameText"[^>]*>([^<]*)</)
+    const tds = [...r.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((m) => m[1].replace(/<[^>]+>/g, ''))
+    if (!id || !name || tds.length < 6) continue
+    titles.push({
+      id: Number(id[1]),
+      en: decode(name[1]),
+      grade: id[2].toLowerCase(),
+      category: CATEGORY[tds[2]] ?? 'utility',
+      race: RACE[tds[1]] ?? 'both',
+      equip: parseStats(tds[3]),
+      collection: parseStats(tds[4]),
+      source: decode(tds[5])
+    })
+  }
+  titles.sort((a, b) => a.id - b.id)
+  await writeJson('titles.json', titles)
+  console.log('✓ титулы:', titles.length)
+}
+
 // ───────────────────────── Вспомогательное ─────────────────────────
 
 async function writeJson(name, data) {
@@ -292,4 +339,5 @@ await buildArcanaPools(skills)
 await buildSpecs(skills, wanted)
 for (const cls of wanted) await buildDaevanion(cls)
 await buildIcons(skills, wanted)
+await buildTitles()
 console.log('Готово →', OUT)

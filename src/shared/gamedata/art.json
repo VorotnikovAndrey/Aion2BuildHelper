@@ -1,0 +1,80 @@
+{
+  "$comment": "Арт игры. Пути — относительно публичного CDN Questlog (cdn.questlog.gg/aion-2/), собраны вручную со страницы билда персонажа и окон игры (8 ноября 2026). Файлы скачивает npm run art в src/renderer/public/art/<группа>/<имя файла строчными>. Править руками можно: это не сгенерированный файл.",
+  "base": "https://cdn.questlog.gg/aion-2/",
+  "items": {
+    "110230096": { "ru": "Блестящий длинный меч Короля истинных драконов", "icon": "assets/Game/UI/Resource/Texture/Item/Weapon/Icon_WP_SW_0036_T05.webp" },
+    "115030053": { "ru": "Наручи Нуакума", "icon": "assets/Game/UI/Resource/Texture/Item/Accessory/Icon_Weapon_Guarder_L_012.webp" },
+    "210130053": { "ru": "Нагрудник Нуакума", "icon": "assets/Game/UI/Resource/Texture/Item/Armor/Icon_Equip_AR_L_Idris_01_Torso.webp" },
+    "210230053": { "ru": "Набедренники Нуакума", "icon": "assets/Game/UI/Resource/Texture/Item/Armor/Icon_Equip_AR_L_Idris_01_Pants.webp" },
+    "210330053": { "ru": "Шлем Нуакума", "icon": "assets/Game/UI/Resource/Texture/Item/Armor/Icon_Equip_AR_L_Idris_01_Helmet.webp" },
+    "210430053": { "ru": "Наплечники Нуакума", "icon": "assets/Game/UI/Resource/Texture/Item/Armor/Icon_Equip_AR_L_Idris_01_Shoulder.webp" },
+    "210530053": { "ru": "Перчатки Нуакума", "icon": "assets/Game/UI/Resource/Texture/Item/Armor/Icon_Equip_AR_L_Idris_01_Gloves.webp" },
+    "210630053": { "ru": "Сапоги Нуакума", "icon": "assets/Game/UI/Resource/Texture/Item/Armor/Icon_Equip_AR_L_Idris_01_Boots.webp" },
+    "210730053": { "ru": "Мантия Нуакума", "icon": "assets/Game/UI/Resource/Texture/Item/Armor/Icon_Equip_AR_L_Idris_01_Cape.webp" },
+    "215230001": { "ru": "Благородный пояс", "icon": "assets/Game/UI/Resource/Texture/Item/Accessory/Icon_Acc_Belt_C_022.webp" },
+    "310130051": { "ru": "Ожерелье разъяренной Кромед", "icon": "assets/Game/UI/Resource/Texture/Item/Accessory/Icon_ACC_NL_0053.webp" },
+    "310230053": { "ru": "Серьги разъяренной Кромед", "icon": "assets/Game/UI/Resource/Texture/Item/Accessory/Icon_ACC_ER_0053.webp" },
+    "310330053": { "ru": "Кольцо разъяренной Кромед", "icon": "assets/Game/UI/Resource/Texture/Item/Accessory/Icon_ACC_Ring_0053.webp" },
+    "310430046": { "ru": "Браслет пробуждения", "icon": "assets/Game/UI/Resource/Texture/Item/Accessory/Icon_Acc_Bracelet_R_027.webp" },
+    "310440017": { "ru": "Браслет паломника", "icon": "assets/Game/UI/Resource/Texture/Item/Accessory/Icon_ACC_Bracelet_0071.webp" },
+    "310900001": { "ru": "Руна столкновения", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/Icon_Acc_Rune_R_002.webp", "grade": "special" },
+    "311030001": { "ru": "Амулет откровения", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/Icon_Item_Craft_Conversion_Crystal_L_lv5_01.webp" }
+  },
+  "frames": {
+    "common": "common/icon_backgrounds/UT_SlotGrade_Common.webp",
+    "rare": "common/icon_backgrounds/UT_SlotGrade_Rare.webp",
+    "legend": "common/icon_backgrounds/UT_SlotGrade_Legend.webp",
+    "unique": "common/icon_backgrounds/UT_SlotGrade_Unique.webp",
+    "epic": "common/icon_backgrounds/UT_SlotGrade_Epic.webp",
+    "mythic": "common/icon_backgrounds/UT_SlotGrade_Mythic.webp",
+    "special": "common/icon_backgrounds/UT_SlotGrade_Special.webp"
+  },
+  "stones": {
+    "plain": "assets/Game/UI/Resource/Texture/Item/ETC/Icon_Usable_MagicStone_a_001.webp",
+    "manaMid": "assets/Game/UI/Resource/Texture/Item/ETC/Icon_Item_Usable_Enchant_MagicStone_A_c_002.webp",
+    "manaHigh": "assets/Game/UI/Resource/Texture/Item/ETC/Icon_Item_Usable_Enchant_MagicStone_A_c_003.webp",
+    "soulMid": "assets/Game/UI/Resource/Texture/Item/ETC/Icon_Item_Usable_Enchant_SoulStone_A_c_002.webp",
+    "soulHigh": "assets/Game/UI/Resource/Texture/Item/ETC/Icon_Item_Usable_Enchant_SoulStone_A_c_003.webp"
+  },
+  "arcana": {
+    "frame": "common/arcana_card_decoration.webp",
+    "enchant": "assets/Game/UI/Resource/Sprite/FWindow_Arcana/UT_FWindow_Arcana_Enchant_BG_Sprite.webp",
+    "cards": "assets/Game/UI/Resource/Texture/Icon_Arcana/Icon_Arcana_Card_{Type}_u_{Set}.webp",
+    "tabs": "assets/Game/UI/Resource/Sprite/FWindow_Arcana/UT_FWindow_Arcana_SubTab_{Type}_Sprite.webp",
+    "types": ["Grail", "Parchment", "Compass", "Bell", "Mirror"],
+    "sets": { "vigor": "PveSet2", "magic": "DefenceSet2" }
+  },
+  "titleEmblems": {
+    "attack": "assets/Game/UI/Resource/Sprite/FWindow_Title/UT_FWindow_Title_Icon_Category_First_On_Sprite.webp",
+    "defense": "assets/Game/UI/Resource/Sprite/FWindow_Title/UT_FWindow_Title_Icon_Category_Second_On_Sprite.webp",
+    "utility": "assets/Game/UI/Resource/Sprite/FWindow_Title/UT_FWindow_Title_Icon_Category_Third_On_Sprite.webp"
+  },
+  "pantheonSlots": {
+    "colossus": "assets/Game/UI/Resource/Sprite/FWindow_Pantheon/UT_FWindow_Pantheon_SlotBG_1_Sprite.webp",
+    "statue": "assets/Game/UI/Resource/Sprite/FWindow_Pantheon/UT_FWindow_Pantheon_SlotBG_2_Sprite.webp",
+    "painting": "assets/Game/UI/Resource/Sprite/FWindow_Pantheon/UT_FWindow_Pantheon_SlotBG_3_Sprite.webp"
+  },
+  "pantheon": {
+    "9": { "ru": "Гильдия бриза", "grade": "rare", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_pic_L_r_NPC_F_ShugoA_01.webp" },
+    "43": { "ru": "Портрет Тейны", "grade": "legend", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_pic_L_l_TeinaFrame_01.webp" },
+    "54": { "ru": "Драупнир", "grade": "unique", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_pic_A_u_Draupnir.webp" },
+    "57": { "ru": "Эксперт кузнечного дела", "grade": "common", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_pic_L_c_NPC_F_Master_01.webp" },
+    "61": { "ru": "Эксперт извлечения эссенции", "grade": "common", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_pic_L_c_NPC_M_Master_01.webp" },
+    "119": { "ru": "Логово свирепого рога", "grade": "unique", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_pic_A_u_HornCave.webp" },
+    "1000": { "ru": "Возвышенный Бакрам", "grade": "unique", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_statueS_A_u_MOB_Bakarma_02.webp" },
+    "1001": { "ru": "Кибелиск", "grade": "common", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_statueS_L_c_TeleportArtifact_L_01.webp" },
+    "1021": { "ru": "Артефакт вечности", "grade": "rare", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_statueS_A_r_SEQ_PortableArtifact_01.webp" },
+    "1023": { "ru": "Зеркало Асара", "grade": "legend", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_statueS_A_l_NPC_AsharMir_01.webp" },
+    "5015": { "ru": "Воплощенное защитное перо", "grade": "rare", "icon": "assets/Game/UI/Resource/Texture/Item/ETC/icon_AD_statueL_A_r_MOB_Protect_01.webp" }
+  },
+  "classes": {
+    "gladiator": "assets/Game/UI/Resource/Texture/Icon/UT_Class_Gladiator_Large.webp",
+    "templar": "assets/Game/UI/Resource/Texture/Icon/UT_Class_Templar_Large.webp",
+    "assassin": "assets/Game/UI/Resource/Texture/Icon/UT_Class_Assassin_Large.webp",
+    "ranger": "assets/Game/UI/Resource/Texture/Icon/UT_Class_Ranger_Large.webp",
+    "sorcerer": "assets/Game/UI/Resource/Texture/Icon/UT_Class_Sorcerer_Large.webp",
+    "spiritmaster": "assets/Game/UI/Resource/Texture/Icon/UT_Class_Elementalist_Large.webp",
+    "cleric": "assets/Game/UI/Resource/Texture/Icon/UT_Class_Cleric_Large.webp",
+    "chanter": "assets/Game/UI/Resource/Texture/Icon/UT_Class_Chanter_Large.webp"
+  }
+}

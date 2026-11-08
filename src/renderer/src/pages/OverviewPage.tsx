@@ -7,6 +7,8 @@ import { describeChange } from '@shared/analysis/history'
 import { classInfo, RACES } from '@shared/gamedata/classes'
 import { ARCANA_TYPES } from '@shared/gamedata/arcana'
 import { MODE_LABEL } from '@shared/guide/types'
+import { ArcanaCardArt, ItemIcon, TitleEmblem } from '@/components/art'
+import { titleName } from '@/components/collections'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
 import { ClassIcon, ImpactPill } from '@/components/game'
 import { Button } from '@/components/ui/Button'
@@ -36,7 +38,7 @@ const SCORE_TIP: Record<string, string> = {
   Даэванион: 'доля нужных узлов досок, взятых по целям гайда.',
   Шмот: 'средняя польза строк на вещах по весам гайда (75%) и манакамни (25%).',
   Арканы: 'нужные умения на картах (70%) и заточка (30%).',
-  'Познание рода': 'средняя польза статов в ячейках рода по весам гайда.'
+  'Знание о видах': 'средняя польза статов в ячейках рода по весам гайда.'
 }
 
 const AREA_ICON: Record<StepArea, typeof Swords> = {
@@ -61,9 +63,11 @@ export function OverviewPage() {
         <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
         <div className="relative flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <span className="glow-accent flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-3 text-accent">
-              <ClassIcon cls={char.cls} size={30} />
-            </span>
+            <Tooltip content={`Класс: ${info?.ru ?? 'неизвестен'}`}>
+              <span className="glow-accent flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-3 text-accent">
+                <ClassIcon cls={char.cls} size={46} />
+              </span>
+            </Tooltip>
             <div>
               <h1 className="text-3xl font-semibold tracking-tight">{char.name}</h1>
               <p className="mt-1 text-[13px] text-ink-2">
@@ -106,6 +110,8 @@ export function OverviewPage() {
         </div>
       </section>
 
+      <DevelopmentStrip ctx={ctx} />
+
       {!guide ? (
         <EmptyState
           title="Гайд не выбран"
@@ -130,7 +136,7 @@ export function OverviewPage() {
             >
               <div className="flex items-center gap-5">
                 <Tooltip
-                  content="Общий балл: умения 35%, Даэванион 20%, шмот 20%, арканы 15%, Познание рода 10%. 85+ — зелёный, 60–84 — жёлтый, ниже — красный."
+                  content="Общий балл: умения 35%, Даэванион 20%, шмот 20%, арканы 15%, Знание о видах 10%. 85+ — зелёный, 60–84 — жёлтый, ниже — красный."
                   wide
                 >
                   <ScoreRing value={report.scores.overall} size={104} label="из 100" />
@@ -142,7 +148,7 @@ export function OverviewPage() {
                       ['Даэванион', report.scores.daevanion, '/daevanion'],
                       ['Шмот', report.scores.gear, '/gear'],
                       ['Арканы', report.scores.arcana, '/arcana'],
-                      ['Познание рода', report.scores.genus, '/genus']
+                      ['Знание о видах', report.scores.genus, '/genus']
                     ] as const
                   ).map(([label, value, to]) => (
                     <Tooltip key={label} block content={`${label}: ${value} из 100 — ${SCORE_TIP[label]} Нажмите, чтобы открыть раздел.`} wide>
@@ -294,7 +300,7 @@ function BuildGlance({ ctx }: { ctx: Ctx }) {
           </Tooltip>
         </div>
       </Card>
-      <Card title="Шмот и род" hint="Доля полезных строк на шмоте и в Познании рода." actions={<GoLink to="/gear" />}>
+      <Card title="Шмот и род" hint="Доля полезных строк на шмоте и в Знании о видах." actions={<GoLink to="/gear" />}>
         <div className="space-y-3 text-[13px]">
           <Row
             label="Полезных строк на шмоте"
@@ -315,7 +321,7 @@ function BuildGlance({ ctx }: { ctx: Ctx }) {
           />
           <Row
             label="Ячеек рода под переброс"
-            tip="Ячейки Познания рода со статами важностью 0–1 по гайду."
+            tip="Ячейки Знания о видах со статами важностью 0–1 по гайду."
             value={`${sum(report.genus.genuses.map((g) => g.reroll.length))} из ${sum(report.genus.genuses.map((g) => g.slots.length))}`}
             warn
           />
@@ -466,3 +472,65 @@ function Row({ label, value, warn, tip }: { label: string; value: string; warn?:
 }
 
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0)
+
+/** «Обзор развития» — как в окне персонажа игры: надетые титулы, арканы и оружие с бронёй одной полосой. */
+function DevelopmentStrip({ ctx }: { ctx: NonNullable<ReturnType<typeof useCharacterContext>> }) {
+  const { report, namer } = ctx
+  const navigate = useNavigate()
+  const titles = report.titles.slots.filter((s) => s.equipped)
+  const cards = report.arcana.cards
+  const main = report.gear.filter((i) => i.group !== 'accessory')
+  return (
+    <Card
+      title="Обзор развития"
+      className="mb-6"
+      hint="Как вкладка «Обзор развития» в окне персонажа: что надето прямо сейчас. Нажмите на блок, чтобы открыть раздел."
+    >
+      <div className="flex flex-wrap items-stretch gap-x-8 gap-y-5">
+        <button onClick={() => navigate('/collections')} className="min-w-0 text-left">
+          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Титулы</div>
+          <div className="flex gap-2">
+            {titles.length === 0 && <span className="text-[13px] text-ink-3">не надеты</span>}
+            {titles.map((s) => (
+              <Tooltip key={s.category} content={`${s.ru}: ${titleName(s.equipped!)}`}>
+                <div className="flex w-[92px] flex-col items-center gap-1 rounded-xl border border-line bg-surface-2 px-1.5 pt-2 pb-1.5 transition-colors hover:border-line-strong">
+                  <TitleEmblem category={s.equipped!.category} grade={s.equipped!.grade} size={40} />
+                  <span className="line-clamp-2 text-center text-[10.5px] leading-tight text-ink-2">{titleName(s.equipped!)}</span>
+                </div>
+              </Tooltip>
+            ))}
+          </div>
+        </button>
+
+        <button onClick={() => navigate('/arcana')} className="min-w-0 text-left">
+          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Арканы</div>
+          <div className="flex gap-2">
+            {cards.map((c) => (
+              <Tooltip
+                key={c.slot}
+                content={
+                  c.item ? `${c.info?.ru ?? ''}: заточка +${c.enchant} из +${c.maxEnchant}` : `${ARCANA_TYPES.find((t) => t.type === c.type)?.ru}: слот пуст`
+                }
+              >
+                <div className="w-[58px] transition-transform hover:-translate-y-0.5" style={{ fontSize: 11 }}>
+                  <ArcanaCardArt type={c.type} variant={c.info?.variant} enchant={c.item ? c.enchant : undefined} empty={!c.item} />
+                </div>
+              </Tooltip>
+            ))}
+          </div>
+        </button>
+
+        <button onClick={() => navigate('/gear')} className="min-w-0 flex-1 text-left">
+          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Оружие и броня</div>
+          <div className="flex flex-wrap gap-1.5">
+            {main.map((i) => (
+              <Tooltip key={i.slot} content={`${namer.item(i.item.item, i.slot).main} · +${i.item.enchant}`}>
+                <ItemIcon itemId={i.item.item} slot={i.slot} enchant={i.item.enchant} size={44} />
+              </Tooltip>
+            ))}
+          </div>
+        </button>
+      </div>
+    </Card>
+  )
+}

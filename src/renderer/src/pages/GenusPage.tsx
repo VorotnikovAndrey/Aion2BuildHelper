@@ -13,7 +13,7 @@ import { useCharacterContext } from '@/lib/report'
 const GRADE_DOT: Record<number, string> = {
   1: 'bg-grade-common',
   2: 'bg-good',
-  3: 'bg-grade-rare',
+  3: 'bg-grade-legend',
   4: 'bg-grade-epic',
   5: 'bg-grade-unique'
 }
@@ -27,13 +27,13 @@ export function GenusPage() {
     <>
       <PageHeader
         icon={<Layers size={22} />}
-        title="Познание рода"
+        title="Знание о видах"
         subtitle="Пять родов питомцев, в каждом — ячейки со случайным статом. Уровень рода растёт с коллекцией питомцев этого рода. Зелёное — уже как нужно по гайду, серое — можно лучше, зачёркнутое — перебросить."
         actions={<GuideSwitcher char={char} />}
       />
 
       {g.genuses.length === 0 ? (
-        <EmptyState title="Оверлей ещё не видел Познание рода">Откройте окно Познания рода в игре или смените зону — оверлей обновит данные.</EmptyState>
+        <EmptyState title="Оверлей ещё не видел Знание о видах">Откройте окно Знания о видах в игре или смените зону — оверлей обновит данные.</EmptyState>
       ) : (
         <>
           {g.wishlist.length > 0 && (
@@ -131,7 +131,7 @@ export function GenusPage() {
               { swatch: <VerdictChip verdict="great">зелёное</VerdictChip>, text: 'как нужно по гайду' },
               { swatch: <VerdictChip verdict="good">жёлтое</VerdictChip>, text: 'приемлемо или слабо — при случае заменить' },
               { swatch: <VerdictChip verdict="bad">зачёркнутое</VerdictChip>, text: 'не по гайду — перебросить' },
-              { swatch: <span className="h-2 w-2 rounded-full bg-grade-epic" />, text: 'цвет точки — грейд ячейки' }
+              { swatch: <span className="h-2 w-2 rounded-full bg-grade-legend" />, text: 'цвет точки — грейд ячейки' }
             ]}
           />
           {guide?.genus.notes && <p className="mt-3 text-xs text-ink-3">{guide.genus.notes}</p>}

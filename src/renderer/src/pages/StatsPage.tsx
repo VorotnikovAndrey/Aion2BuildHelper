@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Gem, Search } from 'lucide-react'
 import { guideWeights } from '@shared/analysis/weights'
 import { formatStatValue, statByKey, statDef, STAT_GROUPS } from '@shared/gamedata/stats'
+import { CharacterSheet } from '@/components/CharacterSheet'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
 import { Name, WeightDots } from '@/components/game'
 import { Card } from '@/components/ui/Card'
@@ -56,6 +57,14 @@ export function StatsPage() {
         subtitle="Итоговые характеристики персонажа, как их видит оверлей. Точки справа — насколько стат важен по гайду; плюс — сколько дают доски Даэваниона."
         actions={<GuideSwitcher char={char} />}
       />
+      <Card
+        title="Показатели персонажа"
+        className="mb-5"
+        hint="Как окно «Показатели персонажа» в игре: шесть характеристик в центре, вокруг — статы богов. Наведите на любой круг — там пояснение."
+      >
+        <CharacterSheet values={values} fromBoards={report.daevanion.stats} namer={namer} />
+      </Card>
+
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <div className="relative">
           <Search size={14} className="absolute top-1/2 left-3 -translate-y-1/2 text-ink-3" />

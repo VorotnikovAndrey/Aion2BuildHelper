@@ -1,5 +1,6 @@
 // Шмот: какие строки (статы и умения) полезны по гайду, что менять, что ловить, как с манакамнями.
 
+import { itemArt } from '../gamedata/art'
 import { optionsForSlot, type KnownOptions } from '../gamedata/gearOptions'
 import { skillDef } from '../gamedata/skills'
 import { gradeOfItem, slotDef, SLOT_ORDER, type ItemGrade, type SlotGroup } from '../gamedata/slots'
@@ -16,6 +17,8 @@ export interface GearLine {
 }
 
 export interface ManastoneLine {
+  /** ID камня: по нему — вид и качество («Качественный камень маны»). */
+  stone: number
   stat: number
   grade: number
   weight: number
@@ -63,7 +66,7 @@ function analyzeItem(item: GearItem, w: GuideWeights, known?: KnownOptions): Ite
   ]
   const manastones = item.manastones.map((m) => {
     const weight = w.stat('manastone', m.stat)
-    return { stat: m.stat, grade: m.grade, weight, verdict: verdictOf(weight) }
+    return { stone: m.stone, stat: m.stat, grade: m.grade, weight, verdict: verdictOf(weight) }
   })
   const present = new Set(lines.map((l) => `${l.kind}:${l.id}`))
   const hasSkills = item.skills.length > 0
@@ -94,7 +97,8 @@ function analyzeItem(item: GearItem, w: GuideWeights, known?: KnownOptions): Ite
     slot: item.slot,
     group,
     item,
-    grade: gradeOfItem(item.item),
+    // Грейд из списка арта важнее цифры в ID (у рун цифры нет — они «особые»).
+    grade: itemArt(item.item)?.grade ?? gradeOfItem(item.item),
     lines,
     manastones,
     useful,

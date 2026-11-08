@@ -2,6 +2,7 @@
 // Пользователь может переименовать что угодно — его названия важнее справочника.
 
 import { arcanaInfo } from './gamedata/arcana'
+import { itemArt } from './gamedata/art'
 import { findNode, type DaevanionNode } from './gamedata/daevanion'
 import { skillDef, skillSpecs } from './gamedata/skills'
 import { slotDef } from './gamedata/slots'
@@ -67,7 +68,8 @@ export function createNamer(mode: NameMode, overrides: NameOverrides = {}): Name
       const arc = arcanaInfo(itemId)
       if (arc) return pick(arc.ru, arc.en, custom)
       const s = slotDef(slot)
-      return pick(s.ru, s.en, custom)
+      // Официальное название из клиента, если вещь есть в списке арта; иначе — название слота.
+      return pick(itemArt(itemId)?.ru ?? s.ru, s.en, custom)
     },
     board(id) {
       const b = findNode(id * 10000 + 113)?.board

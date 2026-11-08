@@ -134,7 +134,7 @@ describe('история', () => {
     const changes = diffCharacters(a, b)
     expect(changes.map((c) => c.kind)).toEqual(['cp', 'skill', 'enchant', 'daevanion'])
     expect(describeChange(changes[0], namer)).toEqual({ text: 'Боевая мощь 100 000 → 101 000 (+1 000)', good: true })
-    expect(describeChange(changes[2], namer).text).toBe('Оружие: заточка +10 → +11')
+    expect(describeChange(changes[2], namer).text).toBe('Блестящий длинный меч Короля истинных драконов: заточка +10 → +11')
   })
 
   it('одинаковые снимки — без изменений', () => {

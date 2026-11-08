@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
-import { Bell, Check, Compass, ScrollText, Sparkles, Wine, type LucideIcon } from 'lucide-react'
+import { Check, Sparkles } from 'lucide-react'
 import { atLeast, oneIn, type ArcanaCardReport, type ArcanaSkillClass } from '@shared/analysis/arcana'
-import { ARCANA_GRADES, ARCANA_SETS, ARCANA_SKILL_CAP, ARCANA_TYPES, type ArcanaType } from '@shared/gamedata/arcana'
+import { ARCANA_GRADES, ARCANA_SETS, ARCANA_SKILL_CAP, ARCANA_TYPES } from '@shared/gamedata/arcana'
 import { statByKey } from '@shared/gamedata/stats'
+import { ArcanaCardArt, ArcanaTypeIcon } from '@/components/art'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
 import { SkillIcon } from '@/components/icons'
 import { Card } from '@/components/ui/Card'
@@ -14,14 +15,6 @@ import { useCharacterContext } from '@/lib/report'
 import type { Tone } from '@/lib/status'
 
 type Ctx = NonNullable<ReturnType<typeof useCharacterContext>>
-
-const TYPE_ICON: Record<ArcanaType, LucideIcon> = {
-  chalice: Wine,
-  parchment: ScrollText,
-  compass: Compass,
-  bell: Bell,
-  mirror: Sparkles
-}
 
 const POOL_TIP: Record<string, string> = {
   all: 'Грааль: может выпасть любое из 22 умений класса — 12 активных и 10 пассивных.',
@@ -186,7 +179,6 @@ function SkillBadge({ cls, children }: { cls: ArcanaSkillClass; children: ReactN
 function ArcanaColumn({ card, rank, ctx }: { card: ArcanaCardReport; rank: number; ctx: Ctx }) {
   const { namer } = ctx
   const type = ARCANA_TYPES.find((t) => t.type === card.type)!
-  const Icon = TYPE_ICON[card.type]
   const wanted = card.skills.filter((s) => s.cls === 'wanted').length
   const grade = card.info ? ARCANA_GRADES[card.info.grade] : null
   const mainStat = card.info ? statByKey(card.info.mainStatKey) : undefined
@@ -199,7 +191,7 @@ function ArcanaColumn({ card, rank, ctx }: { card: ArcanaCardReport; rank: numbe
       <span className="mt-1 block">{POOL_TIP[type.pool]}</span>
       {mainStat && grade && (
         <span className="mt-1 block">
-          Главный эффект: {namer.stat(mainStat.id).main} +{grade.mainStat}.
+          Главный эффект: {namer.stat(mainStat.id).main} +{grade.mainStat + card.enchant} (база +{grade.mainStat} и +1 за каждую заточку).
         </span>
       )}
       <span className="mt-1 block">
@@ -212,24 +204,18 @@ function ArcanaColumn({ card, rank, ctx }: { card: ArcanaCardReport; rank: numbe
 
   return (
     <div className="flex min-w-0 flex-col">
-      {/* Карта */}
-      <div className="relative mx-auto mb-3 aspect-[3/4] w-full max-w-[150px]">
-        <Tooltip content={cardTip} wide className="absolute inset-0">
-          <div
+      {/* Карта — родной арт игры */}
+      <div className="relative mx-auto mb-2 w-full max-w-[168px]">
+        <Tooltip content={cardTip} wide block>
+          <ArcanaCardArt
+            type={card.type}
+            variant={card.info?.variant}
+            empty={!card.item}
             className={cn(
-              'h-full w-full overflow-hidden rounded-2xl border-2 bg-gradient-to-b',
-              card.item ? 'glow-accent border-accent/70' : 'border-dashed border-line-strong',
-              card.info?.variant === 'magic' ? 'from-card-magic-1 via-card-magic-2 to-card-magic-3' : 'from-card-vigor-1 via-card-vigor-2 to-card-vigor-3'
+              'transition-transform duration-200 hover:-translate-y-1',
+              card.item && (card.info?.variant === 'magic' ? 'card-glow-magic' : 'card-glow-vigor')
             )}
-          >
-            <div className="relative flex h-full w-full items-center justify-center">
-              <div
-                className="absolute inset-0 opacity-40"
-                style={{ background: 'radial-gradient(circle at 50% 40%, var(--color-accent-soft), transparent 60%)' }}
-              />
-              <Icon size={56} strokeWidth={1.2} className={cn('relative', card.info?.variant === 'magic' ? 'text-aether' : 'text-accent-2')} />
-            </div>
-          </div>
+          />
         </Tooltip>
         {card.item && (
           <Tooltip
@@ -238,16 +224,16 @@ function ArcanaColumn({ card, rank, ctx }: { card: ArcanaCardReport; rank: numbe
                 ? `Заточена до максимума (+${card.maxEnchant}).`
                 : `Заточка +${card.enchant} из +${card.maxEnchant}: осталось ${card.remaining}. Каждая даёт +1 случайному из ${card.slots} умений карты.`
             }
-            className="absolute -bottom-3 left-1/2 -translate-x-1/2"
+            className="absolute bottom-[4%] left-1/2 -translate-x-1/2"
           >
             <span
               className={cn(
-                'tnum rounded-full border bg-surface px-3 py-1 text-xs font-semibold',
-                enchantDone ? 'border-good/70 text-good' : 'border-warning/70 text-warning'
+                'game-enchant tnum flex h-11 w-11 flex-col items-center justify-center leading-none',
+                enchantDone ? 'shadow-[0_0_0_2px_var(--color-good)]' : null
               )}
             >
-              +{card.enchant}
-              <span className="text-ink-3">/{card.maxEnchant}</span>
+              <span className="game-num text-[15px]">+{card.enchant}</span>
+              <span className="mt-0.5 text-[9px] font-semibold text-ink-3">из {card.maxEnchant}</span>
             </span>
           </Tooltip>
         )}
@@ -261,7 +247,7 @@ function ArcanaColumn({ card, rank, ctx }: { card: ArcanaCardReport; rank: numbe
         >
           <span
             className={cn(
-              'flex h-7 w-7 items-center justify-center rounded-full border-2 text-xs font-bold',
+              'flex h-7 w-7 items-center justify-center rounded-full border-2 text-xs font-bold shadow-md',
               card.done ? 'border-good bg-good text-bg' : 'border-accent bg-surface text-accent'
             )}
           >
@@ -274,10 +260,13 @@ function ArcanaColumn({ card, rank, ctx }: { card: ArcanaCardReport; rank: numbe
       <div className="mt-2 flex-1 rounded-2xl border border-line bg-surface p-3.5">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <div className="text-[15px] leading-tight font-semibold text-accent-2">{card.info?.ru ?? type.ru}</div>
+            <div className="flex items-center gap-1.5 text-[15px] leading-tight font-semibold text-accent-2">
+              <ArcanaTypeIcon type={card.type} size={16} className="opacity-80" />
+              {card.info?.ru ?? type.ru}
+            </div>
             <div className="text-[11px] text-ink-3">
               {grade ? grade.ru : 'слот пуст'}
-              {mainStat && card.info && grade ? ` · ${namer.stat(mainStat.id).main.replace(/ \[.*\]/, '')} +${grade.mainStat}` : ''}
+              {mainStat && card.info && grade ? ` · ${namer.stat(mainStat.id).main} +${grade.mainStat + card.enchant}` : ''}
             </div>
           </div>
           {card.item && (

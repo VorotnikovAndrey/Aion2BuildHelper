@@ -156,7 +156,7 @@ export function describeChange(c: Change, n: Namer): { text: string; good?: bool
         good: c.added >= 0 && c.levels >= 0
       }
     case 'genus':
-      return { text: `Познание рода, ячейка ${c.slot + 1}: ${c.from !== null ? n.stat(c.from).main + ' → ' : ''}${n.stat(c.to).main}` }
+      return { text: `Знание о видах, ячейка ${c.slot + 1}: ${c.from !== null ? n.stat(c.from).main + ' → ' : ''}${n.stat(c.to).main}` }
     case 'titles':
       return { text: `Новых титулов: ${c.added}`, good: true }
   }

@@ -10,6 +10,7 @@ import { analyzeGear, gearScore, type ItemReport } from './gear'
 import { analyzeGenus } from './genus'
 import { analyzePets, type PetsReport } from './pets'
 import { analyzeSkills, skillsScore, specsLookLikeSlots, stigmaLoadout, type SkillReport } from './skills'
+import { analyzeTitles, type TitlesReport } from './titles'
 import type { KnownOptions } from '../gamedata/gearOptions'
 
 export type StepArea = 'skills' | 'stigmas' | 'gear' | 'arcana' | 'daevanion' | 'genus'
@@ -45,6 +46,7 @@ export interface BuildReport {
   genus: ReturnType<typeof analyzeGenus>
   daevanion: DaevanionReport
   pets: PetsReport
+  titles: TitlesReport
   scores: SectionScores
   steps: NextStep[]
 }
@@ -74,6 +76,7 @@ export function analyzeBuild(char: Character, guide: Guide | null, namer: Namer,
   const genus = analyzeGenus(char, guide)
   const daevanion = analyzeDaevanion(char, guide)
   const pets = analyzePets(char)
+  const titles = analyzeTitles(char, guide)
 
   const parts = {
     skills: skillsScore(skills),
@@ -94,6 +97,7 @@ export function analyzeBuild(char: Character, guide: Guide | null, namer: Namer,
     genus,
     daevanion,
     pets,
+    titles,
     scores: { ...parts, overall },
     steps: []
   }
@@ -269,14 +273,14 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
     })
   }
 
-  // ── Познание рода
+  // ── Знание о видах
   const rerolls = r.genus.genuses.flatMap((g) => g.reroll.map((s) => ({ g, s })))
   if (rerolls.length) {
     steps.push({
       id: 'genus',
       area: 'genus',
       impact: 'low',
-      title: `Познание рода: ${rerolls.length} ячеек под переброс`,
+      title: `Знание о видах: ${rerolls.length} ячеек под переброс`,
       detail: rerolls
         .slice(0, 4)
         .map(({ g, s }) => `${g.def.ru} ${s.slot + 1}: ${n.stat(s.stat).main}`)

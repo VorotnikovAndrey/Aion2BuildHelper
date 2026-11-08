@@ -1,47 +1,46 @@
 import { useState } from 'react'
-import { CircleDot, Crown, Ear, Footprints, Gem, Hand, HardHat, Hexagon, Pencil, Shield, Shirt, Sword, Watch, Wind, type LucideIcon } from 'lucide-react'
+import { Pencil, Shirt } from 'lucide-react'
 import type { ItemReport } from '@shared/analysis/gear'
+import { stoneInfo } from '@shared/gamedata/art'
 import { formatStatValue } from '@shared/gamedata/stats'
-import { GRADES, slotDef } from '@shared/gamedata/slots'
+import { GRADES, slotDef, type SlotGroup } from '@shared/gamedata/slots'
+import { ItemIcon, StatusBadge, StoneIcon } from '@/components/art'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
 import { SkillIcon } from '@/components/icons'
-import { GradeText, gradeBorder, VERDICT_TEXT, VerdictChip, WishChip } from '@/components/game'
+import { GradeText, VERDICT_TEXT, VerdictChip, WishChip } from '@/components/game'
 import { Card } from '@/components/ui/Card'
 import { Tooltip } from '@/components/ui/InfoTip'
 import { Legend, PageHeader, StatTile } from '@/components/ui/misc'
 import { Pill, toneOfShare } from '@/components/ui/Pill'
 import { cn } from '@/lib/format'
 import { useCharacterContext } from '@/lib/report'
-import { verdictWhy } from '@/lib/status'
+import { verdictWhy, type Tone } from '@/lib/status'
 import { useApp } from '@/lib/store'
 
 type Ctx = NonNullable<ReturnType<typeof useCharacterContext>>
 
-const SLOT_ICON: Record<string, LucideIcon> = {
-  weapon: Sword,
-  guarder: Shield,
-  helmet: HardHat,
-  shoulder: Crown,
-  torso: Shirt,
-  pants: Shirt,
-  gloves: Hand,
-  boots: Footprints,
-  cape: Wind,
-  necklace: Gem,
-  pendant: Gem,
-  amulet: Gem,
-  belt: Hexagon
-}
-const slotIcon = (slot: number): LucideIcon => {
-  const key = slotDef(slot).key
-  if (SLOT_ICON[key]) return SLOT_ICON[key]
-  if (key.endsWith('Earring')) return Ear
-  if (key.endsWith('Ring')) return CircleDot
-  if (key.endsWith('Bracelet')) return Watch
-  return Hexagon
+const COLS = 'grid-cols-[minmax(230px,1.2fr)_90px_minmax(260px,2fr)_minmax(180px,1.2fr)]'
+
+/** Итог по вещи для значка на иконке: красное — есть что перековать, жёлтое — слабые строки или камни. */
+function itemTone(i: ItemReport): Tone {
+  if (i.total === 0 && !i.manastones.length) return 'neutral'
+  if (i.replace.length) return 'bad'
+  if (i.lines.some((l) => l.verdict === 'weak') || i.manastones.some((m) => m.weight <= 1)) return 'warn'
+  return 'ok'
 }
 
-const COLS = 'grid-cols-[minmax(200px,1.1fr)_90px_minmax(260px,2fr)_minmax(180px,1.2fr)]'
+const TONE_WHY: Record<Tone, string> = {
+  ok: 'Все строки и камни полезны по гайду.',
+  warn: 'Есть слабые строки или камни — при случае заменить.',
+  bad: 'Есть строки не по гайду — их стоит перековать.',
+  neutral: 'Случайных строк нет — важны грейд и заточка.'
+}
+
+const PANEL_GROUPS: { id: SlotGroup; ru: string }[] = [
+  { id: 'weapon', ru: 'Оружие' },
+  { id: 'armor', ru: 'Броня' },
+  { id: 'accessory', ru: 'Украшения' }
+]
 
 export function GearPage() {
   const ctx = useCharacterContext()!
@@ -56,6 +55,8 @@ export function GearPage() {
   const total = items.reduce((s, i) => s + i.total, 0)
   const toReplace = items.reduce((s, i) => s + i.replace.length, 0)
   const weakStones = stones.filter((m) => m.weight <= 1).length
+
+  const jumpTo = (slot: number) => document.getElementById(`gear-${slot}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
 
   return (
     <>
@@ -87,19 +88,42 @@ export function GearPage() {
           hint="Красные зачёркнутые строки: стат, которого нет в приоритетах гайда. Их стоит перековать в первую очередь."
         />
         <StatTile
-          label="Манакамни"
+          label="Камни маны"
           value={`${stones.filter((m) => m.weight >= 3).length} из ${stones.length}`}
           sub={`слабых: ${weakStones}`}
           valueClassName={weakStones ? 'text-warning' : 'text-good'}
-          hint="Сколько манакамней со статами, важными по гайду (важность 3+). Слабые — важность 0–1."
+          hint="Сколько камней маны и духовных камней со статами, важными по гайду (важность 3+). Слабые — важность 0–1."
         />
       </div>
 
       <Card
+        title="Снаряжение"
+        className="mb-5"
+        hint="Все надетые вещи — как в окне персонажа. Значок в углу — итог сверки с гайдом; нажмите на вещь, чтобы перейти к её строкам."
+      >
+        <div className="flex flex-wrap gap-x-8 gap-y-5">
+          {PANEL_GROUPS.map((g) => {
+            const list = items.filter((i) => i.group === g.id)
+            if (!list.length) return null
+            return (
+              <div key={g.id} className="min-w-0">
+                <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{g.ru}</div>
+                <div className="flex flex-wrap gap-2.5">
+                  {list.map((i) => (
+                    <PanelItem key={i.slot} item={i} ctx={ctx} onClick={() => jumpTo(i.slot)} />
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </Card>
+
+      <Card
         bodyClassName="p-0"
-        title="Экипировка"
+        title="Строки вещей"
         actions={
-          <Tooltip content="Показать только вещи, где есть красные строки или слабые манакамни.">
+          <Tooltip content="Показать только вещи, где есть красные строки или слабые камни.">
             <label className="flex cursor-pointer items-center gap-2 text-xs text-ink-2">
               <input type="checkbox" checked={onlyFix} onChange={(e) => setOnlyFix(e.target.checked)} className="accent-[var(--color-accent)]" />
               Только что менять
@@ -129,20 +153,24 @@ export function GearPage() {
           className="mt-5"
           hint="Браслеты, пояс, руны, амулет: у них нет строк, которые можно сверить с гайдом — важны грейд и заточка."
         >
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             {rest.map((i) => {
-              const Icon = slotIcon(i.slot)
+              const name = ctx.namer.item(i.item.item, i.slot).main
               return (
                 <Tooltip
                   key={i.slot}
-                  content={`${slotDef(i.slot).ru}: ${GRADES[i.grade].ru.toLowerCase()}, заточка +${i.item.enchant}, уровень предмета ${i.item.itemLevel}.`}
+                  content={`${name}: ${slotDef(i.slot).ru.toLowerCase()}, ${GRADES[i.grade].ru.toLowerCase()}, заточка +${i.item.enchant}, уровень предмета ${i.item.itemLevel}.`}
                 >
-                  <div className={cn('flex items-center gap-2 rounded-lg border bg-surface-2 px-3 py-2 text-[13px]', gradeBorder(i.grade))}>
-                    <Icon size={14} className="text-ink-3" />
-                    <GradeText grade={i.grade}>{ctx.namer.item(i.item.item, i.slot).main}</GradeText>
-                    <span className="tnum text-xs text-ink-3">
-                      +{i.item.enchant} · ур. {i.item.itemLevel}
-                    </span>
+                  <div id={`gear-${i.slot}`} className="flex items-center gap-3 rounded-xl border border-line bg-surface-2 py-2 pr-4 pl-2">
+                    <ItemIcon itemId={i.item.item} slot={i.slot} enchant={i.item.enchant} size={44} />
+                    <div className="min-w-0">
+                      <div className="truncate text-[13px] font-semibold">
+                        <GradeText grade={i.grade}>{name}</GradeText>
+                      </div>
+                      <div className="tnum text-[11px] text-ink-3">
+                        {slotDef(i.slot).ru} · +{i.item.enchant} · ур. {i.item.itemLevel}
+                      </div>
+                    </div>
                   </div>
                 </Tooltip>
               )
@@ -157,10 +185,50 @@ export function GearPage() {
           { swatch: <VerdictChip verdict="good">жёлтое</VerdictChip>, text: 'приемлемо (3)' },
           { swatch: <VerdictChip verdict="weak">пунктир</VerdictChip>, text: 'слабо (1–2), при случае заменить' },
           { swatch: <VerdictChip verdict="bad">зачёркнутое</VerdictChip>, text: 'не по гайду — менять' },
-          { swatch: <WishChip>голубое</WishChip>, text: 'что ловить' }
+          { swatch: <WishChip>голубое</WishChip>, text: 'что ловить' },
+          { swatch: <StatusBadge tone="ok" />, text: 'значок на вещи — итог по ней' }
         ]}
       />
     </>
+  )
+}
+
+function PanelItem({ item, ctx, onClick }: { item: ItemReport; ctx: Ctx; onClick: () => void }) {
+  const tone = itemTone(item)
+  const name = ctx.namer.item(item.item.item, item.slot).main
+  return (
+    <Tooltip
+      wide
+      content={
+        <>
+          <GradeText grade={item.grade} className="font-semibold">
+            {name}
+          </GradeText>
+          <span className="block text-ink-3">
+            {slotDef(item.slot).ru} · {GRADES[item.grade].ru.toLowerCase()} · заточка +{item.item.enchant} · ур. предмета {item.item.itemLevel}
+          </span>
+          {item.total > 0 && (
+            <span className="mt-1 block">
+              Полезных строк: {item.useful} из {item.total}
+              {item.replace.length ? `, менять: ${item.replace.length}` : ''}.
+            </span>
+          )}
+          <span className="mt-1 block">{TONE_WHY[tone]}</span>
+        </>
+      }
+    >
+      <button onClick={onClick} className="group flex w-[64px] flex-col items-center gap-1">
+        <ItemIcon
+          itemId={item.item.item}
+          slot={item.slot}
+          enchant={item.item.enchant}
+          size={56}
+          status={tone}
+          className="transition-transform group-hover:-translate-y-0.5"
+        />
+        <span className="w-full truncate text-center text-[10.5px] text-ink-3 group-hover:text-ink-2">{slotDef(item.slot).ru}</span>
+      </button>
+    </Tooltip>
   )
 }
 
@@ -169,7 +237,6 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
   const names = useApp((s) => s.settings.names)
   const update = useApp((s) => s.updateSettings)
   const [editing, setEditing] = useState(false)
-  const Icon = slotIcon(item.slot)
   const label = namer.item(item.item.item, item.slot)
   const custom = names.items?.[item.item.item]
   const slot = slotDef(item.slot)
@@ -183,21 +250,19 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
   }
 
   return (
-    <div className={cn('grid items-start gap-x-4 border-b border-line px-5 py-3 last:border-b-0 hover:bg-surface-2/50', COLS)}>
+    <div id={`gear-${item.slot}`} className={cn('grid items-start gap-x-4 border-b border-line px-5 py-3 last:border-b-0 hover:bg-surface-2/50', COLS)}>
       <div className="flex min-w-0 items-start gap-3">
         <Tooltip
-          content={`${slot.ru} · ${GRADES[item.grade].ru.toLowerCase()} · заточка +${item.item.enchant} · уровень предмета ${item.item.itemLevel}. Цвет рамки — грейд.`}
+          content={`${slot.ru} · ${GRADES[item.grade].ru.toLowerCase()} · заточка +${item.item.enchant} · уровень предмета ${item.item.itemLevel}. Цвет подложки — грейд, как в игре.`}
         >
-          <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-surface-2', gradeBorder(item.grade))}>
-            <Icon size={18} className="text-ink-2" />
-          </span>
+          <ItemIcon itemId={item.item.item} slot={item.slot} enchant={item.item.enchant} size={48} />
         </Tooltip>
-        <div className="group min-w-0">
+        <div className="group min-w-0 pt-0.5">
           {editing ? (
             <input
               autoFocus
               defaultValue={custom ?? ''}
-              placeholder={slot.ru}
+              placeholder={label.main}
               onBlur={(e) => saveName(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') saveName((e.target as HTMLInputElement).value)
@@ -206,17 +271,17 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
               className="w-full rounded-md border border-line-strong bg-surface-3 px-2 py-0.5 text-[13px] outline-none focus:border-accent"
             />
           ) : (
-            <Tooltip content="Нажмите, чтобы дать вещи своё название (например, как в игре: «Шлем Нуакума»). Пустое поле — вернуть название слота.">
-              <button onClick={() => setEditing(true)} className="flex max-w-full items-center gap-1.5 text-left">
-                <GradeText grade={item.grade} className="truncate text-[13px] font-semibold">
+            <Tooltip content="Нажмите, чтобы дать вещи своё название. Пустое поле — вернуть название из игры (или слота, если вещь неизвестна).">
+              <button onClick={() => setEditing(true)} className="flex max-w-full items-start gap-1.5 text-left">
+                <GradeText grade={item.grade} className="text-[13px] leading-snug font-semibold">
                   {label.main}
                 </GradeText>
-                <Pencil size={11} className="shrink-0 text-ink-3 opacity-0 group-hover:opacity-100" />
+                <Pencil size={11} className="mt-1 shrink-0 text-ink-3 opacity-0 group-hover:opacity-100" />
               </button>
             </Tooltip>
           )}
           <div className="tnum mt-0.5 text-[11px] text-ink-3">
-            {custom ? `${slot.ru} · ` : ''}+{item.item.enchant} · ур. предмета {item.item.itemLevel}
+            {slot.ru} · ур. предмета {item.item.itemLevel}
           </div>
         </div>
       </div>
@@ -258,21 +323,32 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
           ))}
         </div>
         {item.manastones.length > 0 && (
-          <div className="mt-1.5 flex flex-wrap items-center gap-1">
-            <Tooltip content="Манакамни, вставленные в вещь. Точки — грейд строки камня (1–3).">
-              <span className="mr-0.5 text-[10.5px] text-ink-3">манакамни:</span>
-            </Tooltip>
-            {item.manastones.map((m, i) => (
-              <VerdictChip
-                key={i}
-                verdict={m.verdict}
-                className="px-1.5 py-0 text-[11px]"
-                tip={`Манакамень: ${namer.stat(m.stat).main}, грейд ${m.grade}. ${verdictWhy(m.verdict, m.weight)} (${VERDICT_TEXT[m.verdict]})`}
-              >
-                {namer.stat(m.stat).main}
-                <span className="opacity-60">{'•'.repeat(m.grade)}</span>
-              </VerdictChip>
-            ))}
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            {item.manastones.map((m, i) => {
+              const info = stoneInfo(m.stone)
+              return (
+                <VerdictChip
+                  key={i}
+                  verdict={m.verdict}
+                  className="gap-1 py-0.5 pr-2 pl-0.5 text-[11px]"
+                  tip={
+                    <>
+                      <b className="text-ink">{info.ru}</b>
+                      <span className="block">
+                        {namer.stat(m.stat).main}, сила строки {m.grade} из 3.
+                      </span>
+                      <span className="mt-1 block">
+                        {verdictWhy(m.verdict, m.weight)} ({VERDICT_TEXT[m.verdict]})
+                      </span>
+                    </>
+                  }
+                >
+                  <StoneIcon stoneId={m.stone} size={18} />
+                  {namer.stat(m.stat).main}
+                  <span className="opacity-60">{'•'.repeat(m.grade)}</span>
+                </VerdictChip>
+              )
+            })}
           </div>
         )}
       </div>

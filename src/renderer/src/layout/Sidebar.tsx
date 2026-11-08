@@ -65,7 +65,7 @@ const NAV: { title?: string; items: NavItem[] }[] = [
         tip: 'Доски с отмеченными узлами, цели гайда и план прокачки по очкам.',
         score: (s) => s.daevanion
       },
-      { to: '/genus', label: 'Познание рода', icon: Layers, tip: 'Ячейки пяти родов: что как нужно, что перебросить и что ловить.', score: (s) => s.genus }
+      { to: '/genus', label: 'Знание о видах', icon: Layers, tip: 'Ячейки пяти родов: что как нужно, что перебросить и что ловить.', score: (s) => s.genus }
     ]
   },
   {

@@ -96,9 +96,10 @@ export function DaevanionPage() {
           <BoardView board={board} goals={d.goals} ctx={ctx} />
           <Legend
             items={[
-              { swatch: <Swatch className="bg-accent" />, text: 'взят: +1 к умению' },
+              { swatch: <Swatch className="border-2 border-good bg-surface-3" />, text: 'иконка умения: +1 к уровню (зелёная рамка — взят)' },
               { swatch: <Swatch className="bg-teal" />, text: 'взят: стат' },
-              { swatch: <Swatch className="bg-grade-epic" />, text: 'взят: крупный стат' },
+              { swatch: <Swatch className="rotate-45 bg-grade-legend" />, text: 'взят: крупный стат' },
+              { swatch: <Swatch className="rotate-45 bg-grade-unique" />, text: 'взят: уникальный узел' },
               { swatch: <Swatch className="border-2 border-aether bg-transparent" />, text: 'нужен по гайду (ещё не взят)' },
               { swatch: <Swatch className="border border-dashed border-aether bg-transparent" />, text: 'путь к нужному' }
             ]}
@@ -227,7 +228,7 @@ function GoalCard({ g, ctx, onBoard }: { g: GoalReport; ctx: Ctx; onBoard: (id: 
   )
 }
 
-const CELL = 34
+const CELL = 36
 
 function BoardView({ board, goals, ctx }: { board: BoardReport; goals: GoalReport[]; ctx: Ctx }) {
   const [hover, setHover] = useState<DaevanionNode | null>(null)
@@ -260,8 +261,8 @@ function BoardView({ board, goals, ctx }: { board: BoardReport; goals: GoalRepor
   const fill = (n: DaevanionNode) => {
     if (n.type === 'Start') return 'var(--color-accent)'
     if (!board.taken.has(n.id)) return 'var(--color-surface-2)'
-    if (n.type === 'SkillLevel') return 'var(--color-accent)'
-    if (n.grade === 'Unique' || n.grade === 'Legend') return 'var(--color-grade-epic)'
+    if (n.grade === 'Unique') return 'var(--color-grade-unique)'
+    if (n.grade === 'Legend') return 'var(--color-grade-legend)'
     return 'var(--color-teal)'
   }
 
@@ -269,6 +270,11 @@ function BoardView({ board, goals, ctx }: { board: BoardReport; goals: GoalRepor
     <div className="relative overflow-x-auto">
       <div className="relative mx-auto" style={{ width: w, height: h }}>
         <svg width={w} height={h} className="absolute inset-0">
+          <defs>
+            <filter id="node-glow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="2.4" />
+            </filter>
+          </defs>
           {edges.map(([a, b]) => {
             const lit = board.taken.has(a.id) && board.taken.has(b.id)
             return (
@@ -279,34 +285,74 @@ function BoardView({ board, goals, ctx }: { board: BoardReport; goals: GoalRepor
                 x2={x(b)}
                 y2={y(b)}
                 stroke={lit ? 'var(--color-accent)' : 'var(--color-line-strong)'}
-                strokeOpacity={lit ? 0.7 : 1}
-                strokeWidth={lit ? 2 : 1}
+                strokeOpacity={lit ? 0.75 : 1}
+                strokeWidth={lit ? 2.2 : 1}
               />
             )
           })}
           {nodes.map((n) => {
             const taken = board.taken.has(n.id) || n.type === 'Start'
-            const big = n.type === 'SkillLevel' || n.grade === 'Unique' || n.grade === 'Legend'
-            const r = n.type === 'Start' ? 11 : big ? 10 : 7
+            const skill = n.type === 'SkillLevel' && n.skill
+            const diamond = n.grade === 'Unique' || n.grade === 'Legend'
+            const r = n.type === 'Start' ? 12 : skill ? 13 : diamond ? 10 : 6.5
+            const dim = !board.open && !taken
             return (
-              <g key={n.id} onMouseEnter={() => setHover(n)} onMouseLeave={() => setHover(null)} className="cursor-default">
-                {wanted.has(n.id) && <circle cx={x(n)} cy={y(n)} r={r + 4} fill="none" stroke="var(--color-aether)" strokeWidth={2} />}
+              <g key={n.id} onMouseEnter={() => setHover(n)} onMouseLeave={() => setHover(null)} className="cursor-default" opacity={dim ? 0.45 : 1}>
+                {wanted.has(n.id) && <circle cx={x(n)} cy={y(n)} r={r + 5} fill="none" stroke="var(--color-aether)" strokeWidth={2} />}
                 {path.has(n.id) && !wanted.has(n.id) && (
-                  <circle cx={x(n)} cy={y(n)} r={r + 3} fill="none" stroke="var(--color-aether)" strokeWidth={1.2} strokeDasharray="3 2" />
+                  <circle cx={x(n)} cy={y(n)} r={r + 4} fill="none" stroke="var(--color-aether)" strokeWidth={1.2} strokeDasharray="3 2" />
                 )}
-                <rect
-                  x={x(n) - r}
-                  y={y(n) - r}
-                  width={r * 2}
-                  height={r * 2}
-                  rx={n.type === 'SkillLevel' ? r : 3}
-                  transform={n.grade === 'Unique' || n.grade === 'Legend' ? `rotate(45 ${x(n)} ${y(n)})` : undefined}
-                  fill={fill(n)}
-                  stroke={taken ? 'transparent' : 'var(--color-line-strong)'}
-                  opacity={board.open || taken ? 1 : 0.45}
-                />
+                {/* Свечение взятых крупных узлов — как подсветка в окне Даэваниона */}
+                {taken && (diamond || skill || n.type === 'Start') && (
+                  <rect
+                    x={x(n) - r}
+                    y={y(n) - r}
+                    width={r * 2}
+                    height={r * 2}
+                    rx={skill ? 5 : 2}
+                    transform={diamond ? `rotate(45 ${x(n)} ${y(n)})` : undefined}
+                    fill={skill ? 'var(--color-good)' : fill(n)}
+                    opacity={0.55}
+                    filter="url(#node-glow)"
+                  />
+                )}
+                {skill ? (
+                  <>
+                    <rect
+                      x={x(n) - r - 1.5}
+                      y={y(n) - r - 1.5}
+                      width={r * 2 + 3}
+                      height={r * 2 + 3}
+                      rx={6}
+                      fill="var(--color-bg)"
+                      stroke={taken ? 'var(--color-good)' : 'var(--color-line-strong)'}
+                      strokeWidth={1.5}
+                    />
+                    <image
+                      href={`./icons/skills/${n.skill}.webp`}
+                      x={x(n) - r}
+                      y={y(n) - r}
+                      width={r * 2}
+                      height={r * 2}
+                      preserveAspectRatio="xMidYMid slice"
+                      style={{ clipPath: 'inset(0 round 4.5px)', filter: taken ? undefined : 'grayscale(1) brightness(0.55)' }}
+                    />
+                  </>
+                ) : (
+                  <rect
+                    x={x(n) - r}
+                    y={y(n) - r}
+                    width={r * 2}
+                    height={r * 2}
+                    rx={diamond ? 2 : 2.5}
+                    transform={diamond ? `rotate(45 ${x(n)} ${y(n)})` : undefined}
+                    fill={fill(n)}
+                    stroke={taken ? 'rgb(255 255 255 / 0.35)' : 'var(--color-line-strong)'}
+                    strokeWidth={taken ? 1 : 1}
+                  />
+                )}
                 {n.type === 'Start' && (
-                  <text x={x(n)} y={y(n) + 4} textAnchor="middle" fontSize="11" fill="var(--color-on-accent)" fontWeight={700}>
+                  <text x={x(n)} y={y(n) + 4} textAnchor="middle" fontSize="12" fill="var(--color-on-accent)" fontWeight={700}>
                     ★
                   </text>
                 )}

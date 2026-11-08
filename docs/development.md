@@ -15,6 +15,7 @@
 | `npm run format` | Prettier |
 | `npm run build` | Сборка в `out/` |
 | `npm run gamedata` | Обновить справочники (см. [data-sources.md](data-sources.md)) |
+| `npm run art` | Скачать арт игры по списку `src/shared/gamedata/art.json` в `src/renderer/public/art` |
 | `npm run icon` | Перерисовать `build/icon.png` и `build/icon.ico` |
 | `npm run shortcut` | Ярлык на рабочем столе и в «Пуске» (запускает `Aion2BuildHelper.vbs`: сборка + запуск без консоли) |
 
