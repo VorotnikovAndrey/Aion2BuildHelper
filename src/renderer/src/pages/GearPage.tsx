@@ -1,13 +1,14 @@
 import { useState } from 'react'
-import { Pencil, Shirt } from 'lucide-react'
-import type { ItemReport } from '@shared/analysis/gear'
+import { ArrowRight, Check, Pencil, Shirt } from 'lucide-react'
+import type { GearLine, ItemReport, LineSwap } from '@shared/analysis/gear'
 import { stoneInfo } from '@shared/gamedata/art'
+import { godstoneDef, godstoneEffectRu, godstoneIconSrc } from '@shared/gamedata/godstones'
 import { formatStatValue } from '@shared/gamedata/stats'
 import { GRADES, slotDef, type SlotGroup } from '@shared/gamedata/slots'
-import { ItemIcon, StatusBadge, StoneIcon } from '@/components/art'
+import { GameSlot, ItemIcon, StatusBadge, StoneIcon } from '@/components/art'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
 import { SkillIcon } from '@/components/icons'
-import { GradeText, VERDICT_TEXT, VerdictChip, WishChip } from '@/components/game'
+import { GradeText, VERDICT_TEXT, VerdictChip } from '@/components/game'
 import { Card } from '@/components/ui/Card'
 import { Tooltip } from '@/components/ui/InfoTip'
 import { Legend, PageHeader, StatTile } from '@/components/ui/misc'
@@ -19,22 +20,25 @@ import { useApp } from '@/lib/store'
 
 type Ctx = NonNullable<ReturnType<typeof useCharacterContext>>
 
-const COLS = 'grid-cols-[minmax(230px,1.2fr)_90px_minmax(260px,2fr)_minmax(180px,1.2fr)]'
+const COLS = 'grid-cols-[minmax(230px,1.1fr)_90px_minmax(260px,2fr)_minmax(220px,1.3fr)]'
 
 /** Итог по вещи для значка на иконке: красное — есть что перековать, жёлтое — слабые строки или камни. */
 function itemTone(i: ItemReport): Tone {
   if (i.total === 0 && !i.manastones.length) return 'neutral'
   if (i.replace.length) return 'bad'
-  if (i.lines.some((l) => l.verdict === 'weak') || i.manastones.some((m) => m.weight <= 1)) return 'warn'
+  if (i.swaps.length || i.lines.some((l) => l.verdict === 'weak') || i.manastones.some((m) => m.weight <= 1)) return 'warn'
   return 'ok'
 }
 
 const TONE_WHY: Record<Tone, string> = {
-  ok: 'Все строки и камни полезны по гайду.',
-  warn: 'Есть слабые строки или камни — при случае заменить.',
+  ok: 'Цель достигнута: строки и камни — как нужно по гайду.',
+  warn: 'Есть строки или камни, которые можно заметно улучшить.',
   bad: 'Есть строки не по гайду — их стоит перековать.',
   neutral: 'Случайных строк нет — важны грейд и заточка.'
 }
+
+const lineLabel = (l: { kind: 'stat' | 'skill'; id: number }, ctx: Ctx) => (l.kind === 'stat' ? ctx.namer.stat(l.id).main : ctx.namer.skill(l.id).main)
+const lineValue = (l: GearLine) => (l.kind === 'stat' ? formatStatValue(l.id, l.value) : `ур. ${l.value}`)
 
 const PANEL_GROUPS: { id: SlotGroup; ru: string }[] = [
   { id: 'weapon', ru: 'Оружие' },
@@ -49,10 +53,11 @@ export function GearPage() {
   const items = report.gear
   const withLines = items.filter((i) => i.total > 0 || i.manastones.length)
   const rest = items.filter((i) => i.total === 0 && !i.manastones.length)
-  const shown = onlyFix ? withLines.filter((i) => i.replace.length || i.manastones.some((m) => m.weight <= 1)) : withLines
+  const shown = onlyFix ? withLines.filter((i) => i.swaps.length || i.replace.length || i.manastones.some((m) => m.weight <= 1)) : withLines
   const stones = items.flatMap((i) => i.manastones)
   const useful = items.reduce((s, i) => s + i.useful, 0)
   const total = items.reduce((s, i) => s + i.total, 0)
+  const toSwap = items.reduce((s, i) => s + i.swaps.length, 0)
   const toReplace = items.reduce((s, i) => s + i.replace.length, 0)
   const weakStones = stones.filter((m) => m.weight <= 1).length
 
@@ -63,7 +68,7 @@ export function GearPage() {
       <PageHeader
         icon={<Shirt size={22} />}
         title="Шмот"
-        subtitle="Каждая строка вещи сверена с приоритетами гайда: зелёное — как нужно, жёлтое — приемлемо или слабо, красное зачёркнутое — не по гайду, менять. «Ещё ловить» — что искать при перековке или замене (только то, что встречается на этом слоте). Наведите на любую строку — там пояснение."
+        subtitle="Каждая строка вещи сверена с приоритетами гайда: зелёное — как нужно, жёлтое — приемлемо или слабо, красное зачёркнутое — не по гайду. Справа — цель: какую строку на что перековать (только замены, которые заметно лучше и бывают на этом слоте). Камни — отдельно под строками. Наведите на любой элемент — там пояснение."
         actions={<GuideSwitcher char={char} />}
       />
 
@@ -81,11 +86,11 @@ export function GearPage() {
           hint="Строки вещей, которые гайд ценит (зелёные и жёлтые «приемлемо»)."
         />
         <StatTile
-          label="Менять"
-          value={toReplace}
-          valueClassName={toReplace ? 'text-critical' : 'text-good'}
-          sub="строк, которые гайд не ценит"
-          hint="Красные зачёркнутые строки: стат, которого нет в приоритетах гайда. Их стоит перековать в первую очередь."
+          label="Перековать"
+          value={toSwap}
+          valueClassName={toReplace ? 'text-critical' : toSwap ? 'text-warning' : 'text-good'}
+          sub={toReplace ? `из них не по гайду: ${toReplace}` : 'строк до цели'}
+          hint="Сколько строк стоит перековать на заметно более важные по гайду (на 2 и больше из 5). Строки не по гайду (красные) — в первую очередь."
         />
         <StatTile
           label="Камни маны"
@@ -123,7 +128,7 @@ export function GearPage() {
         bodyClassName="p-0"
         title="Строки вещей"
         actions={
-          <Tooltip content="Показать только вещи, где есть красные строки или слабые камни.">
+          <Tooltip content="Показать только вещи, где есть что перековать или слабые камни.">
             <label className="flex cursor-pointer items-center gap-2 text-xs text-ink-2">
               <input type="checkbox" checked={onlyFix} onChange={(e) => setOnlyFix(e.target.checked)} className="accent-[var(--color-accent)]" />
               Только что менять
@@ -137,8 +142,11 @@ export function GearPage() {
             <span>Полезных</span>
           </Tooltip>
           <span>Сейчас стоит</span>
-          <Tooltip content="Важные по гайду статы и умения, которых на вещи нет, — что искать при перековке или замене.">
-            <span>Ещё ловить</span>
+          <Tooltip
+            wide
+            content="Цель по вещи: какую строку на что перековать. Самая слабая строка меняется на самый важный по гайду стат, который бывает на этом слоте, и так дальше — пока замена заметно лучше (на 2 и больше из 5). Стат меняется на стат, умение — на умение."
+          >
+            <span>Цель</span>
           </Tooltip>
         </div>
         {shown.map((item) => (
@@ -185,7 +193,16 @@ export function GearPage() {
           { swatch: <VerdictChip verdict="good">жёлтое</VerdictChip>, text: 'приемлемо (3)' },
           { swatch: <VerdictChip verdict="weak">пунктир</VerdictChip>, text: 'слабо (1–2), при случае заменить' },
           { swatch: <VerdictChip verdict="bad">зачёркнутое</VerdictChip>, text: 'не по гайду — менять' },
-          { swatch: <WishChip>голубое</WishChip>, text: 'что ловить' },
+          {
+            swatch: (
+              <span className="inline-flex items-center gap-1 text-xs">
+                <span className="text-warning line-through">Блок</span>
+                <ArrowRight size={12} className="text-ink-3" />
+                <span className="rounded-md border border-aether/40 bg-aether-soft px-1.5 text-aether">СКР боя</span>
+              </span>
+            ),
+            text: 'цель: что на что перековать'
+          },
           { swatch: <StatusBadge tone="ok" />, text: 'значок на вещи — итог по ней' }
         ]}
       />
@@ -210,7 +227,7 @@ function PanelItem({ item, ctx, onClick }: { item: ItemReport; ctx: Ctx; onClick
           {item.total > 0 && (
             <span className="mt-1 block">
               Полезных строк: {item.useful} из {item.total}
-              {item.replace.length ? `, менять: ${item.replace.length}` : ''}.
+              {item.swaps.length ? `, перековать: ${item.swaps.length}` : ''}.
             </span>
           )}
           <span className="mt-1 block">{TONE_WHY[tone]}</span>
@@ -322,15 +339,92 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
             </VerdictChip>
           ))}
         </div>
-        {item.manastones.length > 0 && (
-          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+        <Sockets item={item} ctx={ctx} />
+      </div>
+
+      <div className="min-w-0 space-y-1.5 pt-0.5">
+        {item.swaps.map((x, i) => (
+          <SwapRow key={i} swap={x} ctx={ctx} />
+        ))}
+        {item.swaps.length === 0 &&
+          (item.replace.length ? (
+            <Tooltip wide content="Эти строки гайд не ценит, но заметно лучшего стата для этого слота в данных нет — перековать при случае.">
+              <span className="text-xs text-warning">Строки не по гайду — лучшей замены на этом слоте не нашлось</span>
+            </Tooltip>
+          ) : (
+            <Tooltip wide content="Все строки — лучшее по гайду из того, что бывает на этом слоте: любая замена дала бы меньше 2 по важности.">
+              <span className="inline-flex items-center gap-1 text-xs text-good">
+                <Check size={13} strokeWidth={2.5} /> Цель достигнута
+              </span>
+            </Tooltip>
+          ))}
+      </div>
+    </div>
+  )
+}
+
+/** Одна замена: «Блок 52 → СКР боя». */
+function SwapRow({ swap, ctx }: { swap: LineSwap; ctx: Ctx }) {
+  const { from, to } = swap
+  return (
+    <Tooltip
+      block
+      wide
+      content={
+        <>
+          Перековать <b className="text-ink">{`${lineLabel(from, ctx)} ${lineValue(from)}`}</b> (важность {from.weight} из 5) на{' '}
+          <b className="text-aether">{lineLabel(to, ctx)}</b> (важность {to.weight} из 5).
+          <span className="mt-1 block text-ink-3">
+            {to.kind === 'skill' ? 'Это умение бывает строкой на вещах этого слота.' : 'Этот стат встречается строкой на этом слоте.'}
+            {from.verdict === 'bad' ? ' Текущая строка гайду не нужна — менять в первую очередь.' : ''}
+          </span>
+        </>
+      }
+    >
+      <div className="flex w-full flex-wrap items-center gap-1.5 text-xs">
+        <span className={cn('line-through decoration-1', from.verdict === 'bad' ? 'text-critical' : 'text-warning')}>
+          {lineLabel(from, ctx)} <span className="tnum opacity-80">{lineValue(from)}</span>
+        </span>
+        <ArrowRight size={13} className="shrink-0 text-ink-3" />
+        <span className="inline-flex items-center gap-1 rounded-md border border-aether/40 bg-aether-soft px-2 py-0.5 font-medium text-aether">
+          {to.kind === 'skill' && <SkillIcon id={to.id} size={14} />}
+          {lineLabel(to, ctx)}
+        </span>
+      </div>
+    </Tooltip>
+  )
+}
+
+/** Гнёзда вещи отдельной плашкой: камни маны (или духовные) и священный камень. */
+function Sockets({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
+  const { namer } = ctx
+  if (!item.manastones.length && !item.godstoneSlots) return null
+  const soul = item.manastones.length > 0 && stoneInfo(item.manastones[0].stone).kind === 'soul'
+  const god = item.godstones[0]
+  const godDef = god ? godstoneDef(god) : undefined
+  return (
+    <div className="mt-2.5 flex flex-col gap-2 rounded-xl border border-line bg-bg/40 px-3 py-2">
+      {item.manastones.length > 0 && (
+        <div className="min-w-0">
+          <Tooltip
+            content={
+              soul
+                ? 'Духовные камни — гнёзда украшений. Цвет — польза стата по гайду, точки — сила строки (1–3).'
+                : 'Камни маны — гнёзда оружия и брони. Цвет — польза стата по гайду, точки — сила строки (1–3).'
+            }
+          >
+            <div className="mb-1 text-[10px] font-semibold tracking-wider text-ink-3 uppercase">
+              {soul ? 'Духовные камни' : 'Камни маны'} · {item.manastones.length}
+            </div>
+          </Tooltip>
+          <div className="flex flex-wrap gap-1.5">
             {item.manastones.map((m, i) => {
               const info = stoneInfo(m.stone)
               return (
                 <VerdictChip
                   key={i}
                   verdict={m.verdict}
-                  className="gap-1 py-0.5 pr-2 pl-0.5 text-[11px]"
+                  className="gap-1 rounded-full py-0.5 pr-2.5 pl-0.5 text-[11px]"
                   tip={
                     <>
                       <b className="text-ink">{info.ru}</b>
@@ -343,28 +437,43 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
                     </>
                   }
                 >
-                  <StoneIcon stoneId={m.stone} size={18} />
+                  <StoneIcon stoneId={m.stone} size={18} className="rounded-full" />
                   {namer.stat(m.stat).main}
                   <span className="opacity-60">{'•'.repeat(m.grade)}</span>
                 </VerdictChip>
               )
             })}
           </div>
-        )}
-      </div>
-
-      <div className="flex flex-wrap gap-1.5">
-        {item.wishlist.map((w) => (
-          <WishChip
-            key={`${w.kind}${w.id}`}
-            tip={`Важность в гайде: ${w.weight} из 5. ${w.kind === 'skill' ? 'Умение может выпасть строкой на этом слоте.' : 'Встречается строкой на этом слоте.'}`}
-          >
-            {w.kind === 'skill' && <SkillIcon id={w.id} size={14} className="mr-1" />}
-            {w.kind === 'stat' ? namer.stat(w.id).main : namer.skill(w.id).main}
-          </WishChip>
-        ))}
-        {item.wishlist.length === 0 && <span className="text-xs text-ink-3">—</span>}
-      </div>
+        </div>
+      )}
+      {item.godstoneSlots > 0 && (
+        <div className={cn('min-w-0', item.manastones.length > 0 && 'border-t border-line pt-2')}>
+          <div className="mb-1 text-[10px] font-semibold tracking-wider text-ink-3 uppercase">Священный камень</div>
+          {god ? (
+            <Tooltip
+              wide
+              content={
+                <>
+                  <b className="text-ink">{godDef?.en ?? `Камень #${god}`}</b>
+                  {godDef && <span className="mt-1 block">{godstoneEffectRu(godDef.effect)}</span>}
+                  <span className="mt-1 block text-ink-3">Русского названия в данных нет — показано английское.</span>
+                </>
+              }
+            >
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-line-strong bg-surface-2 py-0.5 pr-2.5 pl-0.5 text-[11px] text-ink-2">
+                <GameSlot grade={godDef?.grade ?? 'rare'} src={godstoneIconSrc(god)} size={18} className="rounded-full" />
+                {godDef?.en ?? `#${god}`}
+              </span>
+            </Tooltip>
+          ) : (
+            <Tooltip content="Гнездо пустое: любой священный камень даёт шанс дополнительного эффекта при атаке — урон стихией, кровотечение или контроль.">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-warning/50 px-2.5 py-0.5 text-[11px] text-warning">
+                <span className="h-3 w-3 rounded-full border border-dashed border-warning/70" /> пусто
+              </span>
+            </Tooltip>
+          )}
+        </div>
+      )}
     </div>
   )
 }

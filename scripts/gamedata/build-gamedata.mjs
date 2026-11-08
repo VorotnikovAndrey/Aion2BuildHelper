@@ -316,6 +316,42 @@ async function buildTitles() {
   console.log('✓ титулы:', titles.length)
 }
 
+// ───────────────────────── Священные камни ─────────────────────────
+
+/** Священные камни (Theostone): ID, название, грейд, эффект и иконка — для гнёзд оружия и наручей. */
+async function buildGodstones() {
+  const html = await page('/godstones')
+  const list = []
+  for (const row of html.matchAll(/<tr><th scope="row">([\s\S]*?)<\/tr>/g)) {
+    const r = row[1]
+    const id = r.match(/own:g:(\d+)"/)
+    const name = r.match(/nameText"[^>]*>([^<]*)</)
+    const rarity = r.match(/data-rarity="(\w+)"/)
+    const icon = r.match(/items%2F([a-z0-9_]+)\.webp/)
+    const tds = [...r.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((m) => decode(m[1].replace(/<[^>]+>/g, '')))
+    if (!id || !name) continue
+    list.push({
+      id: Number(id[1]),
+      en: decode(name[1]).replace(/^Theostone:\s*/, ''),
+      grade: (rarity?.[1] ?? 'common').toLowerCase(),
+      effect: tds[tds.length - 1] ?? '',
+      icon: icon?.[1] ?? null
+    })
+  }
+  list.sort((a, b) => a.id - b.id)
+  await writeJson('godstones.json', list)
+  const dir = join(ICONS, 'godstones')
+  await mkdir(dir, { recursive: true })
+  let fetched = 0
+  for (const g of list) {
+    if (!g.icon) continue
+    const file = join(dir, `${g.id}.webp`)
+    if (existsSync(file)) continue
+    if (await download(`${ICON_BASE}/items/${g.icon}.webp`, file)) fetched++
+  }
+  console.log('✓ священные камни:', list.length, '· иконок скачано', fetched)
+}
+
 // ───────────────────────── Вспомогательное ─────────────────────────
 
 async function writeJson(name, data) {
@@ -340,4 +376,5 @@ await buildSpecs(skills, wanted)
 for (const cls of wanted) await buildDaevanion(cls)
 await buildIcons(skills, wanted)
 await buildTitles()
+await buildGodstones()
 console.log('Готово →', OUT)

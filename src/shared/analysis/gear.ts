@@ -2,6 +2,7 @@
 
 import { itemArt } from '../gamedata/art'
 import { optionsForSlot, type KnownOptions } from '../gamedata/gearOptions'
+import { godstoneSlots } from '../gamedata/godstones'
 import { skillDef } from '../gamedata/skills'
 import { gradeOfItem, slotDef, SLOT_ORDER, type ItemGrade, type SlotGroup } from '../gamedata/slots'
 import type { Guide } from '../guide/types'
@@ -31,6 +32,15 @@ export interface Wish {
   weight: number
 }
 
+/** Цель по строке: перековать эту строку на нужный по гайду стат или умение. */
+export interface LineSwap {
+  from: GearLine
+  to: Wish
+}
+
+/** Замену советуем, только если новая строка заметно важнее по гайду: на 2 и больше из 5. */
+export const SWAP_GAIN = 2
+
 export interface ItemReport {
   slot: number
   group: SlotGroup
@@ -44,6 +54,11 @@ export interface ItemReport {
   replace: GearLine[]
   /** Что ловить на этот слот вместо них. */
   wishlist: Wish[]
+  /** Цель: какие строки на что перековать (самая слабая — на самую важную, что бывает на слоте). */
+  swaps: LineSwap[]
+  /** Священные камни в вещи и сколько для них гнёзд. */
+  godstones: number[]
+  godstoneSlots: number
   /** 0…100 */
   score: number
   manastoneScore: number | null
@@ -89,6 +104,19 @@ function analyzeItem(item: GearItem, w: GuideWeights, known?: KnownOptions): Ite
     wishlist.push(...skillWishes)
   }
 
+  // Кандидаты для замен — все подходящие статы и умения слота, а не только первые в «что ловить».
+  const statCands: Wish[] = (canRoll ? w.topStats(group) : [])
+    .filter((s) => s.weight >= SWAP_GAIN && !present.has(`stat:${s.stat}`) && (!possible || possible.has(s.stat)))
+    .map((s) => ({ kind: 'stat' as const, id: s.stat, weight: s.weight }))
+  const skillCands: Wish[] = hasSkills
+    ? w
+        .topGearSkills()
+        .filter((s) => s.weight >= SWAP_GAIN && !present.has(`skill:${s.skill}`))
+        .filter((s) => (skillDef(s.skill)?.type === 'active') === activeSkillSlot(item.slot))
+        .map((s) => ({ kind: 'skill' as const, id: s.skill, weight: s.weight }))
+    : []
+  const swaps = planSwaps(lines, statCands, skillCands)
+
   const total = lines.length
   const useful = lines.filter((l) => isUseful(l.verdict)).length
   const score = total ? Math.round((lines.reduce((s, l) => s + l.weight, 0) / (total * 5)) * 100) : 0
@@ -105,9 +133,32 @@ function analyzeItem(item: GearItem, w: GuideWeights, known?: KnownOptions): Ite
     total,
     replace: lines.filter((l) => l.verdict === 'bad'),
     wishlist,
+    swaps,
+    godstones: item.godstones,
+    godstoneSlots: godstoneSlots(item.slot),
     score,
     manastoneScore
   }
+}
+
+/**
+ * Замены «что → на что»: самые слабые строки по очереди меняются на самые важные кандидаты того же
+ * вида (стат на стат, умение на умение). Останавливаемся, когда выигрыш меньше SWAP_GAIN.
+ */
+export function planSwaps(lines: GearLine[], statCands: Wish[], skillCands: Wish[]): LineSwap[] {
+  const out: LineSwap[] = []
+  for (const [kind, cands] of [
+    ['stat', statCands],
+    ['skill', skillCands]
+  ] as const) {
+    const own = lines.filter((l) => l.kind === kind).sort((a, b) => a.weight - b.weight)
+    const best = [...cands].sort((a, b) => b.weight - a.weight)
+    for (let i = 0; i < own.length && i < best.length; i++) {
+      if (best[i].weight < own[i].weight + SWAP_GAIN) break
+      out.push({ from: own[i], to: best[i] })
+    }
+  }
+  return out
 }
 
 /** На каких слотах строкой выпадают активные умения (по данным клиента: оружие, гарда, кольца). */

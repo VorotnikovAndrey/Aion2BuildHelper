@@ -252,17 +252,26 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
   }
 
   // ── Шмот
+  const lineName = (l: { kind: 'stat' | 'skill'; id: number }) => (l.kind === 'stat' ? n.stat(l.id).main : n.skill(l.id).main)
   for (const item of r.gear) {
-    if (!item.replace.length) continue
-    const what = item.replace.map((l) => (l.kind === 'stat' ? n.stat(l.id).main : n.skill(l.id).main)).join(', ')
-    const wish = item.wishlist.slice(0, 3).map((w) => (w.kind === 'stat' ? n.stat(w.id).main : n.skill(w.id).main))
-    steps.push({
-      id: `gear-${item.slot}`,
-      area: 'gear',
-      impact: 'medium',
-      title: `${n.item(item.item.item, item.slot).main}: заменить ${what}`,
-      detail: wish.length ? `Ловить: ${wish.join(', ')}.` : undefined
-    })
+    if (item.swaps.length) {
+      steps.push({
+        id: `gear-${item.slot}`,
+        area: 'gear',
+        // Строка, которую гайд вообще не ценит, — важнее, чем замена приемлемой на лучшую.
+        impact: item.swaps.some((x) => x.from.verdict === 'bad') ? 'medium' : 'low',
+        title: `${n.item(item.item.item, item.slot).main}: ${item.swaps.map((x) => `${lineName(x.from)} → ${lineName(x.to)}`).join(', ')}`,
+        detail: 'Перековать эти строки: справа — что важнее по гайду и бывает на этом слоте.'
+      })
+    } else if (item.replace.length) {
+      steps.push({
+        id: `gear-${item.slot}`,
+        area: 'gear',
+        impact: 'low',
+        title: `${n.item(item.item.item, item.slot).main}: строка ${item.replace.map(lineName).join(', ')} не по гайду`,
+        detail: 'Заметно лучшей замены на этом слоте не нашлось — при случае перековать.'
+      })
+    }
   }
   const badStones = r.gear.flatMap((i) => i.manastones.filter((m) => m.weight <= 1))
   if (badStones.length) {

@@ -5,7 +5,7 @@ import { createNamer } from '../names'
 import { makeTemplar } from '../testing/fixtures'
 import { analyzeBuild } from './build'
 import { analyzeDaevanion } from './daevanion'
-import { analyzeGear } from './gear'
+import { analyzeGear, planSwaps, type GearLine } from './gear'
 import { analyzeGenus } from './genus'
 import { describeChange, diffCharacters } from './history'
 import { analyzePets } from './pets'
@@ -156,5 +156,32 @@ describe('устаревшие доски в файле оверлея', () => {
   it('стигмы не проверяются: их уровни — из своих очков', () => {
     const char = { ...makeTemplar(), skills: [{ skill: 12070000, level: 20, equipped: true, specs: [] }] }
     expect(unexplainedLevels(char)).toEqual([])
+  })
+})
+
+describe('цель по вещи: что на что перековать', () => {
+  const line = (id: number, weight: number, kind: 'stat' | 'skill' = 'stat'): GearLine => ({ kind, id, value: 1, weight, verdict: 'good' })
+
+  it('самая слабая строка — на самый важный стат слота, пока выигрыш не меньше 2', () => {
+    // Оружие: урон 5, АТК 5, крит 4, блок 3; на слоте бывают СКР боя 5 и Мощь 4
+    const lines = [line(28, 5), line(317, 5), line(128, 4), line(255, 3)]
+    const swaps = planSwaps(
+      lines,
+      [
+        { kind: 'stat', id: 1, weight: 4 },
+        { kind: 'stat', id: 282, weight: 5 }
+      ],
+      []
+    )
+    expect(swaps.map((x) => [x.from.id, x.to.id])).toEqual([[255, 282]]) // Блок → СКР боя; крит 4 → Мощь 4 не выигрыш
+  })
+
+  it('стат меняется на стат, умение — на умение', () => {
+    const swaps = planSwaps([line(52, 1), line(12720000, 1, 'skill')], [{ kind: 'stat', id: 317, weight: 5 }], [{ kind: 'skill', id: 12780000, weight: 5 }])
+    expect(swaps.map((x) => `${x.from.kind}:${x.from.id}→${x.to.id}`)).toEqual(['stat:52→317', 'skill:12720000→12780000'])
+  })
+
+  it('без кандидатов замен нет', () => {
+    expect(planSwaps([line(52, 0)], [], [])).toEqual([])
   })
 })

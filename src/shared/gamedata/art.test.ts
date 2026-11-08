@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { allArtFiles, arcanaCardArt, frameArt, itemArt, pantheonArt, pantheonKind, skillIconSrc, stoneInfo } from './art'
+import { godstoneDef, godstoneEffectRu, godstoneSlots, GODSTONES } from './godstones'
 import { gradeOfItem } from './slots'
 
 describe('арт игры', () => {
@@ -58,5 +59,20 @@ describe('арт игры', () => {
     expect(skillIconSrc(12760000)).toBe('./art/skills/icon_gl_skill_passive_006.webp')
     expect(skillIconSrc(12790000)).toBe('./art/skills/icon_gl_skill_passive_009.webp')
     expect(skillIconSrc(12240000)).toBe('./icons/skills/12240000.webp')
+  })
+
+  it('священные камни: гнёзда в оружии и наручах, эффект по-русски', () => {
+    expect(godstoneSlots(1)).toBe(1)
+    expect(godstoneSlots(2)).toBe(1)
+    expect(godstoneSlots(3)).toBe(0)
+    expect(godstoneDef(19950010)?.en).toBe("Feruk's Instinct")
+    expect(godstoneEffectRu('Has a 3% chance to inflict [Stun] for 1s on attack · Effect Activation Cooldown: 5s')).toBe(
+      'При атаке с шансом 3% — оглушение на 1 с. Перезарядка эффекта — 5 с.'
+    )
+    expect(godstoneEffectRu('Has a 2% chance to deal 1,250 AoE Fire damage to up to 4 targets on attack · Effect Activation Cooldown: 1s')).toBe(
+      'При атаке с шансом 2% — 1 250 урона огнём по площади (до 4 целей). Перезарядка эффекта — 1 с.'
+    )
+    // Все эффекты из справочника переводятся (новый шаблон — сигнал дописать перевод)
+    expect(GODSTONES.filter((g) => godstoneEffectRu(g.effect) === g.effect).map((g) => g.id)).toEqual([])
   })
 })
