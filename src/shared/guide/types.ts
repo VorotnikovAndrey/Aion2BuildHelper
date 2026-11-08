@@ -51,6 +51,27 @@ export interface DaevanionGoal {
   nodes?: number[]
 }
 
+/** Откуда гайд: статья, видео или статистика игроков. */
+export interface GuideSource {
+  title?: string
+  url?: string
+  author?: string
+  date?: string
+  /** Для какой версии игры писался: глобальная, Корея/Тайвань или смешанно. */
+  region?: 'global' | 'korea' | 'mixed'
+  /** Статья-гайд или статистика того, что носят игроки. */
+  kind?: 'guide' | 'data'
+  note?: string
+}
+
+/** Рекомендуемые титулы по категориям — в порядке предпочтения (ID титулов). */
+export interface GuideTitles {
+  attack?: number[]
+  defense?: number[]
+  utility?: number[]
+  notes?: string
+}
+
 export interface GuideTip {
   title: string
   text: string
@@ -63,7 +84,9 @@ export interface Guide {
   cls: ClassKey
   mode: GuideMode
   description?: string
-  source?: { title?: string; url?: string; author?: string; date?: string }
+  source?: GuideSource
+  /** Сводный гайд: все источники, из которых он собран. */
+  sources?: GuideSource[]
   /** Встроенный гайд нельзя изменить — только скопировать. */
   builtin?: boolean
   updatedAt: string
@@ -94,6 +117,7 @@ export interface Guide {
   }
   daevanion: { goals: DaevanionGoal[]; notes?: string }
   genus: { stats?: StatWeight[]; notes?: string }
+  titles?: GuideTitles
   rotation?: string[]
   tips?: GuideTip[]
   /** Собственные пункты для чек-листа («сделать один раз»). */

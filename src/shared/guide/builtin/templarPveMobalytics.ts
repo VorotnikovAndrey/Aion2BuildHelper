@@ -81,7 +81,7 @@ const ASSISTANT = 'Оценка помощника: в гайде приорит
 export const templarPveMobalytics: Guide = {
   schema: 1,
   id: 'builtin-templar-pve-mobalytics',
-  name: 'Страж PvE — Суд и Кровавая месть',
+  name: 'Страж PvE — Mobalytics (Суд и Кровавая месть)',
   cls: 'templar',
   mode: 'pve',
   builtin: true,

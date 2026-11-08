@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { titleDef } from '../gamedata/titles'
+import { templarPveConsensus } from '../guide/builtin/templarPveConsensus'
 import { templarPveMobalytics } from '../guide/builtin/templarPveMobalytics'
 import { makeTemplar } from '../testing/fixtures'
 import { analyzeTitles, titleScore } from './titles'
@@ -46,5 +47,22 @@ describe('титулы', () => {
   it('без гайда ничего не советует', () => {
     const char = { ...makeTemplar(), titles: [11010001], ownedTitles: [11010001, 12030002] }
     expect(analyzeTitles(char, null).slots[0].better).toBeNull()
+  })
+
+  it('если гайд называет титулы — совет по его списку, а лучший несобранный становится целью', () => {
+    const char = {
+      ...makeTemplar(),
+      titles: [12030002, 12030003, 13010010],
+      ownedTitles: [12030002, 12030003, 13010010, 12010061]
+    }
+    const [attack, defense, utility] = analyzeTitles(char, templarPveConsensus).slots
+    // «Прошедший огонь и воду» уже собран и стоит в списке гайда первым
+    expect(utility.better).toMatchObject({ title: { id: 12010061 }, reason: 'guide' })
+    // «Святой Бертрона» — первый в списке защиты: менять нечего
+    expect(defense.better).toBeNull()
+    expect(defense.goal).toBeNull()
+    // Лучшего атакующего титула ещё нет — он цель, а надетый остаётся
+    expect(attack.better).toBeNull()
+    expect(attack.goal?.id).toBe(13010021)
   })
 })

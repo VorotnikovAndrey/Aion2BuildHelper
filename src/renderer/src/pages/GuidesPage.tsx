@@ -2,12 +2,16 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { BookOpen, Check, Copy, Download, ExternalLink, Pencil, Plus, Trash2, Upload } from 'lucide-react'
 import { classInfo } from '@shared/gamedata/classes'
-import { emptyGuide, MODE_LABEL, ROLE_LABEL, type Guide } from '@shared/guide/types'
+import { titleDef } from '@shared/gamedata/titles'
+import { emptyGuide, MODE_LABEL, ROLE_LABEL, type Guide, type GuideSource } from '@shared/guide/types'
+import { TitleEmblem } from '@/components/art'
+import { titleName } from '@/components/collections'
 import { ClassIcon } from '@/components/game'
 import { SkillIcon } from '@/components/icons'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Modal, PageHeader } from '@/components/ui/misc'
+import { Tooltip } from '@/components/ui/InfoTip'
 import { Pill } from '@/components/ui/Pill'
 import { cn } from '@/lib/format'
 import { useNamer } from '@/lib/report'
@@ -199,6 +203,7 @@ function GuideDetail({
             {guide.source.title ?? guide.source.url} <ExternalLink size={12} />
           </button>
         )}
+        {guide.sources && guide.sources.length > 0 && <SourceList sources={guide.sources} />}
       </Card>
 
       <div className="grid grid-cols-1 gap-5 2xl:grid-cols-2">
@@ -261,6 +266,40 @@ function GuideDetail({
             </div>
           </Card>
         )}
+        {guide.titles && (
+          <Card title="Титулы" hint="Какие титулы надевать — по порядку предпочтения. На странице «Питомцы и коллекции» видно, какие из них уже собраны.">
+            <div className="space-y-3">
+              {(
+                [
+                  ['attack', 'Атака'],
+                  ['defense', 'Защита'],
+                  ['utility', 'Другое']
+                ] as const
+              ).map(([key, ru]) =>
+                guide.titles?.[key]?.length ? (
+                  <div key={key}>
+                    <div className="mb-1.5 text-[11px] text-ink-3">{ru}</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {guide.titles[key]!.map((id, i) => {
+                        const t = titleDef(id)
+                        return (
+                          <Pill
+                            key={id}
+                            tone={i === 0 ? 'accent' : 'neutral'}
+                            icon={t ? <TitleEmblem category={t.category} grade={t.grade} size={14} /> : undefined}
+                          >
+                            {t ? titleName(t) : `#${id}`}
+                          </Pill>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ) : null
+              )}
+              {guide.titles.notes && <p className="text-xs leading-relaxed text-ink-3">{guide.titles.notes}</p>}
+            </div>
+          </Card>
+        )}
         {guide.daevanion.goals.length > 0 && (
           <Card title="Цели Даэваниона">
             <div className="space-y-2.5">
@@ -273,6 +312,50 @@ function GuideDetail({
             </div>
           </Card>
         )}
+      </div>
+    </div>
+  )
+}
+
+const REGION: Record<NonNullable<GuideSource['region']>, { ru: string; tip: string; tone: 'good' | 'warning' | 'neutral' }> = {
+  global: { ru: 'глобальная', tip: 'Писался для глобальной версии — как у вас.', tone: 'good' },
+  korea: { ru: 'Корея / Тайвань', tip: 'Основан на корейской или тайваньской версии: числа и набор стигм могут отличаться от глобальной.', tone: 'warning' },
+  mixed: { ru: 'смешанно', tip: 'Собран из источников разных версий игры.', tone: 'neutral' }
+}
+
+/** Источники сводного гайда: откуда что взято и для какой версии игры. */
+function SourceList({ sources }: { sources: GuideSource[] }) {
+  return (
+    <div className="mt-4 border-t border-line pt-3">
+      <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Источники ({sources.length})</div>
+      <div className="space-y-1">
+        {sources.map((src, i) => (
+          <div key={i} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+            {src.url ? (
+              <button onClick={() => void api.app.openExternal(src.url!)} className="inline-flex items-center gap-1 text-accent hover:underline">
+                {src.title ?? src.url} <ExternalLink size={11} />
+              </button>
+            ) : (
+              <span className="text-ink-2">{src.title}</span>
+            )}
+            {src.date && <span className="tnum text-ink-3">{src.date}</span>}
+            {src.kind === 'data' && (
+              <Pill tone="aether" tip="Не статья, а статистика: что реально носят игроки.">
+                данные игроков
+              </Pill>
+            )}
+            {src.region && (
+              <Pill tone={REGION[src.region].tone} tip={REGION[src.region].tip}>
+                {REGION[src.region].ru}
+              </Pill>
+            )}
+            {src.note && (
+              <Tooltip content={src.note}>
+                <span className="text-ink-3 underline decoration-dotted underline-offset-2">заметка</span>
+              </Tooltip>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   )

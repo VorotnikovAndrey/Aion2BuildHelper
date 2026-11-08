@@ -8,6 +8,7 @@
 |---|---|
 | `name`, `cls`, `mode` | Название, класс (`templar`, `gladiator`, …), назначение (`pve`, `pvp`, `leveling`, `other`) |
 | `description`, `source` | Описание и источник (`title`, `url`, `author`, `date`) |
+| `sources[]` | Для сводного гайда — все источники: `title`, `url`, `author`, `date`, `region` (`global` / `korea` / `mixed`), `kind` (`guide` или `data` — статистика игроков), `note` |
 | `skills[]` | Цели по умениям: `skill` (ID), `role` (`core` главное, `support`, `passive`, `stigma`, `situational`), `level` — к какому итоговому уровню стремиться, `specs` — нужные специализации **по важности**, `earlySpecs` — что ставить, пока главные не открыты, `equip` — для стигм: держать надетой, `note` |
 | `stats[]` | Веса статов `{ stat, weight }`: 5 — главное … 1 — «лучше, чем ничего»; не указан = 0 = бесполезно |
 | `gear` | `skills[]` — какие умения хороши строкой на шмоте (с весом); по желанию свои веса статов для `weapon`, `armor`, `accessory`; `notes` |
@@ -15,6 +16,7 @@
 | `arcana` | `attack[]` и `passive[]` — умения по важности; `useless[]`; `preferredSet` (`magic` / `vigor`); `notes` |
 | `daevanion.goals[]` | Цели: `name`, `description`, `skills[]` — у каких умений брать узлы «+1», `boards[]` — на каких досках (21–26 у стража), `nodes[]` — конкретные узлы |
 | `genus.stats[]` | Веса статов для Знания о видах (иначе — общие) |
+| `titles` | Рекомендуемые титулы по категориям — `attack[]`, `defense[]`, `utility[]` (ID титулов по порядку предпочтения), `notes`. Приложение советует первый собранный, который стоит выше надетого, а лучший несобранный показывает целью |
 | `rotation[]`, `tips[]`, `checklist[]` | Ротация по шагам, советы `{ title, text }`, разовые дела `{ id, text }` |
 
 ### Специализации

@@ -69,16 +69,39 @@ export function TitleCard({ slot, namer }: { slot: TitleSlotReport; namer: Namer
           wide
           content={
             <>
-              <b className="text-ink">{titleName(slot.better.title)}</b> уже есть в коллекции, и по приоритетам гайда его бонусы, похоже, полезнее:{' '}
-              {slot.better.title.equip.map(([s, v]) => `${namer.stat(s).main} ${formatStatValue(s, v)}`).join(', ')}.
-              <span className="mt-1 block text-ink-3">Оценка помощника: сравнивается важность статов по гайду, а не точные величины.</span>
+              <b className="text-ink">{titleName(slot.better.title)}</b> уже есть в коллекции.{' '}
+              {slot.better.reason === 'guide' ? 'Гайд ставит его выше надетого.' : 'По приоритетам гайда его бонусы, похоже, полезнее.'} Даёт:{' '}
+              {statText(slot.better.title.equip, namer)}.
+              {slot.better.reason === 'score' && (
+                <span className="mt-1 block text-ink-3">Оценка помощника: важность статов по гайду с учётом величины бонуса.</span>
+              )}
             </>
           }
         >
           <div className="mt-3 flex w-full items-center gap-2 rounded-lg border border-warning/35 bg-warning-soft px-2.5 py-1.5 text-[12px] text-warning">
             <TitleEmblem category={slot.better.title.category} grade={slot.better.title.grade} size={20} />
             <span className="min-w-0">
-              Есть полезнее: <b>{titleName(slot.better.title)}</b>
+              {slot.better.reason === 'guide' ? 'Гайд советует надеть' : 'Есть полезнее'}: <b>{titleName(slot.better.title)}</b>
+            </span>
+          </div>
+        </Tooltip>
+      )}
+      {slot.goal && (
+        <Tooltip
+          block
+          wide
+          content={
+            <>
+              <b className="text-ink">{titleName(slot.goal)}</b> — лучший титул этой категории по гайду, его пока нет в коллекции. Даёт:{' '}
+              {statText(slot.goal.equip, namer)}.
+              {slot.goal.source && slot.goal.source !== '—' && <span className="mt-1 block text-ink-3">Где взять: {slot.goal.source}.</span>}
+            </>
+          }
+        >
+          <div className="mt-2 flex w-full items-center gap-2 rounded-lg border border-aether/30 bg-aether-soft px-2.5 py-1.5 text-[12px] text-aether">
+            <TitleEmblem category={slot.goal.category} grade={slot.goal.grade} size={20} dim />
+            <span className="min-w-0">
+              Цель: <b>{titleName(slot.goal)}</b> — ещё не получен
             </span>
           </div>
         </Tooltip>
@@ -86,6 +109,8 @@ export function TitleCard({ slot, namer }: { slot: TitleSlotReport; namer: Namer
     </div>
   )
 }
+
+const statText = (list: [number, number][], namer: Namer) => list.map(([s, v]) => `${namer.stat(s).main} ${formatStatValue(s, v)}`).join(', ')
 
 // ───────────── Пантеон ─────────────
 

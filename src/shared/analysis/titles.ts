@@ -16,8 +16,10 @@ export interface TitleSlotReport {
   equipped: TitleDef | null
   /** Польза надетого по гайду (оценка помощника). */
   score: number
-  /** Собранный титул этой категории, который по гайду, похоже, полезнее надетого. */
-  better: { title: TitleDef; score: number } | null
+  /** Собранный титул этой категории, который стоит надеть вместо текущего. */
+  better: { title: TitleDef; score: number; reason: 'guide' | 'score' } | null
+  /** Лучший титул категории по гайду, если его ещё нет в коллекции, — цель на будущее. */
+  goal: TitleDef | null
 }
 
 export interface TitlesReport {
@@ -43,19 +45,33 @@ export function analyzeTitles(char: Character, guide: Guide | null): TitlesRepor
   const owned = new Set(char.ownedTitles)
   const equipped = char.titles.map(titleDef).filter((t): t is TitleDef => !!t)
 
-  const slots = TITLE_CATEGORIES.map(({ id, ru }) => {
+  const slots = TITLE_CATEGORIES.map(({ id, ru }): TitleSlotReport => {
     const on = equipped.find((t) => t.category === id) ?? null
     const score = on ? titleScore(on, weight) : 0
+    const list = (guide?.titles?.[id] ?? []).map(titleDef).filter((t): t is TitleDef => !!t)
+
+    // Гайд назвал титулы — советуем по его списку: первый собранный, который стоит выше надетого.
+    if (list.length) {
+      const rank = (t: TitleDef | null) => (t ? list.findIndex((x) => x.id === t.id) : -1)
+      const pick = list.find((t) => owned.has(t.id)) ?? null
+      const onRank = rank(on)
+      const better =
+        pick && pick.id !== on?.id && (onRank === -1 || rank(pick) < onRank) ? { title: pick, score: titleScore(pick, weight), reason: 'guide' as const } : null
+      const top = list[0]
+      const goal = !owned.has(top.id) && top.id !== on?.id ? top : null
+      return { category: id, ru, equipped: on, score, better, goal }
+    }
+
     let better: TitleSlotReport['better'] = null
     if (guide) {
       for (const t of TITLES) {
         if (t.category !== id || !owned.has(t.id) || t.id === on?.id) continue
         const s = titleScore(t, weight)
         // Советуем менять, только если разница заметная: больше балла и больше четверти.
-        if (s >= score + 1 && s >= score * 1.25 && (!better || s > better.score)) better = { title: t, score: s }
+        if (s >= score + 1 && s >= score * 1.25 && (!better || s > better.score)) better = { title: t, score: s, reason: 'score' }
       }
     }
-    return { category: id, ru, equipped: on, score, better }
+    return { category: id, ru, equipped: on, score, better, goal: null }
   })
 
   const collection = new Map<number, number>()

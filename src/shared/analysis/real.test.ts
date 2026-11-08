@@ -3,7 +3,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { templarPveMobalytics } from '../guide/builtin/templarPveMobalytics'
+import { templarPveConsensus } from '../guide/builtin/templarPveConsensus'
 import { createNamer } from '../names'
 import { parseQuestlogCharacters } from '../questlog/parse'
 import { analyzeBuild } from './build'
@@ -17,7 +17,7 @@ describe.skipIf(!existsSync(file))('реальные данные (samples/priva
     const char = data.characters.find((c) => c.cls === 'templar')
     expect(char).toBeDefined()
     const n = createNamer('ru')
-    const r = analyzeBuild(char!, templarPveMobalytics, n, { knownOptions: learnGearOptions(data.characters) })
+    const r = analyzeBuild(char!, templarPveConsensus, n, { knownOptions: learnGearOptions(data.characters) })
     if (process.env.SHOW) {
       console.log(char!.name, r.scores)
       for (const s of r.steps) console.log(`[${s.impact}] ${s.title} — ${s.detail ?? ''}`)

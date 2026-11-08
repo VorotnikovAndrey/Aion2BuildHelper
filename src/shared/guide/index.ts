@@ -2,12 +2,14 @@
 
 import { classInfo } from '../gamedata/classes'
 import { toClassKey } from '../questlog/parse'
+import { templarPveConsensus } from './builtin/templarPveConsensus'
 import { templarPveMobalytics } from './builtin/templarPveMobalytics'
-import { GUIDE_SCHEMA, type Guide, type GuideMode, type SkillRole, type SkillTarget, type StatWeight } from './types'
+import { GUIDE_SCHEMA, type Guide, type GuideMode, type GuideSource, type SkillRole, type SkillTarget, type StatWeight } from './types'
 
 export * from './types'
 
-export const BUILTIN_GUIDES: Guide[] = [templarPveMobalytics]
+/** Первый подходящий по классу — гайд по умолчанию. Сводный идёт первым: приложение не следует одному гайду вслепую. */
+export const BUILTIN_GUIDES: Guide[] = [templarPveConsensus, templarPveMobalytics]
 
 type Obj = Record<string, unknown>
 const isObj = (v: unknown): v is Obj => typeof v === 'object' && v !== null && !Array.isArray(v)
@@ -57,8 +59,16 @@ export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
   const arcana = isObj(raw.arcana) ? raw.arcana : {}
   const daev = isObj(raw.daevanion) ? raw.daevanion : {}
   const genus = isObj(raw.genus) ? raw.genus : {}
-  const source = isObj(raw.source) ? raw.source : undefined
   const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v : undefined)
+  const toSource = (v: unknown): GuideSource | undefined => {
+    if (!isObj(v)) return undefined
+    const out: GuideSource = { title: str(v.title), url: str(v.url), author: str(v.author), date: str(v.date) }
+    if (v.region === 'global' || v.region === 'korea' || v.region === 'mixed') out.region = v.region
+    if (v.kind === 'guide' || v.kind === 'data') out.kind = v.kind
+    if (str(v.note)) out.note = str(v.note)
+    return out
+  }
+  const titles = isObj(raw.titles) ? raw.titles : undefined
 
   return {
     schema: GUIDE_SCHEMA,
@@ -67,7 +77,8 @@ export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
     cls,
     mode: MODES.includes(raw.mode as GuideMode) ? (raw.mode as GuideMode) : 'other',
     description: str(raw.description),
-    source: source ? { title: str(source.title), url: str(source.url), author: str(source.author), date: str(source.date) } : undefined,
+    source: toSource(raw.source),
+    sources: Array.isArray(raw.sources) ? raw.sources.map(toSource).filter((x): x is GuideSource => !!x) : undefined,
     updatedAt: str(raw.updatedAt) ?? new Date().toISOString(),
     skills,
     stats: weights(raw.stats),
@@ -100,6 +111,14 @@ export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
       notes: str(daev.notes)
     },
     genus: { stats: genus.stats ? weights(genus.stats) : undefined, notes: str(genus.notes) },
+    titles: titles
+      ? {
+          attack: nums(titles.attack).length ? nums(titles.attack) : undefined,
+          defense: nums(titles.defense).length ? nums(titles.defense) : undefined,
+          utility: nums(titles.utility).length ? nums(titles.utility) : undefined,
+          notes: str(titles.notes)
+        }
+      : undefined,
     rotation: Array.isArray(raw.rotation) ? raw.rotation.filter((x): x is string => typeof x === 'string') : undefined,
     tips: Array.isArray(raw.tips)
       ? raw.tips.filter(isObj).flatMap((t) => (typeof t.title === 'string' && typeof t.text === 'string' ? [{ title: t.title, text: t.text }] : []))
