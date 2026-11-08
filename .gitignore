@@ -1,0 +1,11 @@
+node_modules/
+out/
+dist/
+*.log
+.DS_Store
+
+# Кэш скачанных страниц для npm run gamedata
+.cache/
+
+# Реальные данные персонажа для локальной проверки — не коммитим
+samples/private/

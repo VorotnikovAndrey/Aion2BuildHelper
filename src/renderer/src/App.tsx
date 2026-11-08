@@ -1,0 +1,65 @@
+import { useLayoutEffect, useRef } from 'react'
+import { createHashRouter, Route, RouterProvider, Routes, useLocation } from 'react-router'
+import { Sidebar } from './layout/Sidebar'
+import { NoData } from './pages/NoData'
+import { OverviewPage } from './pages/OverviewPage'
+import { SkillsPage } from './pages/SkillsPage'
+import { GearPage } from './pages/GearPage'
+import { ArcanaPage } from './pages/ArcanaPage'
+import { DaevanionPage } from './pages/DaevanionPage'
+import { GenusPage } from './pages/GenusPage'
+import { CollectionsPage } from './pages/CollectionsPage'
+import { StatsPage } from './pages/StatsPage'
+import { HistoryPage } from './pages/HistoryPage'
+import { GuidesPage } from './pages/GuidesPage'
+import { GuideEditorPage } from './pages/GuideEditorPage'
+import { ChecklistPage } from './pages/ChecklistPage'
+import { SettingsPage } from './pages/SettingsPage'
+import { useCharacter } from './lib/store'
+
+export function App() {
+  return <RouterProvider router={router} />
+}
+
+const router = createHashRouter([{ path: '*', element: <Shell /> }])
+
+function Shell() {
+  const char = useCharacter()
+  const location = useLocation()
+  const main = useRef<HTMLElement>(null)
+  // Новая страница открывается сверху.
+  useLayoutEffect(() => {
+    main.current?.scrollTo({ top: 0 })
+  }, [location.pathname])
+
+  return (
+    <div className="flex h-full">
+      <Sidebar />
+      <main ref={main} className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
+        <div key={location.pathname} className="mx-auto max-w-[1280px] animate-fade-in px-8 py-7">
+          <Routes>
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/guides" element={<GuidesPage />} />
+            <Route path="/guides/:id/edit" element={<GuideEditorPage />} />
+            {char ? (
+              <>
+                <Route path="/" element={<OverviewPage />} />
+                <Route path="/skills" element={<SkillsPage />} />
+                <Route path="/gear" element={<GearPage />} />
+                <Route path="/arcana" element={<ArcanaPage />} />
+                <Route path="/daevanion" element={<DaevanionPage />} />
+                <Route path="/genus" element={<GenusPage />} />
+                <Route path="/collections" element={<CollectionsPage />} />
+                <Route path="/stats" element={<StatsPage />} />
+                <Route path="/history" element={<HistoryPage />} />
+                <Route path="/checklist" element={<ChecklistPage />} />
+              </>
+            ) : (
+              <Route path="*" element={<NoData />} />
+            )}
+          </Routes>
+        </div>
+      </main>
+    </div>
+  )
+}

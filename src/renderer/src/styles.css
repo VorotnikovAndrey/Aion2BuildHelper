@@ -1,0 +1,147 @@
+@import 'tailwindcss';
+
+/*
+  Дизайн-токены Aion2 Build Helper. Тёмная тема: глубокий сине-чёрный фон, золотой акцент
+  (как рамки интерфейса Aion), голубой «эфир» для второстепенного. Все цвета — отсюда,
+  hex в компонентах не пишем. Подробнее: docs/design.md
+*/
+@theme {
+  --font-sans: 'Inter Variable', system-ui, 'Segoe UI', sans-serif;
+
+  --color-bg: #0f1117;
+  --color-sidebar: #0b0d12;
+  --color-surface: #161a23;
+  --color-surface-2: #1c212c;
+  --color-surface-3: #262c3a;
+  --color-line: rgb(255 255 255 / 0.07);
+  --color-line-strong: rgb(255 255 255 / 0.13);
+
+  --color-ink: #e9ecf2;
+  --color-ink-2: #b4bccb;
+  --color-ink-3: #7d8698;
+
+  --color-accent: #d9a441;
+  --color-accent-2: color-mix(in oklab, var(--color-accent) 75%, white);
+  --color-accent-soft: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  --color-on-accent: #17130a;
+  --color-aether: #55c7ec;
+  --color-aether-soft: color-mix(in srgb, var(--color-aether) 14%, transparent);
+
+  /* Статусы — только вместе с иконкой или подписью */
+  --color-good: #3fb950;
+  --color-good-soft: color-mix(in srgb, var(--color-good) 15%, transparent);
+  --color-teal: #2bb3a3;
+  --color-warning: #e3b341;
+  --color-warning-soft: color-mix(in srgb, var(--color-warning) 14%, transparent);
+  --color-critical: #e5534b;
+  --color-critical-soft: color-mix(in srgb, var(--color-critical) 14%, transparent);
+  --color-info: #58a6ff;
+
+  /* Грейды предметов — как в игре */
+  --color-grade-mythic: #ec7c3f;
+  --color-grade-unique: #e3b341;
+  --color-grade-epic: #b383ff;
+  --color-grade-rare: #4aa8ff;
+  --color-grade-common: #9aa3b2;
+
+  /* Фон карт аркан: «магия» — холодный, «жизнь» — тёплый */
+  --color-card-magic-1: #1b2a44;
+  --color-card-magic-2: #152034;
+  --color-card-magic-3: #0f1520;
+  --color-card-vigor-1: #3a2a12;
+  --color-card-vigor-2: #241b10;
+  --color-card-vigor-3: #15110b;
+
+  /* Серии графиков */
+  --color-series-1: #d9a441;
+  --color-series-2: #55c7ec;
+  --color-series-3: #3fb950;
+  --color-series-4: #b383ff;
+  --color-grid: #1f2430;
+  --color-axis: #2b3242;
+
+  --animate-fade-in: fade-in 0.35s ease-out both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+input,
+textarea,
+.selectable {
+  user-select: text;
+}
+
+::selection {
+  background: var(--color-accent-soft);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-3);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Цифры одинаковой ширины — колонки чисел не прыгают */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Мягкое свечение для золотых рамок (арканы, активный пункт меню) */
+.glow-accent {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 55%, transparent),
+    0 0 18px -4px color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+.static-mode *,
+.static-mode *::before,
+.static-mode *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

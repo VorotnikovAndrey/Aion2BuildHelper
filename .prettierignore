@@ -1,0 +1,6 @@
+out/
+dist/
+node_modules/
+.cache/
+src/shared/gamedata/generated/
+samples/

@@ -1,0 +1,60 @@
+# Архитектура
+
+```
+ Questlog overlay ──writes──▶ %APPDATA%\Questlog\aion-2\characters.json
+                                         │ fs.watch + опрос раз в 15 с
+                                         ▼
+ ┌──────────────── main (Electron) ────────────────┐
+ │ questlog.ts  читать → parseQuestlogCharacters   │
+ │              → история: diff со снимком → JSON  │
+ │ storage.ts   настройки, свои гайды, история     │──IPC──▶ preload (window.api)
+ │ ipc.ts       контракт shared/api.ts             │
+ └─────────────────────────────────────────────────┘
+                                                              │
+ ┌──────────────── renderer (React) ───────────────────────────▼─┐
+ │ lib/store.ts   zustand: источник, настройки, гайды            │
+ │ lib/report.ts  персонаж + гайд + отметки → analyzeBuild()     │
+ │ pages/*        только показывают BuildReport                  │
+ └───────────────────────────────────────────────────────────────┘
+                     ▲
+       src/shared: types, questlog/parse, gamedata/*, guide/*, analysis/*, names
+```
+
+## Слои
+
+**`src/shared` — вся логика.** Без Electron и React, поэтому тестируется vitest'ом и одинаково работает в приложении и в браузерном режиме.
+
+- `questlog/parse.ts` — терпимый разбор файла оверлея в модель `Character` (`types.ts`). Кривые записи пропускаются, неизвестные поля игнорируются.
+- `gamedata/*` — справочники. Сгенерированные JSON (`generated/`) + ручные русские названия и знания о механиках (слоты, арканы, род, опции шмота).
+- `guide/*` — формат гайда (`types.ts`), проверка импорта (`normalizeGuide`), встроенные гайды (`builtin/`).
+- `analysis/*` — разбор персонажа по гайду. Каждый раздел — свой модуль с функцией `analyzeX(char, guide)` и оценкой 0–100. `build.ts` собирает всё в `BuildReport` и строит список «что сделать дальше». `history.ts` — сводка снимка и разница между снимками.
+- `names.ts` — `Namer`: как назвать умение / стат / вещь / узел в текущем режиме (ru, en, оба) с учётом своих названий пользователя.
+
+**`src/main` — Electron.**
+
+- `questlog.ts` — путь к файлу (стандартный или выбранный), чтение, слежение (`fs.watch` на папку + страховочный опрос), запись истории при каждом обновлении.
+- `storage.ts` — `%APPDATA%\Aion2 Build Helper`: `settings.json`, `guides/*.json`, `history/<персонаж>.json`, `snapshots/<персонаж>.json`. Запись атомарная (через `.tmp`).
+- `ipc.ts` — обработчики `window.api` (контракт — `shared/api.ts`): источник, настройки, гайды (+ диалоги импорта/экспорта), история, служебное.
+- `devShots.ts` — режим автоскриншотов (`npm run shots`).
+
+**`src/renderer` — интерфейс.**
+
+- `lib/store.ts` — состояние: данные источника, настройки, свои гайды; хуки `useCharacter`, `useActiveGuide`, `useCharacterPrefs`.
+- `lib/report.ts` — `useCharacterContext()`: персонаж + гайд + ручные отметки → мемоизированный `BuildReport`.
+- `lib/webApi.ts` — реализация `window.api` для браузера (`npm run dev:web`): данные отдаёт dev-сервер Vite, настройки — localStorage.
+- `pages/*` — экраны; `components/ui/*` — общие элементы; `components/game.tsx` — игровые (вердикты, грейды, классы).
+
+## Данные пользователя
+
+| Что | Где | Зачем |
+|---|---|---|
+| Настройки | `settings.json` | путь к файлу оверлея, режим названий, свои названия, скрытые персонажи, по персонажу: гайд, ручные специализации, чек-лист, задачи, заметки |
+| Свои гайды | `guides/<id>.json` | формат `shared/guide/types.ts` |
+| История | `history/<сервер_имя>.json` | до 3000 записей: сводка снимка + список изменений |
+| Последний снимок | `snapshots/<сервер_имя>.json` | с ним сравнивается следующее обновление |
+
+## Почему так
+
+- [0001 — Electron и файл оверлея](decisions/0001-electron-and-overlay-file.md)
+- [0002 — JSON-файлы вместо базы](decisions/0002-local-json-storage.md)
+- [0003 — Гайды по игровым ID](decisions/0003-guides-by-game-ids.md)

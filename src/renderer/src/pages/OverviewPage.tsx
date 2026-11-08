@@ -1,0 +1,381 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router'
+import { ArrowRight, CheckCircle2, ExternalLink, Layers, Shirt, Sparkles, Swords, TrendingDown, TrendingUp, Waypoints } from 'lucide-react'
+import { Line, LineChart, ResponsiveContainer, Tooltip as ChartTooltip, XAxis, YAxis } from 'recharts'
+import type { NextStep, StepArea } from '@shared/analysis/build'
+import { describeChange } from '@shared/analysis/history'
+import { classInfo, RACES } from '@shared/gamedata/classes'
+import { ARCANA_TYPES } from '@shared/gamedata/arcana'
+import { MODE_LABEL } from '@shared/guide/types'
+import { GuideSwitcher } from '@/components/GuideSwitcher'
+import { ClassIcon, ImpactPill } from '@/components/game'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { EmptyState, StatTile } from '@/components/ui/misc'
+import { Pill, toneOfShare } from '@/components/ui/Pill'
+import { ProgressBar, ScoreRing } from '@/components/ui/Progress'
+import { ago, cn, compact, dateTime, fmt } from '@/lib/format'
+import { abyssRankName, useHistory } from '@/lib/history'
+import { useCharacterContext } from '@/lib/report'
+import { api } from '@/lib/store'
+
+const AREA_ROUTE: Record<StepArea, string> = {
+  skills: '/skills',
+  stigmas: '/skills',
+  gear: '/gear',
+  arcana: '/arcana',
+  daevanion: '/daevanion',
+  genus: '/genus'
+}
+
+const AREA_ICON: Record<StepArea, typeof Swords> = {
+  skills: Swords,
+  stigmas: Swords,
+  gear: Shirt,
+  arcana: Sparkles,
+  daevanion: Waypoints,
+  genus: Layers
+}
+
+export function OverviewPage() {
+  const ctx = useCharacterContext()!
+  const { char, guide, report } = ctx
+  const navigate = useNavigate()
+  const info = classInfo(char.cls)
+
+  return (
+    <>
+      {/* Шапка персонажа */}
+      <section className="relative mb-6 overflow-hidden rounded-2xl border border-line bg-gradient-to-br from-surface-2 via-surface to-surface p-6">
+        <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
+        <div className="relative flex flex-wrap items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <span className="glow-accent flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-3 text-accent">
+              <ClassIcon cls={char.cls} size={30} />
+            </span>
+            <div>
+              <h1 className="text-3xl font-semibold tracking-tight">{char.name}</h1>
+              <p className="mt-1 text-[13px] text-ink-2">
+                {info?.ru ?? 'Класс неизвестен'} · ур. {char.level}
+                {char.legion ? ` · ${char.legion}` : ''} · сервер {char.server}
+                {char.race && RACES[char.race] ? ` · ${RACES[char.race].ru}` : ''}
+              </p>
+              <p className="mt-0.5 text-[11px] text-ink-3">Оверлей видел персонажа {ago(char.updatedAt)}</p>
+            </div>
+          </div>
+          <GuideSwitcher char={char} />
+        </div>
+        <div className="relative mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <StatTile label="Боевая мощь" value={compact(char.combatPower)} sub={fmt(char.combatPower)} accent />
+          <StatTile label="Уровень снаряжения" value={fmt(char.gearScore)} />
+          <StatTile
+            label="Ранг Бездны"
+            value={char.abyss ? abyssRankName(char.abyss.grade) : '—'}
+            sub={char.abyss ? `Очки: ${compact(char.abyss.points)}` : undefined}
+          />
+          <StatTile
+            label="Сезон Бездны"
+            value={char.abyss ? `${char.abyss.kills} / ${char.abyss.deaths} / ${char.abyss.assists}` : '—'}
+            sub="убийства / смерти / помощь"
+          />
+        </div>
+      </section>
+
+      {!guide ? (
+        <EmptyState
+          title="Гайд не выбран"
+          action={
+            <Button variant="primary" onClick={() => navigate('/guides')}>
+              Выбрать гайд
+            </Button>
+          }
+        >
+          Без гайда приложение показывает персонажа как есть, но не может подсказать, чего не хватает. Выберите встроенный гайд или создайте свой.
+        </EmptyState>
+      ) : (
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_380px]">
+          <div className="flex min-w-0 flex-col gap-5">
+            <NextSteps steps={report.steps} onOpen={(s) => navigate(AREA_ROUTE[s.area])} />
+            <BuildGlance ctx={ctx} />
+          </div>
+          <div className="flex min-w-0 flex-col gap-5">
+            <Card
+              title="Готовность билда"
+              hint="Насколько персонаж совпадает с выбранным гайдом. Умения и Даэванион весят больше всего — от них зависят ключевые специализации."
+            >
+              <div className="flex items-center gap-5">
+                <ScoreRing value={report.scores.overall} size={104} label="из 100" />
+                <div className="min-w-0 flex-1 space-y-2.5">
+                  {(
+                    [
+                      ['Умения', report.scores.skills, '/skills'],
+                      ['Даэванион', report.scores.daevanion, '/daevanion'],
+                      ['Шмот', report.scores.gear, '/gear'],
+                      ['Арканы', report.scores.arcana, '/arcana'],
+                      ['Познание рода', report.scores.genus, '/genus']
+                    ] as const
+                  ).map(([label, value, to]) => (
+                    <button key={label} onClick={() => navigate(to)} className="block w-full text-left">
+                      <div className="mb-1 flex items-center justify-between text-xs">
+                        <span className="text-ink-2">{label}</span>
+                        <span className="tnum text-ink-3">{value}</span>
+                      </div>
+                      <ProgressBar value={value} height={5} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-4 rounded-lg bg-surface-2 px-3 py-2.5 text-xs text-ink-3">
+                <span className="text-ink-2">{guide.name}</span> · {MODE_LABEL[guide.mode]}
+                {guide.source?.url && (
+                  <button
+                    onClick={() => void api.app.openExternal(guide.source!.url!)}
+                    className="ml-1.5 inline-flex items-center gap-1 text-accent hover:underline"
+                  >
+                    источник <ExternalLink size={11} />
+                  </button>
+                )}
+              </div>
+            </Card>
+            <GrowthCard ctx={ctx} />
+            <RecentChanges ctx={ctx} />
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+type Ctx = NonNullable<ReturnType<typeof useCharacterContext>>
+
+function BuildGlance({ ctx }: { ctx: Ctx }) {
+  const { report, namer } = ctx
+  const core = report.skills.filter((s) => s.role === 'core')
+  return (
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <Card title="Главные умения" hint="Умения, вокруг которых построен гайд: уровень против цели и специализации." actions={<GoLink to="/skills" />}>
+        <div className="space-y-3">
+          {core.map((s) => (
+            <div key={s.skill}>
+              <div className="mb-1 flex items-center justify-between gap-2 text-[13px]">
+                <span className="truncate">{namer.skill(s.skill).main}</span>
+                <span className="tnum shrink-0 text-xs text-ink-3">
+                  ур. <span className={s.levelGap ? 'text-warning' : 'text-good'}>{s.level}</span>
+                  {s.targetLevel ? ` / ${s.targetLevel}` : ''}
+                </span>
+              </div>
+              <ProgressBar value={s.targetLevel ? (Math.min(s.level, s.targetLevel) / s.targetLevel) * 100 : 100} height={4} />
+            </div>
+          ))}
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {report.stigmas.equipped.map((id) => (
+              <Pill key={id} tone={report.stigmas.wanted.includes(id) ? 'good' : 'neutral'}>
+                {namer.skill(id).main}
+              </Pill>
+            ))}
+            {report.stigmas.missing.map((id) => (
+              <Pill key={id} tone="critical">
+                нет: {namer.skill(id).main}
+              </Pill>
+            ))}
+          </div>
+        </div>
+      </Card>
+      <Card title="Арканы" hint="Сколько нужных по гайду умений на каждой карте и заточка." actions={<GoLink to="/arcana" />}>
+        <div className="space-y-2">
+          {report.arcana.cards.map((c) => {
+            const wanted = c.skills.filter((s) => s.cls === 'wanted').length
+            return (
+              <div key={c.slot} className="flex items-center gap-3 text-[13px]">
+                <span className="w-28 truncate">{c.info?.ru ?? ARCANA_TYPES.find((t) => t.type === c.type)!.ru}</span>
+                <Pill tone={toneOfShare(wanted, c.desired.length)}>
+                  {wanted} из {c.desired.length}
+                </Pill>
+                <span className="tnum text-xs text-ink-3">
+                  +{c.enchant}/{c.maxEnchant}
+                </span>
+                <ProgressBar value={c.score} height={4} className="flex-1" />
+              </div>
+            )
+          })}
+        </div>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {report.arcana.sets
+            .filter((s) => s.count)
+            .map((s) => (
+              <Pill key={s.variant} tone={s.active ? 'accent' : 'neutral'}>
+                {s.name}: {s.count}/4
+              </Pill>
+            ))}
+        </div>
+      </Card>
+      <Card title="Даэванион" hint="Цели гайда по доскам: сколько нужных узлов взято." actions={<GoLink to="/daevanion" />}>
+        <div className="space-y-3">
+          {report.daevanion.goals.map((g) => (
+            <div key={g.goal.id}>
+              <div className="mb-1 flex items-center justify-between gap-2 text-[13px]">
+                <span className="truncate">{g.goal.name}</span>
+                <span className="tnum shrink-0 text-xs text-ink-3">
+                  {g.done}/{g.required.length}
+                </span>
+              </div>
+              <ProgressBar value={g.required.length ? (g.done / g.required.length) * 100 : 100} height={4} />
+            </div>
+          ))}
+          <p className="text-xs text-ink-3">Вложено очков: {fmt(report.daevanion.spent)}</p>
+        </div>
+      </Card>
+      <Card title="Шмот и род" hint="Доля полезных строк на шмоте и в Познании рода." actions={<GoLink to="/gear" />}>
+        <div className="space-y-3 text-[13px]">
+          <Row label="Полезных строк на шмоте" value={`${sum(report.gear.map((g) => g.useful))} из ${sum(report.gear.map((g) => g.total))}`} />
+          <Row label="Строк «менять»" value={String(sum(report.gear.map((g) => g.replace.length)))} warn />
+          <Row
+            label="Слабых манакамней"
+            value={`${report.gear.flatMap((g) => g.manastones).filter((m) => m.weight <= 1).length} из ${report.gear.flatMap((g) => g.manastones).length}`}
+            warn
+          />
+          <Row
+            label="Ячеек рода под переброс"
+            value={`${sum(report.genus.genuses.map((g) => g.reroll.length))} из ${sum(report.genus.genuses.map((g) => g.slots.length))}`}
+            warn
+          />
+        </div>
+      </Card>
+    </div>
+  )
+}
+
+function GrowthCard({ ctx }: { ctx: Ctx }) {
+  const { char } = ctx
+  const { entries } = useHistory(char.key)
+  const points = entries.map((e) => ({ t: e.summary.at || e.savedAt, cp: e.summary.combatPower }))
+  const first = points[0]
+  const delta = first ? char.combatPower - first.cp : 0
+  return (
+    <Card title="Рост боевой мощи" hint="Строится по снимкам, которые приложение сохраняет при каждом обновлении данных оверлея.">
+      {points.length < 2 ? (
+        <p className="text-[13px] text-ink-3">История копится с первого запуска. Как только оверлей обновит персонажа ещё раз, здесь появится график.</p>
+      ) : (
+        <>
+          <div className="mb-2 flex items-center gap-2 text-[13px]">
+            {delta >= 0 ? <TrendingUp size={15} className="text-good" /> : <TrendingDown size={15} className="text-critical" />}
+            <span className={delta >= 0 ? 'text-good' : 'text-critical'}>
+              {delta >= 0 ? '+' : ''}
+              {fmt(delta)}
+            </span>
+            <span className="text-ink-3">с {dateTime(first.t)}</span>
+          </div>
+          <div className="h-28">
+            <ResponsiveContainer>
+              <LineChart data={points} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+                <XAxis dataKey="t" hide type="number" domain={['dataMin', 'dataMax']} />
+                <YAxis hide domain={['dataMin - 1000', 'dataMax + 1000']} />
+                <ChartTooltip
+                  contentStyle={{ background: 'var(--color-surface-3)', border: '1px solid var(--color-line-strong)', borderRadius: 8, fontSize: 12 }}
+                  labelFormatter={(t) => dateTime(Number(t))}
+                  formatter={(v) => [fmt(Number(v)), 'Боевая мощь']}
+                />
+                <Line type="monotone" dataKey="cp" stroke="var(--color-accent)" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </>
+      )}
+    </Card>
+  )
+}
+
+function RecentChanges({ ctx }: { ctx: Ctx }) {
+  const { char, namer } = ctx
+  const { entries } = useHistory(char.key)
+  const recent = entries
+    .slice()
+    .reverse()
+    .flatMap((e) => e.changes.map((c) => ({ at: e.savedAt, c })))
+    .filter(({ c }) => c.kind !== 'gearScore')
+    .slice(0, 7)
+  return (
+    <Card title="Последние изменения" actions={<GoLink to="/history" />}>
+      {recent.length === 0 ? (
+        <p className="text-[13px] text-ink-3">Изменений пока нет — они появятся после следующего обновления оверлея.</p>
+      ) : (
+        <ul className="space-y-2">
+          {recent.map(({ at, c }, i) => {
+            const d = describeChange(c, namer)
+            return (
+              <li key={i} className="flex items-start gap-2 text-[13px]">
+                <span className={cn('mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full', d.good === true ? 'bg-good' : d.good === false ? 'bg-critical' : 'bg-ink-3')} />
+                <span className="min-w-0 flex-1 text-ink-2">{d.text}</span>
+                <span className="shrink-0 text-[11px] text-ink-3">{ago(at)}</span>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </Card>
+  )
+}
+
+function NextSteps({ steps, onOpen }: { steps: NextStep[]; onOpen: (s: NextStep) => void }) {
+  const [all, setAll] = useState(false)
+  const shown = all ? steps : steps.slice(0, 8)
+  return (
+    <Card
+      title="Что сделать дальше"
+      hint="Список собран из разницы между персонажем и гайдом. Сверху — то, что сильнее всего влияет на билд. Нажмите на пункт, чтобы открыть раздел."
+      actions={<Pill tone={steps.length ? 'accent' : 'good'}>{steps.length ? `${steps.length} шагов` : 'всё по гайду'}</Pill>}
+    >
+      {steps.length === 0 ? (
+        <div className="flex items-center gap-2 text-[13px] text-good">
+          <CheckCircle2 size={16} /> Персонаж полностью совпадает с гайдом. Самое время выбрать гайд посерьёзнее.
+        </div>
+      ) : (
+        <ul className="-mx-2">
+          {shown.map((s) => {
+            const Icon = AREA_ICON[s.area]
+            return (
+              <li key={s.id}>
+                <button
+                  onClick={() => onOpen(s)}
+                  className="group flex w-full items-start gap-3 rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-surface-2"
+                >
+                  <Icon size={16} className="mt-0.5 shrink-0 text-ink-3 group-hover:text-accent" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[13px] leading-snug">{s.title}</span>
+                    {s.detail && <span className="mt-0.5 block text-xs leading-relaxed text-ink-3">{s.detail}</span>}
+                  </span>
+                  <ImpactPill impact={s.impact} />
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+      {steps.length > 8 && (
+        <Button variant="ghost" size="sm" className="mt-2" onClick={() => setAll((v) => !v)}>
+          {all ? 'Свернуть' : `Показать все (${steps.length})`}
+        </Button>
+      )}
+    </Card>
+  )
+}
+
+function GoLink({ to }: { to: string }) {
+  const navigate = useNavigate()
+  return (
+    <button onClick={() => navigate(to)} className="flex items-center gap-1 text-xs text-ink-3 hover:text-accent">
+      подробнее <ArrowRight size={12} />
+    </button>
+  )
+}
+
+function Row({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-ink-2">{label}</span>
+      <span className={cn('tnum', warn && value.trim().startsWith('0') ? 'text-good' : warn ? 'text-warning' : 'text-ink')}>{value}</span>
+    </div>
+  )
+}
+
+const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0)

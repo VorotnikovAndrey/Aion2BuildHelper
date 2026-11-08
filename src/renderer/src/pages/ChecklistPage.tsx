@@ -1,0 +1,148 @@
+import { useState } from 'react'
+import { CheckCircle2, Circle, ListChecks, Plus, Trash2 } from 'lucide-react'
+import { GuideSwitcher } from '@/components/GuideSwitcher'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { PageHeader } from '@/components/ui/misc'
+import { Pill, toneOfShare } from '@/components/ui/Pill'
+import { cn } from '@/lib/format'
+import { useCharacterContext } from '@/lib/report'
+import { useApp, useCharacterPrefs } from '@/lib/store'
+
+export function ChecklistPage() {
+  const ctx = useCharacterContext()!
+  const { char, guide, report, namer } = ctx
+  const prefs = useCharacterPrefs(char.key)
+  const setPrefs = useApp((s) => s.updateCharacterPrefs)
+  const [text, setText] = useState('')
+
+  // Вехи считаются сами из разбора — отмечать их не нужно.
+  const milestones: { id: string; text: string; done: boolean; unsure?: boolean }[] = [
+    ...report.skills
+      .filter((s) => s.role === 'core' && s.targetLevel)
+      .map((s) => ({ id: `lvl-${s.skill}`, text: `${namer.skill(s.skill).main}: ур. ${s.targetLevel}`, done: s.levelGap === 0 })),
+    ...report.skills
+      .filter((s) => s.role === 'core' && s.specs && s.specs.wanted.length)
+      .map((s) => ({
+        id: `spec-${s.skill}`,
+        text: `${namer.skill(s.skill).main}: специализации ${s.specs!.wanted.join(', ')}`,
+        done: s.specs!.ok,
+        unsure: report.specsUncertain && s.specsSource === 'overlay'
+      })),
+    { id: 'stigmas', text: 'Стигмы гайда надеты', done: report.stigmas.missing.length === 0 },
+    ...report.daevanion.goals.map((g) => ({
+      id: `goal-${g.goal.id}`,
+      text: `Даэванион: ${g.goal.name}`,
+      done: g.required.length > 0 && g.done === g.required.length
+    })),
+    ...report.arcana.cards.map((c) => ({ id: `arc-${c.slot}`, text: `${c.info?.ru ?? 'Аркана'}: нужный набор и +${c.maxEnchant}`, done: c.done })),
+    { id: 'gear', text: 'На шмоте нет бесполезных строк', done: report.gear.every((g) => g.replace.length === 0) }
+  ]
+  const doneCount = milestones.filter((m) => m.done).length
+
+  const tasks = prefs.tasks ?? []
+  const checks = prefs.checklist ?? {}
+  const guideItems = guide?.checklist ?? []
+
+  return (
+    <>
+      <PageHeader
+        icon={<ListChecks size={22} />}
+        title="Чек-лист"
+        subtitle="Вехи гайда отмечаются сами по данным персонажа. Разовые дела гайда (макросы, бинды) и свои задачи отмечайте вручную."
+        actions={<GuideSwitcher char={char} />}
+      />
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+        <Card title="Вехи гайда" actions={<Pill tone={toneOfShare(doneCount, milestones.length)}>{`${doneCount} из ${milestones.length}`}</Pill>}>
+          {!guide ? (
+            <p className="text-[13px] text-ink-3">Выберите гайд — и здесь появятся его вехи.</p>
+          ) : (
+            <ul className="space-y-1.5">
+              {milestones.map((m) => (
+                <li key={m.id} className="flex items-center gap-2.5 text-[13px]">
+                  {m.done ? <CheckCircle2 size={16} className="shrink-0 text-good" /> : <Circle size={16} className="shrink-0 text-ink-3" />}
+                  <span className={cn(m.done ? 'text-ink-3 line-through' : 'text-ink-2')}>{m.text}</span>
+                  {m.unsure && !m.done && <Pill tone="warning">проверьте в игре</Pill>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+
+        <div className="flex flex-col gap-5">
+          {guideItems.length > 0 && (
+            <Card title="Разовые дела гайда">
+              <ul className="space-y-1">
+                {guideItems.map((c) => (
+                  <li key={c.id}>
+                    <label className="flex cursor-pointer items-center gap-2.5 rounded-lg px-1 py-1 text-[13px] hover:bg-surface-2">
+                      <input
+                        type="checkbox"
+                        checked={!!checks[c.id]}
+                        onChange={(e) => void setPrefs(char.key, { checklist: { ...checks, [c.id]: e.target.checked } })}
+                        className="accent-[var(--color-accent)]"
+                      />
+                      <span className={checks[c.id] ? 'text-ink-3 line-through' : 'text-ink-2'}>{c.text}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
+
+          <Card title="Мои задачи">
+            <form
+              className="mb-3 flex gap-2"
+              onSubmit={(e) => {
+                e.preventDefault()
+                if (!text.trim()) return
+                void setPrefs(char.key, { tasks: [...tasks, { id: `t-${Date.now()}`, text: text.trim() }] })
+                setText('')
+              }}
+            >
+              <input
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Например: выбить Компас с Избиением"
+                className="h-9 flex-1 rounded-lg border border-line-strong bg-surface-2 px-3 text-[13px] outline-none placeholder:text-ink-3 focus:border-accent"
+              />
+              <Button type="submit" icon={<Plus size={14} />}>
+                Добавить
+              </Button>
+            </form>
+            <ul className="space-y-1">
+              {tasks.map((t) => (
+                <li key={t.id} className="group flex items-center gap-2.5 rounded-lg px-1 py-1 text-[13px] hover:bg-surface-2">
+                  <input
+                    type="checkbox"
+                    checked={!!t.done}
+                    onChange={(e) => void setPrefs(char.key, { tasks: tasks.map((x) => (x.id === t.id ? { ...x, done: e.target.checked } : x)) })}
+                    className="accent-[var(--color-accent)]"
+                  />
+                  <span className={cn('flex-1', t.done ? 'text-ink-3 line-through' : 'text-ink-2')}>{t.text}</span>
+                  <button
+                    onClick={() => void setPrefs(char.key, { tasks: tasks.filter((x) => x.id !== t.id) })}
+                    className="text-ink-3 opacity-0 group-hover:opacity-100 hover:text-critical"
+                    aria-label="Удалить задачу"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </li>
+              ))}
+              {tasks.length === 0 && <li className="text-xs text-ink-3">Задач пока нет.</li>}
+            </ul>
+          </Card>
+
+          <Card title="Заметки">
+            <textarea
+              defaultValue={prefs.notes ?? ''}
+              onBlur={(e) => void setPrefs(char.key, { notes: e.target.value })}
+              placeholder="Что пробовал, что сработало, куда копить кристаллы…"
+              className="min-h-32 w-full rounded-lg border border-line-strong bg-surface-2 px-3 py-2 text-[13px] outline-none placeholder:text-ink-3 focus:border-accent"
+            />
+          </Card>
+        </div>
+      </div>
+    </>
+  )
+}
