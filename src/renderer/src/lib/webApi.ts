@@ -6,6 +6,7 @@ import { DEFAULT_SETTINGS, type AppApi, type Settings, type SourceState } from '
 import { normalizeGuide } from '@shared/guide'
 import type { Guide } from '@shared/guide/types'
 import { parseQuestlogCharacters } from '@shared/questlog/parse'
+import { normalizeUi } from '@shared/theme'
 
 const LS_SETTINGS = 'a2bh.settings'
 const LS_GUIDES = 'a2bh.guides'
@@ -59,6 +60,12 @@ export function createWebApi(): AppApi {
       get: async () => ({ ...DEFAULT_SETTINGS, ...load<Partial<Settings>>(LS_SETTINGS, {}) }),
       update: async (patch) => {
         const next = { ...DEFAULT_SETTINGS, ...load<Partial<Settings>>(LS_SETTINGS, {}), ...patch }
+        store(LS_SETTINGS, next)
+        return next
+      },
+      updateUi: async (patch) => {
+        const current = { ...DEFAULT_SETTINGS, ...load<Partial<Settings>>(LS_SETTINGS, {}) }
+        const next = { ...current, ui: normalizeUi({ ...current.ui, ...patch }) }
         store(LS_SETTINGS, next)
         return next
       }
@@ -117,7 +124,9 @@ export function createWebApi(): AppApi {
     app: {
       version: async () => __APP_VERSION__,
       openExternal: async (url) => void window.open(url, '_blank', 'noopener'),
-      openDataFolder: async () => undefined
+      openDataFolder: async () => undefined,
+      // В браузере масштабом управляет сам браузер (Ctrl +/−) — событий от приложения нет.
+      onZoomChanged: () => () => undefined
     }
   }
 }

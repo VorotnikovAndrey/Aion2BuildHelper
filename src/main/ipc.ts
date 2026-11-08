@@ -4,10 +4,12 @@ import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import { readFile, writeFile } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
 import type { Settings } from '@shared/api'
+import type { UiPrefs } from '@shared/theme'
 import { normalizeGuide } from '@shared/guide'
 import type { Guide } from '@shared/guide/types'
 import { getSourceState, onSourceChange, reloadSource, startWatching } from './questlog'
-import { dataDir, getSettings, listGuides, listHistory, removeGuide, saveGuide, updateSettings } from './storage'
+import { dataDir, getSettings, listGuides, listHistory, removeGuide, saveGuide, updateSettings, updateUi } from './storage'
+import { applyUiToWindows } from './zoom'
 
 export function registerIpc(): void {
   ipcMain.handle('source:get', () => getSourceState())
@@ -36,6 +38,11 @@ export function registerIpc(): void {
 
   ipcMain.handle('settings:get', () => getSettings())
   ipcMain.handle('settings:update', (_e, patch: Partial<Settings>) => updateSettings(patch))
+  ipcMain.handle('settings:updateUi', async (_e, patch: Partial<UiPrefs>) => {
+    const settings = await updateUi(patch)
+    await applyUiToWindows()
+    return settings
+  })
 
   ipcMain.handle('guides:list', () => listGuides())
   ipcMain.handle('guides:save', (_e, guide: Guide) => saveGuide(guide))

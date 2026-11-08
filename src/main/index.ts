@@ -6,7 +6,10 @@ import { join } from 'node:path'
 import { prepareShots, runShots, shotsEnabled } from './devShots'
 import { registerIpc } from './ipc'
 import { startWatching, stopWatching } from './questlog'
+import { getSettings } from './storage'
 import { loadWindowState, trackWindowState } from './windowState'
+import { attachZoom } from './zoom'
+import { themeBase } from '@shared/theme'
 
 app.setName('Aion2 Build Helper')
 // Папка данных — по имени приложения, а не пакета: %APPDATA%/Aion2 Build Helper.
@@ -24,7 +27,7 @@ app.on('second-instance', () => {
   win.focus()
 })
 
-function createWindow(): BrowserWindow {
+function createWindow(background: string): BrowserWindow {
   const iconPath = join(__dirname, '../../build/icon.png')
   const min = { width: 1100, height: 700 }
   const saved = loadWindowState(min)
@@ -35,7 +38,7 @@ function createWindow(): BrowserWindow {
     minWidth: min.width,
     minHeight: min.height,
     show: false,
-    backgroundColor: '#0f1117',
+    backgroundColor: background,
     title: 'Aion2 Build Helper',
     icon: existsSync(iconPath) ? iconPath : undefined,
     autoHideMenuBar: true,
@@ -47,6 +50,7 @@ function createWindow(): BrowserWindow {
   })
   if (saved.maximized && !shotsEnabled()) win.maximize()
   trackWindowState(win)
+  attachZoom(win)
   win.once('ready-to-show', () => win.show())
 
   // Внешние ссылки (гайды, базы) — в браузере, а не внутри приложения.
@@ -70,11 +74,13 @@ function createWindow(): BrowserWindow {
 
 app.whenReady().then(async () => {
   registerIpc()
-  const win = createWindow()
+  // Фон окна до загрузки интерфейса — в цвет сохранённой темы, чтобы ничего не мигало.
+  const background = themeBase((await getSettings()).ui.base).bg
+  const win = createWindow(background)
   if (shotsEnabled()) win.webContents.once('did-finish-load', () => void runShots(win))
   await startWatching()
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0) createWindow(background)
   })
 })
 

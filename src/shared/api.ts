@@ -4,6 +4,7 @@
 import type { HistoryEntry } from './analysis/history'
 import type { Guide } from './guide/types'
 import type { NameMode, NameOverrides } from './names'
+import { DEFAULT_UI, type UiPrefs } from './theme'
 import type { QuestlogData } from './types'
 
 export interface SourceState {
@@ -42,13 +43,16 @@ export interface Settings {
   characters: Record<string, CharacterPrefs>
   /** Скрытые персонажи (твинки, которых не нужно показывать). */
   hiddenCharacters: string[]
+  /** Оформление: тема и масштаб. */
+  ui: UiPrefs
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   nameMode: 'both',
   names: {},
   characters: {},
-  hiddenCharacters: []
+  hiddenCharacters: [],
+  ui: DEFAULT_UI
 }
 
 export interface AppApi {
@@ -64,6 +68,8 @@ export interface AppApi {
   settings: {
     get(): Promise<Settings>
     update(patch: Partial<Settings>): Promise<Settings>
+    /** Изменить оформление; масштаб применяется к окну сразу. */
+    updateUi(patch: Partial<UiPrefs>): Promise<Settings>
   }
   guides: {
     /** Свои (сохранённые) гайды. Встроенные живут в коде (@shared/guide). */
@@ -82,5 +88,7 @@ export interface AppApi {
     openExternal(url: string): Promise<void>
     /** Открыть папку с данными приложения (настройки, гайды, история). */
     openDataFolder(): Promise<void>
+    /** Масштаб поменяли с клавиатуры или колесом (Ctrl+колесо, Ctrl +/−/0). */
+    onZoomChanged(cb: (zoom: number) => void): () => void
   }
 }

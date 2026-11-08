@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { createHashRouter, Route, RouterProvider, Routes, useLocation } from 'react-router'
 import { Sidebar } from './layout/Sidebar'
+import { ZoomToast } from './components/ZoomToast'
 import { NoData } from './pages/NoData'
 import { OverviewPage } from './pages/OverviewPage'
 import { SkillsPage } from './pages/SkillsPage'
@@ -60,6 +61,7 @@ function Shell() {
           </Routes>
         </div>
       </main>
+      <ZoomToast />
     </div>
   )
 }

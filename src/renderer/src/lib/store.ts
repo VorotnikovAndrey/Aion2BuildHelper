@@ -6,7 +6,9 @@ import type { AppApi, CharacterPrefs, Settings, SourceState } from '@shared/api'
 import { DEFAULT_SETTINGS } from '@shared/api'
 import { BUILTIN_GUIDES } from '@shared/guide'
 import type { Guide } from '@shared/guide/types'
+import { normalizeUi, type UiPrefs } from '@shared/theme'
 import type { Character } from '@shared/types'
+import { applyCssZoom, applyTheme } from './theme'
 import { createWebApi } from './webApi'
 
 export const api: AppApi = window.api ?? createWebApi()
@@ -23,6 +25,10 @@ interface AppState {
   setSource(s: SourceState): void
   updateSettings(patch: Partial<Settings>): Promise<void>
   updateCharacterPrefs(key: string, patch: Partial<CharacterPrefs>): Promise<void>
+  /** Тема и масштаб: применяются сразу, сохраняются следом. */
+  updateUi(patch: Partial<UiPrefs>): Promise<void>
+  /** Масштаб поменяли с клавиатуры — только запомнить (окно уже отмасштабировано). */
+  onZoomChanged(zoom: number): void
   saveGuide(g: Guide): Promise<Guide>
   removeGuide(id: string): Promise<void>
   importGuide(): Promise<Guide | null>
@@ -34,7 +40,9 @@ export const useApp = create<AppState>((set, get) => ({
   settings: DEFAULT_SETTINGS,
   customGuides: [],
   async load() {
-    const [source, settings, customGuides] = await Promise.all([api.source.get(), api.settings.get(), api.guides.list()])
+    const [source, loaded, customGuides] = await Promise.all([api.source.get(), api.settings.get(), api.guides.list()])
+    const settings = { ...loaded, ui: normalizeUi(loaded.ui) }
+    applyUi(settings.ui)
     set({ source, settings, customGuides, ready: true })
     api.source.onChange((s) => set({ source: s }))
   },
@@ -47,6 +55,16 @@ export const useApp = create<AppState>((set, get) => ({
   async updateSettings(patch) {
     set({ settings: { ...get().settings, ...patch } })
     set({ settings: await api.settings.update(patch) })
+  },
+  async updateUi(patch) {
+    const ui = normalizeUi({ ...get().settings.ui, ...patch })
+    applyUi(ui)
+    set({ settings: { ...get().settings, ui } })
+    set({ settings: await api.settings.updateUi(patch) })
+  },
+  onZoomChanged(zoom) {
+    const s = get().settings
+    set({ settings: { ...s, ui: { ...s.ui, zoom } } })
   },
   async updateCharacterPrefs(key, patch) {
     const all = get().settings.characters
@@ -67,6 +85,11 @@ export const useApp = create<AppState>((set, get) => ({
     return g
   }
 }))
+
+function applyUi(ui: UiPrefs) {
+  applyTheme(ui)
+  if (isWebMode) applyCssZoom(ui.zoom)
+}
 
 /** Все гайды: сначала свои, потом встроенные. */
 export function useGuides(): Guide[] {

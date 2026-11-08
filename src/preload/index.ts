@@ -20,7 +20,7 @@ const api: AppApi = {
       return () => ipcRenderer.removeListener('source:changed', listener)
     }
   } as AppApi['source'],
-  settings: { get: call('settings:get'), update: call('settings:update') } as AppApi['settings'],
+  settings: { get: call('settings:get'), update: call('settings:update'), updateUi: call('settings:updateUi') } as AppApi['settings'],
   guides: {
     list: call('guides:list'),
     save: call('guides:save'),
@@ -32,7 +32,12 @@ const api: AppApi = {
   app: {
     version: call('app:version'),
     openExternal: call('app:openExternal'),
-    openDataFolder: call('app:openDataFolder')
+    openDataFolder: call('app:openDataFolder'),
+    onZoomChanged(cb) {
+      const listener = (_e: unknown, z: number) => cb(z)
+      ipcRenderer.on('ui:zoom-changed', listener)
+      return () => ipcRenderer.removeListener('ui:zoom-changed', listener)
+    }
   } as AppApi['app']
 }
 

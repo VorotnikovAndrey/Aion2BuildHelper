@@ -10,7 +10,7 @@
 | `npm run dev:web` | Интерфейс в браузере на http://localhost:5199 без Electron. Данные — из `samples/private/characters.json`, если есть, иначе из файла оверлея (`A2BH_LIVE=1` — всегда из оверлея). Настройки и гайды — в localStorage браузера |
 | `npm test` | Тесты логики (vitest) |
 | `npm run typecheck` | Проверка типов main + renderer |
-| `npm run shots` | Сборка и автоскриншоты всех экранов в `out/shots` (временная папка настроек, реальные данные оверлея) |
+| `npm run shots` | Сборка и автоскриншоты всех экранов в `out/shots` (временная папка настроек, реальные данные оверлея). В другой теме и масштабе: `A2BH_SHOTS_UI='{"base":"asmodae","accent":"#e0525e","zoom":1.25}' node scripts/shots.mjs` |
 | `npm run format` | Prettier |
 | `npm run build` | Сборка в `out/` |
 | `npm run gamedata` | Обновить справочники (см. [data-sources.md](data-sources.md)) |

@@ -7,6 +7,8 @@ import { app, type BrowserWindow } from 'electron'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
+import { updateUi } from './storage'
+import { applyUiToWindows } from './zoom'
 
 export const shotsEnabled = () => Boolean(process.env.A2BH_SHOTS)
 
@@ -31,7 +33,8 @@ const ROUTES: [string, string][] = [
   ['09-history', '/history'],
   ['10-guides', '/guides'],
   ['11-checklist', '/checklist'],
-  ['12-settings', '/settings']
+  ['12-settings', '/settings'],
+  ['13-appearance', '/settings?tab=appearance']
 ]
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
@@ -44,6 +47,12 @@ export async function runShots(win: BrowserWindow): Promise<void> {
   const out = join(resolve(app.getAppPath()), 'out', 'shots')
   mkdirSync(out, { recursive: true })
   win.setContentSize(1440, 900)
+  // A2BH_SHOTS_UI='{"themeId":"crimson","base":"asmodae","accent":"#e0525e","zoom":1.25}' — снять в другой теме и масштабе.
+  if (process.env.A2BH_SHOTS_UI) {
+    await updateUi(JSON.parse(process.env.A2BH_SHOTS_UI))
+    await applyUiToWindows()
+    win.webContents.reload()
+  }
   await sleep(2000)
   for (const [name, route] of ROUTES) {
     await win.webContents.executeJavaScript(`location.hash = ${JSON.stringify('#' + route)}`)

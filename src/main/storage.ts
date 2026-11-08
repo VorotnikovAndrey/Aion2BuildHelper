@@ -11,6 +11,7 @@ import { join } from 'node:path'
 import { DEFAULT_SETTINGS, type Settings } from '@shared/api'
 import type { HistoryEntry } from '@shared/analysis/history'
 import type { Guide } from '@shared/guide/types'
+import { normalizeUi, type UiPrefs } from '@shared/theme'
 import type { Character } from '@shared/types'
 
 export const dataDir = () => app.getPath('userData')
@@ -43,7 +44,11 @@ async function writeJson(file: string, data: unknown): Promise<void> {
 let settingsCache: Settings | null = null
 
 export async function getSettings(): Promise<Settings> {
-  if (!settingsCache) settingsCache = { ...DEFAULT_SETTINGS, ...((await readJson<Partial<Settings>>(settingsFile())) ?? {}) }
+  if (!settingsCache) {
+    const saved = (await readJson<Partial<Settings>>(settingsFile())) ?? {}
+    // Оформление чиним по полям: в старом файле его может не быть совсем, в чужом — быть криво.
+    settingsCache = { ...DEFAULT_SETTINGS, ...saved, ui: normalizeUi(saved.ui) }
+  }
   return settingsCache
 }
 
@@ -52,6 +57,11 @@ export async function updateSettings(patch: Partial<Settings>): Promise<Settings
   settingsCache = next
   await writeJson(settingsFile(), next)
   return next
+}
+
+export async function updateUi(patch: Partial<UiPrefs>): Promise<Settings> {
+  const current = await getSettings()
+  return updateSettings({ ui: normalizeUi({ ...current.ui, ...patch }) })
 }
 
 // ───────────────────────── Гайды ─────────────────────────
