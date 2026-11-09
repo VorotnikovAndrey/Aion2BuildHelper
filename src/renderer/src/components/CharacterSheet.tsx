@@ -4,19 +4,20 @@
 
 import type { CSSProperties } from 'react'
 import type { TargetStatus } from '@shared/analysis/targets'
+import { ATTRIBUTE_EFFECT, DEITIES, deityInfo } from '@shared/gamedata/deities'
 import { formatStatValue, statByKey } from '@shared/gamedata/stats'
 import type { Namer } from '@shared/names'
 import { Tooltip } from '@/components/ui/InfoTip'
 import { cn } from '@/lib/format'
 
 /** icon — файл в icons/attributes (не «con.png»: CON — зарезервированное имя в Windows). */
-const ATTRS: { key: string; icon: string; angle: number; tip: string }[] = [
-  { key: 'str', icon: 'might', angle: -90, tip: 'Мощь: увеличивает атаку.' },
-  { key: 'dex', icon: 'agility', angle: -30, tip: 'Ловкость: увеличивает крит. удар и уклонение.' },
-  { key: 'agi', icon: 'precision', angle: 30, tip: 'Точность: увеличивает меткость.' },
-  { key: 'wis', icon: 'will', angle: 90, tip: 'Воля: увеличивает сопротивление негативным эффектам.' },
-  { key: 'int', icon: 'intellect', angle: 150, tip: 'Интеллект: увеличивает силу магии и исцеления.' },
-  { key: 'con', icon: 'health', angle: 210, tip: 'Здоровье: увеличивает ОЗ.' }
+const ATTRS: { key: string; icon: string; angle: number }[] = [
+  { key: 'str', icon: 'might', angle: -90 },
+  { key: 'dex', icon: 'agility', angle: -30 },
+  { key: 'agi', icon: 'precision', angle: 30 },
+  { key: 'wis', icon: 'will', angle: 90 },
+  { key: 'int', icon: 'intellect', angle: 150 },
+  { key: 'con', icon: 'health', angle: 210 }
 ]
 
 /**
@@ -170,7 +171,7 @@ export function CharacterSheet({
             const label = v ? namer.stat(v.def.id).main : a.key
             return (
               <div key={a.key} className="absolute -translate-x-1/2 -translate-y-1/2" style={pos}>
-                <Tooltip content={`${a.tip} У вас: ${v?.value ?? 0}. ${v ? refText(v.def.id) : ''}`}>
+                <Tooltip content={`${label}: ${ATTRIBUTE_EFFECT[a.key]}. У вас: ${v?.value ?? 0}. ${v ? refText(v.def.id) : ''}`}>
                   <div className="flex w-[78px] flex-col items-center text-center">
                     <GameIcon src={`./icons/attributes/${a.icon}.png`} size={24} className="text-ink-2" />
                     <span className="mt-0.5 text-[11.5px] leading-tight font-semibold text-aether">{label}</span>
@@ -202,6 +203,7 @@ export function CharacterSheet({
                   content={
                     <>
                       <b className="text-ink">{namer.stat(v.def.id).main}</b>: {v.value ?? 0}
+                      {deityInfo(key) && <span className="mt-1 block">{capital(deityInfo(key)!.effect)}.</span>}
                       {boards ? <span className="block text-ink-3">из них от досок Даэваниона: +{boards}</span> : null}
                       {refText(v.def.id) && <span className="block text-ink-3">{refText(v.def.id)}</span>}
                       <span className="mt-1 block text-ink-3">Стат бога{deity ? ` ${deity}` : ''}: растёт от досок Даэваниона, аркан и пантеона.</span>
@@ -270,6 +272,40 @@ export function CharacterSheet({
           Значения — как их отдаёт оверлей, по слагаемым: «АТК» и «Доп. АТК» отдельно. Итоговые АТК и ЗЩТ в окне игры считаются с множителями, поэтому там числа
           больше. Характеристики и статы богов совпадают с игрой.
         </p>
+        <DeityLegend valueOf={valueOf} namer={namer} />
+      </div>
+    </div>
+  )
+}
+
+const capital = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
+
+/** Расшифровка статов богов: что даёт каждый — как в описании клиента, в порядке окна игры. */
+function DeityLegend({ valueOf, namer }: { valueOf: (key: string) => { def: { id: number }; value?: number } | null; namer: Namer }) {
+  return (
+    <div className="mt-4 rounded-xl border border-line">
+      <div className="border-b border-line px-3 py-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Что дают статы богов</div>
+      <div className="grid grid-cols-1 lg:grid-flow-col lg:grid-cols-2 lg:grid-rows-5">
+        {DEITIES.map((d) => {
+          const v = valueOf(d.key)
+          if (!v) return null
+          const aspect = namer.stat(v.def.id).main.replace(/^\[.+?\]\s*/, '')
+          const has = (v.value ?? 0) > 0
+          return (
+            <div key={d.key} className="flex items-start gap-2.5 px-3 py-2">
+              <GameIcon src={`./icons/deities/${d.key}.png`} size={26} className={cn('mt-0.5', has ? 'text-ink-2' : 'text-ink-3 opacity-50')} />
+              <div className="min-w-0 flex-1 text-[12px] leading-snug">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span>
+                    <b className="text-ink">{aspect}</b> <span className="text-ink-3">· {d.god}</span>
+                  </span>
+                  <span className={cn('tnum font-semibold', has ? 'text-ink' : 'text-ink-3')}>{has ? v.value : '—'}</span>
+                </div>
+                <div className="text-ink-3">{capital(d.effect)}</div>
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
