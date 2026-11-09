@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { BookOpen, Check, ChevronDown, Flag } from 'lucide-react'
 import { sortedStages } from '@shared/guide/stages'
 import { MODE_LABEL } from '@shared/guide/types'
 import type { Character } from '@shared/types'
 import { cn } from '@/lib/format'
+import { DropdownPanel } from '@/components/ui/Dropdown'
 import { Tooltip } from '@/components/ui/InfoTip'
 import { useActiveGuide, useActiveStage, useApp, useCharacterPrefs, useGuides } from '@/lib/store'
 
@@ -27,6 +28,8 @@ function StageSwitcher({ char }: { char: Character }) {
   const prefs = useCharacterPrefs(char.key)
   const setPrefs = useApp((s) => s.updateCharacterPrefs)
   const [open, setOpen] = useState(false)
+  const anchor = useRef<HTMLButtonElement>(null)
+  const close = useCallback(() => setOpen(false), [])
   if (!guide?.stages?.length || !stage) return null
   const choose = (id: string | null) => {
     const stages = { ...(prefs.stages ?? {}) }
@@ -36,7 +39,7 @@ function StageSwitcher({ char }: { char: Character }) {
     setOpen(false)
   }
   return (
-    <div className="relative">
+    <div>
       <Tooltip
         wide
         content={
@@ -55,6 +58,7 @@ function StageSwitcher({ char }: { char: Character }) {
         }
       >
         <button
+          ref={anchor}
           onClick={() => setOpen((v) => !v)}
           className="flex items-center gap-2 rounded-lg border border-line-strong bg-surface px-3 py-1.5 text-left transition-colors hover:bg-surface-2"
         >
@@ -65,36 +69,31 @@ function StageSwitcher({ char }: { char: Character }) {
           <ChevronDown size={14} className="text-ink-3" />
         </button>
       </Tooltip>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-40 mt-1 max-h-[70vh] w-96 animate-fade-in overflow-y-auto rounded-xl border border-line-strong bg-surface-2 p-1 shadow-xl shadow-black/50">
-            <div className="px-2.5 pt-1.5 pb-1 text-[11px] text-ink-3">Целевая стадия · у вас {gsLabel(char.gearScore)}</div>
-            <button onClick={() => choose(null)} className="flex w-full items-start gap-2 rounded-lg px-2.5 py-2 text-left hover:bg-surface-3">
-              <Check size={14} className={cn('mt-0.5 shrink-0 text-accent', !auto && 'invisible')} />
-              <span className="min-w-0">
-                <span className="block text-[13px]">Автоматически</span>
-                <span className="block text-[11px] text-ink-3">Ближайшая стадия впереди по уровню снаряжения</span>
+      <DropdownPanel anchor={anchor} open={open} onClose={close} className="w-96">
+        <div className="px-2.5 pt-1.5 pb-1 text-[11px] text-ink-3">Целевая стадия · у вас {gsLabel(char.gearScore)}</div>
+        <button onClick={() => choose(null)} className="flex w-full items-start gap-2 rounded-lg px-2.5 py-2 text-left hover:bg-surface-3">
+          <Check size={14} className={cn('mt-0.5 shrink-0 text-accent', !auto && 'invisible')} />
+          <span className="min-w-0">
+            <span className="block text-[13px]">Автоматически</span>
+            <span className="block text-[11px] text-ink-3">Ближайшая стадия впереди по уровню снаряжения</span>
+          </span>
+        </button>
+        {sortedStages(guide).map((st) => {
+          const done = st.gearScore !== undefined && st.gearScore <= char.gearScore
+          return (
+            <button key={st.id} onClick={() => choose(st.id)} className="flex w-full items-start gap-2 rounded-lg px-2.5 py-2 text-left hover:bg-surface-3">
+              <Check size={14} className={cn('mt-0.5 shrink-0 text-accent', (auto || stage.id !== st.id) && 'invisible')} />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[13px] leading-snug">{st.name}</span>
+                <span className="block text-[11px] text-ink-3">
+                  {[gsLabel(st.gearScore), ...(st.tags ?? [])].filter(Boolean).join(' · ')}
+                  {done ? ' · уже пройдена по GS' : ''}
+                </span>
               </span>
             </button>
-            {sortedStages(guide).map((st) => {
-              const done = st.gearScore !== undefined && st.gearScore <= char.gearScore
-              return (
-                <button key={st.id} onClick={() => choose(st.id)} className="flex w-full items-start gap-2 rounded-lg px-2.5 py-2 text-left hover:bg-surface-3">
-                  <Check size={14} className={cn('mt-0.5 shrink-0 text-accent', (auto || stage.id !== st.id) && 'invisible')} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-[13px] leading-snug">{st.name}</span>
-                    <span className="block text-[11px] text-ink-3">
-                      {[gsLabel(st.gearScore), ...(st.tags ?? [])].filter(Boolean).join(' · ')}
-                      {done ? ' · уже пройдена по GS' : ''}
-                    </span>
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        </>
-      )}
+          )
+        })}
+      </DropdownPanel>
     </div>
   )
 }
@@ -104,12 +103,15 @@ function GuidePicker({ char }: { char: Character }) {
   const active = useActiveGuide(char)
   const setPrefs = useApp((s) => s.updateCharacterPrefs)
   const [open, setOpen] = useState(false)
+  const anchor = useRef<HTMLButtonElement>(null)
+  const close = useCallback(() => setOpen(false), [])
   const navigate = useNavigate()
 
   return (
-    <div className="relative">
+    <div>
       <Tooltip content="Гайд, с которым приложение сравнивает этого персонажа. Нажмите, чтобы выбрать другой — у каждого персонажа свой.">
         <button
+          ref={anchor}
           onClick={() => setOpen((v) => !v)}
           className="flex items-center gap-2 rounded-lg border border-line-strong bg-surface px-3 py-1.5 text-left transition-colors hover:bg-surface-2"
         >
@@ -118,53 +120,49 @@ function GuidePicker({ char }: { char: Character }) {
           <ChevronDown size={14} className="text-ink-3" />
         </button>
       </Tooltip>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-40 mt-1 w-80 animate-fade-in rounded-xl border border-line-strong bg-surface-2 p-1 shadow-xl shadow-black/50">
-            <div className="px-2.5 pt-1.5 pb-1 text-[11px] text-ink-3">С чем сравнивать персонажа</div>
-            {guides.map((g) => (
-              <button
-                key={g.id}
-                onClick={() => {
-                  void setPrefs(char.key, { guideId: g.id })
-                  setOpen(false)
-                }}
-                className="flex w-full items-start gap-2 rounded-lg px-2.5 py-2 text-left hover:bg-surface-3"
-              >
-                <Check size={14} className={cn('mt-0.5 shrink-0 text-accent', active?.id !== g.id && 'invisible')} />
-                <span className="min-w-0">
-                  <span className="block truncate text-[13px]">{g.name}</span>
-                  <span className="block text-[11px] text-ink-3">
-                    {MODE_LABEL[g.mode]} · {g.builtin ? 'встроенный' : 'свой'}
-                    {g.source?.title ? ` · ${g.source.title}` : ''}
-                  </span>
-                </span>
-              </button>
-            ))}
-            <button
-              onClick={() => {
-                void setPrefs(char.key, { guideId: 'none' })
-                setOpen(false)
-              }}
-              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px] text-ink-3 hover:bg-surface-3"
-            >
-              <Check size={14} className={cn('shrink-0 text-accent', active && 'invisible')} />
-              Без гайда — просто посмотреть персонажа
-            </button>
-            <div className="my-1 border-t border-line" />
-            <button
-              onClick={() => {
-                setOpen(false)
-                navigate('/guides')
-              }}
-              className="w-full rounded-lg px-2.5 py-2 text-left text-[13px] text-accent hover:bg-surface-3"
-            >
-              Все гайды и редактор…
-            </button>
-          </div>
-        </>
-      )}
+      <DropdownPanel anchor={anchor} open={open} onClose={close} className="w-96">
+        <div className="px-2.5 pt-1.5 pb-1 text-[11px] text-ink-3">С чем сравнивать персонажа</div>
+        {guides.map((g) => (
+          <button
+            key={g.id}
+            onClick={() => {
+              void setPrefs(char.key, { guideId: g.id })
+              setOpen(false)
+            }}
+            className="flex w-full items-start gap-2 rounded-lg px-2.5 py-2 text-left hover:bg-surface-3"
+          >
+            <Check size={14} className={cn('mt-0.5 shrink-0 text-accent', active?.id !== g.id && 'invisible')} />
+            <span className="min-w-0">
+              <span className="block truncate text-[13px]">{g.name}</span>
+              <span className="block text-[11px] text-ink-3">
+                {g.source?.kind === 'questlog'
+                  ? `Questlog · ${g.source.likes ?? 0} лайков · стадий: ${g.stages?.length ?? 0}${g.source.region === 'korea' ? ' · Корея' : ''}`
+                  : `${MODE_LABEL[g.mode]} · ${g.builtin ? 'встроенный' : 'свой'}${g.source?.title ? ` · ${g.source.title}` : ''}`}
+              </span>
+            </span>
+          </button>
+        ))}
+        <button
+          onClick={() => {
+            void setPrefs(char.key, { guideId: 'none' })
+            setOpen(false)
+          }}
+          className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px] text-ink-3 hover:bg-surface-3"
+        >
+          <Check size={14} className={cn('shrink-0 text-accent', active && 'invisible')} />
+          Без гайда — просто посмотреть персонажа
+        </button>
+        <div className="my-1 border-t border-line" />
+        <button
+          onClick={() => {
+            setOpen(false)
+            navigate('/guides')
+          }}
+          className="w-full rounded-lg px-2.5 py-2 text-left text-[13px] text-accent hover:bg-surface-3"
+        >
+          Все гайды и редактор…
+        </button>
+      </DropdownPanel>
     </div>
   )
 }
