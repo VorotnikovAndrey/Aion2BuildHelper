@@ -1,24 +1,59 @@
-// Панель «Показатели персонажа» в духе окна игры: шесть характеристик в центре, кольцо статов богов,
-// снизу — основные боевые показатели.
+// Панель «Показатели персонажа» как окно игры: шесть характеристик в центре, вокруг — эмблемы богов
+// (по пять слева и справа, симметрично, сверху и снизу — перемычки), рядом — основные боевые показатели.
+// Значки эмблем и характеристик — из окна игры (icons/deities, icons/attributes), цвет — из темы.
 
-import { BicepsFlexed, BookOpen, Eye, Feather, Heart, Sparkles, type LucideIcon } from 'lucide-react'
+import type { CSSProperties } from 'react'
 import type { TargetStatus } from '@shared/analysis/targets'
 import { formatStatValue, statByKey } from '@shared/gamedata/stats'
 import type { Namer } from '@shared/names'
 import { Tooltip } from '@/components/ui/InfoTip'
 import { cn } from '@/lib/format'
 
-const ATTRS: { key: string; icon: LucideIcon; angle: number; tip: string }[] = [
-  { key: 'str', icon: BicepsFlexed, angle: -90, tip: 'Мощь: увеличивает атаку.' },
-  { key: 'dex', icon: Feather, angle: -30, tip: 'Ловкость: увеличивает крит. удар и уклонение.' },
-  { key: 'agi', icon: Eye, angle: 30, tip: 'Точность: увеличивает меткость.' },
-  { key: 'wis', icon: Sparkles, angle: 90, tip: 'Воля: увеличивает сопротивление негативным эффектам.' },
-  { key: 'int', icon: BookOpen, angle: 150, tip: 'Интеллект: увеличивает силу магии и исцеления.' },
-  { key: 'con', icon: Heart, angle: 210, tip: 'Здоровье: увеличивает ОЗ.' }
+/** icon — файл в icons/attributes (не «con.png»: CON — зарезервированное имя в Windows). */
+const ATTRS: { key: string; icon: string; angle: number; tip: string }[] = [
+  { key: 'str', icon: 'might', angle: -90, tip: 'Мощь: увеличивает атаку.' },
+  { key: 'dex', icon: 'agility', angle: -30, tip: 'Ловкость: увеличивает крит. удар и уклонение.' },
+  { key: 'agi', icon: 'precision', angle: 30, tip: 'Точность: увеличивает меткость.' },
+  { key: 'wis', icon: 'will', angle: 90, tip: 'Воля: увеличивает сопротивление негативным эффектам.' },
+  { key: 'int', icon: 'intellect', angle: 150, tip: 'Интеллект: увеличивает силу магии и исцеления.' },
+  { key: 'con', icon: 'health', angle: 210, tip: 'Здоровье: увеличивает ОЗ.' }
 ]
 
-/** Статы богов по кругу: сначала боги досок Даэваниона, затем остальные. */
-const DEITIES = ['justice', 'destruction', 'freedom', 'death', 'light', 'dark', 'space', 'destiny', 'time', 'life', 'wisdom', 'illusion']
+/**
+ * Эмблемы богов — как в окне игры: слева сверху вниз Неджакан, Байзел, Кайсинель, Юстиэль, Сиэль,
+ * справа зеркально их пары — Джикел, Триниэль, Маркутан, Румиэль, Израфель. Угол — по часам: 11…7 и 1…5.
+ */
+const DEITY_RING: { key: string; angle: number }[] = [
+  { key: 'justice', angle: -120 },
+  { key: 'freedom', angle: -150 },
+  { key: 'illusion', angle: 180 },
+  { key: 'life', angle: 150 },
+  { key: 'time', angle: 120 },
+  { key: 'destruction', angle: -60 },
+  { key: 'death', angle: -30 },
+  { key: 'destiny', angle: 0 },
+  { key: 'wisdom', angle: 30 },
+  { key: 'space', angle: 60 }
+]
+/** Ариэль и Асфель — в окне игры их нет: показываем под кругом, только если стат есть. */
+const EXTRA_DEITIES = ['light', 'dark']
+
+/** Значок из игры, окрашенный цветом текста (маска): так он виден в любой теме. */
+function GameIcon({ src, size, className }: { src: string; size: number; className?: string }) {
+  const mask: CSSProperties = {
+    width: size,
+    height: size,
+    WebkitMaskImage: `url(${src})`,
+    maskImage: `url(${src})`,
+    WebkitMaskSize: 'contain',
+    maskSize: 'contain',
+    WebkitMaskRepeat: 'no-repeat',
+    maskRepeat: 'no-repeat',
+    WebkitMaskPosition: 'center',
+    maskPosition: 'center'
+  }
+  return <span aria-hidden className={cn('inline-block shrink-0 bg-current', className)} style={mask} />
+}
 
 const COMBAT: string[][] = [
   ['weaponfixingdamage', 'armordefense'],
@@ -71,110 +106,138 @@ export function CharacterSheet({
 
   return (
     <div className="flex flex-wrap items-start gap-6">
-      <div className="relative shrink-0" style={{ width: size, height: size }}>
-        <svg viewBox="-100 -100 200 200" className="absolute inset-0 h-full w-full" aria-hidden>
-          <defs>
-            <radialGradient id="sheet-bg">
-              <stop offset="0%" stopColor="var(--color-surface-3)" />
-              <stop offset="100%" stopColor="var(--color-surface)" />
-            </radialGradient>
-          </defs>
-          <circle r={97} fill="url(#sheet-bg)" stroke="var(--color-line-strong)" strokeWidth={0.8} />
-          <circle r={70} fill="none" stroke="var(--color-accent)" strokeOpacity={0.22} strokeWidth={0.6} />
-          <circle r={56} fill="var(--color-bg)" fillOpacity={0.35} stroke="var(--color-line-strong)" strokeWidth={0.6} />
-          {Array.from({ length: 60 }, (_, i) => {
-            const a = (i * 6 * Math.PI) / 180
-            return (
+      <div className="shrink-0">
+        <div className="relative" style={{ width: size, height: size }}>
+          <svg viewBox="-100 -100 200 200" className="absolute inset-0 h-full w-full" aria-hidden>
+            <defs>
+              <radialGradient id="sheet-bg">
+                <stop offset="0%" stopColor="var(--color-surface-3)" />
+                <stop offset="100%" stopColor="var(--color-surface)" />
+              </radialGradient>
+            </defs>
+            <circle r={97} fill="url(#sheet-bg)" stroke="var(--color-line-strong)" strokeWidth={0.8} />
+            <circle r={70} fill="none" stroke="var(--color-accent)" strokeOpacity={0.22} strokeWidth={0.6} />
+            <circle r={56} fill="var(--color-bg)" fillOpacity={0.35} stroke="var(--color-line-strong)" strokeWidth={0.6} />
+            {Array.from({ length: 60 }, (_, i) => {
+              const a = (i * 6 * Math.PI) / 180
+              return (
+                <line
+                  key={i}
+                  x1={Math.cos(a) * 93}
+                  y1={Math.sin(a) * 93}
+                  x2={Math.cos(a) * (i % 5 ? 95 : 97)}
+                  y2={Math.sin(a) * (i % 5 ? 95 : 97)}
+                  stroke="var(--color-accent)"
+                  strokeOpacity={0.25}
+                  strokeWidth={0.5}
+                />
+              )
+            })}
+            {[0, 60, 120].map((d) => (
               <line
-                key={i}
-                x1={Math.cos(a) * 93}
-                y1={Math.sin(a) * 93}
-                x2={Math.cos(a) * (i % 5 ? 95 : 97)}
-                y2={Math.sin(a) * (i % 5 ? 95 : 97)}
-                stroke="var(--color-accent)"
-                strokeOpacity={0.25}
-                strokeWidth={0.5}
+                key={d}
+                x1={Math.cos((d * Math.PI) / 180) * 56}
+                y1={Math.sin((d * Math.PI) / 180) * 56}
+                x2={-Math.cos((d * Math.PI) / 180) * 56}
+                y2={-Math.sin((d * Math.PI) / 180) * 56}
+                stroke="var(--color-line-strong)"
+                strokeWidth={0.4}
               />
+            ))}
+            {/* Перемычки сверху и снизу кольца — как в окне игры */}
+            {[-1, 1].map((dir) => (
+              <g key={dir}>
+                <rect
+                  x={-7}
+                  y={dir < 0 ? -97 : 56}
+                  width={14}
+                  height={41}
+                  rx={3}
+                  fill="var(--color-surface-3)"
+                  stroke="var(--color-line-strong)"
+                  strokeWidth={0.6}
+                />
+                <line x1={0} y1={dir * 60} x2={0} y2={dir * 93} stroke="var(--color-accent)" strokeOpacity={0.35} strokeWidth={0.6} />
+              </g>
+            ))}
+            <circle r={4} fill="var(--color-aether)" opacity={0.9} />
+            <circle r={9} fill="var(--color-aether)" opacity={0.15} />
+          </svg>
+
+          {ATTRS.map((a) => {
+            const v = valueOf(a.key)
+            const pos = at(0.17, a.angle)
+            const label = v ? namer.stat(v.def.id).main : a.key
+            return (
+              <div key={a.key} className="absolute -translate-x-1/2 -translate-y-1/2" style={pos}>
+                <Tooltip content={`${a.tip} У вас: ${v?.value ?? 0}. ${v ? refText(v.def.id) : ''}`}>
+                  <div className="flex w-[78px] flex-col items-center text-center">
+                    <GameIcon src={`./icons/attributes/${a.icon}.png`} size={24} className="text-ink-2" />
+                    <span className="mt-0.5 text-[11.5px] leading-tight font-semibold text-aether">{label}</span>
+                    <span
+                      className={cn(
+                        'tnum text-[12px]',
+                        v && refTone(v.def.id) === 'warn' ? 'text-warning' : v && refTone(v.def.id) === 'ok' ? 'text-good' : 'text-ink'
+                      )}
+                    >
+                      {v?.value ?? 0}
+                    </span>
+                  </div>
+                </Tooltip>
+              </div>
             )
           })}
-          {[0, 60, 120].map((d) => (
-            <line
-              key={d}
-              x1={Math.cos((d * Math.PI) / 180) * 56}
-              y1={Math.sin((d * Math.PI) / 180) * 56}
-              x2={-Math.cos((d * Math.PI) / 180) * 56}
-              y2={-Math.sin((d * Math.PI) / 180) * 56}
-              stroke="var(--color-line-strong)"
-              strokeWidth={0.4}
-            />
-          ))}
-          <circle r={4} fill="var(--color-aether)" opacity={0.9} />
-          <circle r={9} fill="var(--color-aether)" opacity={0.15} />
-        </svg>
 
-        {ATTRS.map((a) => {
-          const v = valueOf(a.key)
-          const pos = at(0.17, a.angle)
-          const Icon = a.icon
-          const label = v ? namer.stat(v.def.id).main : a.key
-          return (
-            <div key={a.key} className="absolute -translate-x-1/2 -translate-y-1/2" style={pos}>
-              <Tooltip content={`${a.tip} У вас: ${v?.value ?? 0}. ${v ? refText(v.def.id) : ''}`}>
-                <div className="flex w-[78px] flex-col items-center text-center">
-                  <Icon size={18} strokeWidth={1.6} className="text-ink-2" />
-                  <span className="mt-0.5 text-[11.5px] leading-tight font-semibold text-aether">{label}</span>
-                  <span
-                    className={cn(
-                      'tnum text-[12px]',
-                      v && refTone(v.def.id) === 'warn' ? 'text-warning' : v && refTone(v.def.id) === 'ok' ? 'text-good' : 'text-ink'
-                    )}
-                  >
-                    {v?.value ?? 0}
-                  </span>
-                </div>
-              </Tooltip>
-            </div>
-          )
-        })}
-
-        {DEITIES.map((key, i) => {
-          const v = valueOf(key)
-          if (!v) return null
-          const { deity, aspect } = splitDeity(namer.stat(v.def.id).main)
-          const pos = at(0.4, -90 + i * 30)
-          const boards = fromBoards.get(v.def.id)
-          const has = (v.value ?? 0) > 0
-          return (
-            <div key={key} className="absolute -translate-x-1/2 -translate-y-1/2" style={pos}>
-              <Tooltip
-                content={
-                  <>
-                    <b className="text-ink">{namer.stat(v.def.id).main}</b>: {v.value ?? 0}
-                    {boards ? <span className="block text-ink-3">из них от досок Даэваниона: +{boards}</span> : null}
-                    {refText(v.def.id) && <span className="block text-ink-3">{refText(v.def.id)}</span>}
-                    <span className="mt-1 block text-ink-3">Стат бога{deity ? ` ${deity}` : ''}: растёт от досок Даэваниона, аркан и пантеона.</span>
-                  </>
-                }
-              >
-                <div
-                  className={cn(
-                    'flex h-[52px] w-[52px] flex-col items-center justify-center rounded-full border text-center',
-                    !has
-                      ? 'border-line bg-surface-2/60'
-                      : refTone(v.def.id) === 'warn'
-                        ? 'border-warning/60 bg-surface-2 shadow-[0_0_14px_-4px_var(--color-warning)]'
-                        : refTone(v.def.id) === 'ok'
-                          ? 'border-good/60 bg-surface-2 shadow-[0_0_14px_-4px_var(--color-good)]'
-                          : 'border-accent/45 bg-surface-2 shadow-[0_0_14px_-4px_var(--color-accent)]'
-                  )}
+          {DEITY_RING.map(({ key, angle }) => {
+            const v = valueOf(key)
+            if (!v) return null
+            const { deity } = splitDeity(namer.stat(v.def.id).main)
+            const pos = at(0.383, angle)
+            const boards = fromBoards.get(v.def.id)
+            const has = (v.value ?? 0) > 0
+            const tone = refTone(v.def.id)
+            return (
+              <div key={key} className="absolute -translate-x-1/2 -translate-y-1/2" style={pos}>
+                <Tooltip
+                  content={
+                    <>
+                      <b className="text-ink">{namer.stat(v.def.id).main}</b>: {v.value ?? 0}
+                      {boards ? <span className="block text-ink-3">из них от досок Даэваниона: +{boards}</span> : null}
+                      {refText(v.def.id) && <span className="block text-ink-3">{refText(v.def.id)}</span>}
+                      <span className="mt-1 block text-ink-3">Стат бога{deity ? ` ${deity}` : ''}: растёт от досок Даэваниона, аркан и пантеона.</span>
+                    </>
+                  }
                 >
-                  <span className={cn('tnum text-[15px] leading-none font-bold', has ? 'text-accent-2' : 'text-ink-3')}>{has ? v.value : '—'}</span>
-                  <span className="mt-0.5 max-w-[48px] truncate text-[8.5px] leading-none text-ink-3">{deity ?? aspect}</span>
-                </div>
-              </Tooltip>
-            </div>
-          )
-        })}
+                  <div className="relative flex h-[52px] w-[52px] items-center justify-center">
+                    <GameIcon src={`./icons/deities/${key}.png`} size={50} className={has ? 'text-ink' : 'text-ink-3 opacity-50'} />
+                    <span
+                      className={cn(
+                        'tnum absolute -right-2 -bottom-1 text-[14px] leading-none font-bold [text-shadow:0_1px_3px_var(--color-bg),0_0_2px_var(--color-bg)]',
+                        !has ? 'text-ink-3' : tone === 'warn' ? 'text-warning' : tone === 'ok' ? 'text-good' : 'text-ink'
+                      )}
+                    >
+                      {has ? v.value : '—'}
+                    </span>
+                  </div>
+                </Tooltip>
+              </div>
+            )
+          })}
+        </div>
+
+        {EXTRA_DEITIES.some((k) => (valueOf(k)?.value ?? 0) > 0) && (
+          <div className="mt-2 flex justify-center gap-3 text-[12px] text-ink-3">
+            {EXTRA_DEITIES.map((k) => {
+              const v = valueOf(k)
+              if (!v || !v.value) return null
+              return (
+                <span key={k}>
+                  {namer.stat(v.def.id).main}: <b className="tnum text-ink">{v.value}</b>
+                </span>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       <div className="min-w-[280px] flex-1">

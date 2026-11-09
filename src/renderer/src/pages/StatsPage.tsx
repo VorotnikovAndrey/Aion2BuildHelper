@@ -74,23 +74,29 @@ export function StatsPage() {
         <Card
           title="Где хватает и к чему стремиться"
           className="mb-5"
-          hint={`Пороги для контента — сколько нужно (по отчётам игроков глобальной версии). Ориентиры — сколько в среднем у ${topData(char.cls)?.players.toLocaleString('ru-RU') ?? ''} топ-игроков класса (metabot.gg). Отметка на шкале — цель; зелёное — хватает, жёлтое — не хватает.`}
+          hint={
+            top.length
+              ? `Пороги — сколько нужно для контента или сколько у автора гайда на целевой стадии. Ориентиры — сколько в среднем у ${topData(char.cls)?.players.toLocaleString('ru-RU') ?? ''} топ-игроков класса (metabot.gg). Отметка на шкале — цель; зелёное — хватает, жёлтое — не хватает.`
+              : 'Пороги — сколько нужно для контента или сколько у автора гайда на целевой стадии (по расчёту Questlog). Отметка на шкале — цель; зелёное — хватает, жёлтое — не хватает.'
+          }
         >
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-            <div className="space-y-4">
+          <div className={cn('grid grid-cols-1 gap-6', top.length > 0 && 'xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]')}>
+            <div className={cn('space-y-4', !top.length && 'max-w-xl')}>
               <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Для контента (PvE)</div>
               {content.map((t) => (
                 <TargetBar key={t.target.id} t={t} />
               ))}
             </div>
-            <div className="space-y-4">
-              <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Ориентир: в среднем у топ-игроков класса</div>
-              <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
-                {top.map((t) => (
-                  <TargetBar key={t.target.id} t={t} compact />
-                ))}
+            {top.length > 0 && (
+              <div className="space-y-4">
+                <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Ориентир: в среднем у топ-игроков класса</div>
+                <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+                  {top.map((t) => (
+                    <TargetBar key={t.target.id} t={t} compact />
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </Card>
       )}

@@ -229,7 +229,7 @@ function gearOf(build) {
   return out.sort((a, b) => a.slot - b.slot)
 }
 
-/** Характеристики стадии (как их считает Questlog) → ориентиры: меткость, крит, скорость боя. */
+/** Характеристики стадии (как их считает Questlog) → ориентиры: меткость и крит. */
 function stageTargets(ss, stageName) {
   if (!ss?.stats) return undefined
   const get = (cat, name) => {
@@ -263,16 +263,7 @@ function stageTargets(ss, stageName) {
       goals: [{ value: Math.round(crit), label }],
       note: 'Крит. удар на этой стадии у автора билда.'
     })
-  const speed = get('Осн. показатели', 'СКР боя')
-  if (speed !== null)
-    out.push({
-      id: 'stage-combat-speed',
-      name: 'СКР боя',
-      kind: 'stage',
-      stats: [statByKey.get('combatspeed')],
-      goals: [{ value: Math.round(speed * 100), label }],
-      note: 'Скорость боя на этой стадии у автора билда.'
-    })
+  // СКР боя не берём: Questlog показывает итоговую скорость, а оверлей отдаёт только её часть (13% против 41%) — сравнение врёт.
   return out.length ? out : undefined
 }
 
