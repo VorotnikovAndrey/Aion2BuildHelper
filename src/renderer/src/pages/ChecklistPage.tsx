@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { CheckCircle2, Circle, ListChecks, Plus, Trash2 } from 'lucide-react'
+import { ListChecks, Plus, Trash2 } from 'lucide-react'
+import { StatusBadge } from '@/components/StatusBadge'
+import { Sparks } from '@/components/fx'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -72,11 +74,7 @@ export function ChecklistPage() {
                     }
                   >
                     <div className="flex w-full items-center gap-2.5 text-[13px]">
-                      {m.done ? (
-                        <CheckCircle2 size={16} className="shrink-0 text-good" />
-                      ) : (
-                        <Circle size={16} className={cn('shrink-0', m.unsure ? 'text-warning' : 'text-critical')} />
-                      )}
+                      <StatusBadge tone={m.done ? 'ok' : m.unsure ? 'warn' : 'bad'} size={16} />
                       <span className={cn(m.done ? 'text-good' : m.unsure ? 'text-warning' : 'text-critical')}>{m.text}</span>
                       {m.unsure && !m.done && <Pill tone="warning">проверьте в игре</Pill>}
                     </div>
@@ -94,12 +92,7 @@ export function ChecklistPage() {
                 {guideItems.map((c) => (
                   <li key={c.id}>
                     <label className="flex cursor-pointer items-center gap-2.5 rounded-lg px-1 py-1 text-[13px] hover:bg-surface-2">
-                      <input
-                        type="checkbox"
-                        checked={!!checks[c.id]}
-                        onChange={(e) => void setPrefs(char.key, { checklist: { ...checks, [c.id]: e.target.checked } })}
-                        className="accent-[var(--color-accent)]"
-                      />
+                      <SparkCheckbox checked={!!checks[c.id]} onChange={(v) => void setPrefs(char.key, { checklist: { ...checks, [c.id]: v } })} />
                       <span className={checks[c.id] ? 'text-ink-3 line-through' : 'text-ink-2'}>{c.text}</span>
                     </label>
                   </li>
@@ -131,11 +124,9 @@ export function ChecklistPage() {
             <ul className="space-y-1">
               {tasks.map((t) => (
                 <li key={t.id} className="group flex items-center gap-2.5 rounded-lg px-1 py-1 text-[13px] hover:bg-surface-2">
-                  <input
-                    type="checkbox"
+                  <SparkCheckbox
                     checked={!!t.done}
-                    onChange={(e) => void setPrefs(char.key, { tasks: tasks.map((x) => (x.id === t.id ? { ...x, done: e.target.checked } : x)) })}
-                    className="accent-[var(--color-accent)]"
+                    onChange={(v) => void setPrefs(char.key, { tasks: tasks.map((x) => (x.id === t.id ? { ...x, done: v } : x)) })}
                   />
                   <span className={cn('flex-1', t.done ? 'text-ink-3 line-through' : 'text-ink-2')}>{t.text}</span>
                   <button
@@ -162,5 +153,24 @@ export function ChecklistPage() {
         </div>
       </div>
     </>
+  )
+}
+
+/** Галочка, из которой при отметке разлетаются искры (только при «Полных» анимациях). */
+function SparkCheckbox({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+  const [fire, setFire] = useState(0)
+  return (
+    <span className="relative inline-flex">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => {
+          if (e.target.checked) setFire((n) => n + 1)
+          onChange(e.target.checked)
+        }}
+        className="accent-[var(--color-accent)]"
+      />
+      <Sparks fire={fire} />
+    </span>
   )
 }

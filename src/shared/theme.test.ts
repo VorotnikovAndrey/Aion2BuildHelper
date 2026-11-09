@@ -39,3 +39,12 @@ describe('темы', () => {
     expect(onAccentColor('#6366f1')).toBe('#ffffff') // тёмный индиго — белый текст
   })
 })
+
+describe('анимации', () => {
+  it('по умолчанию — полные; неизвестное значение и старый файл без поля — тоже', () => {
+    expect(DEFAULT_UI.motion).toBe('full')
+    expect(normalizeUi({ motion: 'calm' }).motion).toBe('calm')
+    expect(normalizeUi({ motion: 'turbo' }).motion).toBe('full')
+    expect(normalizeUi({ themeId: 'gold', base: 'abyss', accent: '#d9a441', zoom: 1 }).motion).toBe('full')
+  })
+})

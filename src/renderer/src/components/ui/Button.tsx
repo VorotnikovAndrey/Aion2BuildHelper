@@ -21,7 +21,7 @@ export function Button({ variant = 'secondary', size = 'md', icon, className, ch
     <button
       {...rest}
       className={cn(
-        'inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg transition-colors disabled:pointer-events-none disabled:opacity-40',
+        'inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg transition-[color,background-color,border-color,transform] active:scale-[0.96] disabled:pointer-events-none disabled:opacity-40',
         size === 'sm' ? 'h-7 px-2.5 text-xs' : 'h-9 px-3.5 text-[13px]',
         VARIANTS[variant],
         className

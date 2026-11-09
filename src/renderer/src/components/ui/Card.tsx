@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { motion } from 'motion/react'
-import { STATIC_MODE } from '@/lib/env'
+import { useAnimate } from '@/lib/motion'
 import { cn } from '@/lib/format'
 import { InfoTip } from './InfoTip'
 
@@ -16,11 +16,12 @@ interface CardProps {
 }
 
 export function Card({ title, hint, actions, className, bodyClassName, children, delay = 0 }: CardProps) {
+  const animate = useAnimate()
   return (
     <motion.section
-      initial={STATIC_MODE ? false : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay, ease: 'easeOut' }}
+      initial={animate ? { opacity: 0, y: 10, scale: 0.985 } : false}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.35, delay, ease: [0.22, 1, 0.36, 1] }}
       className={cn('rounded-2xl border border-line bg-surface', className)}
     >
       {(title || actions) && (

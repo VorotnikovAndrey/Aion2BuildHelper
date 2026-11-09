@@ -2,25 +2,7 @@
 // Пути и названия — в shared/gamedata/art.ts; если картинки нет, рисуется аккуратная заглушка.
 
 import { useState, type ReactNode } from 'react'
-import {
-  AlertTriangle,
-  Check,
-  CircleDot,
-  Crown,
-  Ear,
-  Footprints,
-  Gem,
-  Hand,
-  HardHat,
-  Hexagon,
-  Shield,
-  Shirt,
-  Sword,
-  Watch,
-  Wind,
-  X,
-  type LucideIcon
-} from 'lucide-react'
+import { CircleDot, Crown, Ear, Footprints, Gem, Hand, HardHat, Hexagon, Shield, Shirt, Sword, Watch, Wind, type LucideIcon } from 'lucide-react'
 import {
   ARCANA_FRAME,
   arcanaCardArt,
@@ -38,6 +20,8 @@ import type { ArcanaType, ArcanaVariant } from '@shared/gamedata/arcana'
 import { gradeOfItem, slotDef, type ItemGrade } from '@shared/gamedata/slots'
 import { cn } from '@/lib/format'
 import type { Tone } from '@/lib/status'
+import { StatusBadge } from './StatusBadge'
+import { hash01 } from './fx'
 
 const SLOT_GLYPH: Record<string, LucideIcon> = {
   weapon: Sword,
@@ -92,32 +76,17 @@ export function GameSlot({
       ) : (
         fallback && <span className="absolute inset-0 flex items-center justify-center text-ink/70">{fallback}</span>
       )}
+      {SHINY.has(grade) && <span className="fx-shine" style={{ ['--shine-delay' as string]: `${(hash01(src ?? grade) * 7).toFixed(2)}s` }} />}
       {children}
     </span>
   )
 }
 
-const STATUS_STYLE: Record<Tone, { bg: string; icon: LucideIcon } | null> = {
-  ok: { bg: 'bg-good', icon: Check },
-  warn: { bg: 'bg-warning', icon: AlertTriangle },
-  bad: { bg: 'bg-critical', icon: X },
-  neutral: null
-}
+/** У каких грейдов по иконке пробегает блеск. */
+const SHINY = new Set<ItemGrade>(['mythic', 'epic', 'unique', 'legend'])
 
-/** Маленький значок статуса в углу ячейки: цвет всегда вместе с иконкой. */
-export function StatusBadge({ tone, size = 15, className }: { tone: Tone; size?: number; className?: string }) {
-  const s = STATUS_STYLE[tone]
-  if (!s) return null
-  const Icon = s.icon
-  return (
-    <span
-      className={cn('flex items-center justify-center rounded-full text-bg shadow-[0_0_0_2px_var(--color-surface)]', s.bg, className)}
-      style={{ width: size, height: size }}
-    >
-      <Icon size={size * 0.68} strokeWidth={3} />
-    </span>
-  )
-}
+// Значок статуса нарисован в Figma — см. StatusBadge.tsx.
+export { StatusBadge }
 
 /** Иконка надетой вещи: арт из игры (или значок слота), рамка грейда, заточка «+14». */
 export function ItemIcon({

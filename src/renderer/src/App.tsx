@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from 'react'
 import { createHashRouter, Route, RouterProvider, Routes, useLocation } from 'react-router'
 import { Sidebar } from './layout/Sidebar'
 import { ZoomToast } from './components/ZoomToast'
+import { AetherBackdrop } from './components/fx'
 import { NoData } from './pages/NoData'
 import { OverviewPage } from './pages/OverviewPage'
 import { SkillsPage } from './pages/SkillsPage'
@@ -37,32 +38,35 @@ function Shell() {
   return (
     <div className="flex h-full">
       <Sidebar />
-      <main ref={main} className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
-        <div key={location.pathname} className="mx-auto max-w-[1280px] animate-fade-in px-8 py-7">
-          <Routes>
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/guides" element={<GuidesPage />} />
-            <Route path="/guides/:id/edit" element={<GuideEditorPage />} />
-            {char ? (
-              <>
-                <Route path="/" element={<OverviewPage />} />
-                <Route path="/skills" element={<SkillsPage />} />
-                <Route path="/rotation" element={<RotationPage />} />
-                <Route path="/gear" element={<GearPage />} />
-                <Route path="/arcana" element={<ArcanaPage />} />
-                <Route path="/daevanion" element={<DaevanionPage />} />
-                <Route path="/genus" element={<GenusPage />} />
-                <Route path="/collections" element={<CollectionsPage />} />
-                <Route path="/stats" element={<StatsPage />} />
-                <Route path="/history" element={<HistoryPage />} />
-                <Route path="/checklist" element={<ChecklistPage />} />
-              </>
-            ) : (
-              <Route path="*" element={<NoData />} />
-            )}
-          </Routes>
-        </div>
-      </main>
+      <div className="relative min-w-0 flex-1">
+        <AetherBackdrop />
+        <main ref={main} className="relative h-full overflow-x-hidden overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
+          <div key={location.pathname} className="mx-auto max-w-[1280px] animate-fade-in px-8 py-7">
+            <Routes>
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/guides" element={<GuidesPage />} />
+              <Route path="/guides/:id/edit" element={<GuideEditorPage />} />
+              {char ? (
+                <>
+                  <Route path="/" element={<OverviewPage />} />
+                  <Route path="/skills" element={<SkillsPage />} />
+                  <Route path="/rotation" element={<RotationPage />} />
+                  <Route path="/gear" element={<GearPage />} />
+                  <Route path="/arcana" element={<ArcanaPage />} />
+                  <Route path="/daevanion" element={<DaevanionPage />} />
+                  <Route path="/genus" element={<GenusPage />} />
+                  <Route path="/collections" element={<CollectionsPage />} />
+                  <Route path="/stats" element={<StatsPage />} />
+                  <Route path="/history" element={<HistoryPage />} />
+                  <Route path="/checklist" element={<ChecklistPage />} />
+                </>
+              ) : (
+                <Route path="*" element={<NoData />} />
+              )}
+            </Routes>
+          </div>
+        </main>
+      </div>
       <ZoomToast />
     </div>
   )

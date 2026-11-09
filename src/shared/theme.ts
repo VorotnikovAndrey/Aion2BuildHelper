@@ -64,6 +64,18 @@ export const ACCENT_SWATCHES = [
   '#d4d4d4'
 ]
 
+/**
+ * Анимации: full — все (появление, блеск вещей, эфир на фоне, искры); calm — только короткие переходы,
+ * без фоновых и повторяющихся эффектов; off — без анимаций.
+ */
+export type MotionLevel = 'full' | 'calm' | 'off'
+
+export const MOTION_LEVELS: { id: MotionLevel; label: string; hint: string }[] = [
+  { id: 'full', label: 'Полные', hint: 'Появление карточек, счётчики, блеск редких вещей, эфир на фоне, искры при отметке в чек-листе.' },
+  { id: 'calm', label: 'Спокойные', hint: 'Только короткие переходы и счётчики — без блеска, эфира на фоне и искр.' },
+  { id: 'off', label: 'Выключены', hint: 'Всё появляется сразу, ничего не движется.' }
+]
+
 export interface UiPrefs {
   /** id готовой темы или 'custom', если цвета собраны вручную. */
   themeId: string
@@ -71,9 +83,10 @@ export interface UiPrefs {
   accent: string
   /** Масштаб интерфейса, 1 = 100%. */
   zoom: number
+  motion: MotionLevel
 }
 
-export const DEFAULT_UI: UiPrefs = { themeId: 'gold', base: 'abyss', accent: '#d9a441', zoom: 1 }
+export const DEFAULT_UI: UiPrefs = { themeId: 'gold', base: 'abyss', accent: '#d9a441', zoom: 1, motion: 'full' }
 
 export const ZOOM_STEPS = [0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2]
 export const ZOOM_MIN = ZOOM_STEPS[0]
@@ -101,7 +114,8 @@ export function normalizeUi(raw: unknown): UiPrefs {
     themeId: typeof r.themeId === 'string' && r.themeId ? r.themeId : DEFAULT_UI.themeId,
     base,
     accent,
-    zoom: clampZoom(typeof r.zoom === 'number' ? r.zoom : 1)
+    zoom: clampZoom(typeof r.zoom === 'number' ? r.zoom : 1),
+    motion: MOTION_LEVELS.some((m) => m.id === r.motion) ? (r.motion as MotionLevel) : DEFAULT_UI.motion
   }
 }
 

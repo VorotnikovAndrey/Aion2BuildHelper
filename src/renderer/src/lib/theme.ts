@@ -2,7 +2,8 @@
 // ссылаются на эти переменные, поэтому интерфейс перекрашивается мгновенно, без перезагрузки.
 // Производные цвета (accent-2, accent-soft, свечение) считаются в styles.css через color-mix от акцента.
 
-import { onAccentColor, themeBase, type UiPrefs } from '@shared/theme'
+import { onAccentColor, themeBase, type MotionLevel, type UiPrefs } from '@shared/theme'
+import { STATIC_MODE } from './env'
 
 export function applyTheme(ui: Pick<UiPrefs, 'base' | 'accent'>): void {
   const base = themeBase(ui.base)
@@ -19,4 +20,16 @@ export function applyTheme(ui: Pick<UiPrefs, 'base' | 'accent'>): void {
 /** Масштаб в браузерном режиме (в приложении им управляет main-процесс через setZoomFactor). */
 export function applyCssZoom(zoom: number): void {
   document.documentElement.style.setProperty('zoom', String(zoom))
+}
+
+/** Что применяется на деле: режим ?static и системное «уменьшить движение» сильнее выбора в приложении. */
+export function effectiveMotion(level: MotionLevel): MotionLevel {
+  if (STATIC_MODE) return 'off'
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+  return reduced && level === 'full' ? 'calm' : level
+}
+
+/** Уровень анимаций — атрибутом data-motion на <html>: по нему styles.css выключает фоновые эффекты и блеск. */
+export function applyMotion(level: MotionLevel): void {
+  document.documentElement.dataset.motion = effectiveMotion(level)
 }

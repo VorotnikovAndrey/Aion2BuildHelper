@@ -192,3 +192,165 @@ textarea,
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ───────────── Анимации «повеселее» ─────────────
+   Уровень задаёт data-motion на <html> (Оформление → Анимации): full — всё, calm — без декоративных
+   эффектов (блеск, эфир, искры), off — без анимаций. ?static и системное «уменьшить движение» сильнее. */
+
+/* Значок статуса выпрыгивает при появлении. */
+.fx-pop {
+  animation: fx-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: var(--pop-delay, 0ms);
+  transform-origin: center;
+}
+@keyframes fx-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-25deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Блеск редких вещей: полоса света пробегает по иконке раз в несколько секунд, при наведении — сразу. */
+.fx-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.fx-shine::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  width: 45%;
+  left: -60%;
+  transform: skewX(-20deg);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.32), transparent);
+  animation: fx-shine 7s ease-in-out infinite;
+  animation-delay: var(--shine-delay, 0s);
+}
+.game-slot:hover .fx-shine::before {
+  animation: fx-shine-now 0.7s ease-out;
+}
+@keyframes fx-shine {
+  0%,
+  86% {
+    left: -60%;
+  }
+  100% {
+    left: 130%;
+  }
+}
+@keyframes fx-shine-now {
+  from {
+    left: -60%;
+  }
+  to {
+    left: 130%;
+  }
+}
+
+/* Иконки чуть приподнимаются под курсором. */
+.game-slot {
+  transition: transform 0.18s ease-out;
+}
+[data-motion='full'] .game-slot:hover {
+  transform: translateY(-2px) scale(1.04);
+}
+
+/* Эфир на фоне: медленно плывущие пятна света и искры, поднимающиеся вверх. */
+.fx-aether-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.11;
+  animation: fx-drift 38s ease-in-out infinite alternate;
+}
+@keyframes fx-drift {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(var(--dx, 80px), var(--dy, -60px)) scale(1.25);
+  }
+}
+.fx-mote {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  box-shadow: 0 0 6px 1px color-mix(in srgb, var(--color-accent) 70%, transparent);
+  opacity: 0;
+  animation: fx-rise var(--dur, 24s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes fx-rise {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.55;
+  }
+  85% {
+    opacity: 0.35;
+  }
+  100% {
+    transform: translate(var(--sway, 30px), -105vh);
+    opacity: 0;
+  }
+}
+
+/* Искры — например, при отметке пункта чек-листа. */
+.fx-spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 9999px;
+  background: var(--spark, var(--color-accent));
+  box-shadow: 0 0 6px var(--spark, var(--color-accent));
+  animation: fx-spark 0.75s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+@keyframes fx-spark {
+  from {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--sx), var(--sy)) scale(0.2);
+    opacity: 0;
+  }
+}
+
+/* Мягкий «пинг» — когда пришли свежие данные. */
+.fx-ping {
+  animation: fx-ping 1.2s cubic-bezier(0, 0, 0.2, 1) 3;
+}
+@keyframes fx-ping {
+  75%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+[data-motion='calm'] .fx-ambient,
+[data-motion='off'] .fx-ambient,
+[data-motion='calm'] .fx-shine,
+[data-motion='off'] .fx-shine {
+  display: none;
+}
+[data-motion='off'] *,
+[data-motion='off'] *::before,
+[data-motion='off'] *::after {
+  animation: none !important;
+  transition: none !important;
+}

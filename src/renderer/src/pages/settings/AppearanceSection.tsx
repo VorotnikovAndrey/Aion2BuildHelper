@@ -1,10 +1,11 @@
-// Настройки → Оформление: готовые темы, свои цвета (основа + акцент) и масштаб интерфейса.
+// Настройки → Оформление: готовые темы, свои цвета (основа + акцент), масштаб интерфейса и анимации.
 
 import type { ReactNode } from 'react'
 import { motion } from 'motion/react'
-import { Check, Minus, Plus, RotateCcw } from 'lucide-react'
+import { Check, Minus, Plus, RotateCcw, Sparkles } from 'lucide-react'
 import {
   ACCENT_SWATCHES,
+  MOTION_LEVELS,
   stepZoom,
   THEME_BASES,
   THEME_PRESETS,
@@ -147,6 +148,43 @@ export function AppearanceSection() {
           )}
         </Card>
       </div>
+
+      <Card
+        title="Анимации"
+        hint="Насколько оживлён интерфейс. Если в Windows включено «уменьшить анимацию», приложение не показывает блеск, эфир и искры, даже при «Полных»."
+      >
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+          {MOTION_LEVELS.map((m) => {
+            const active = ui.motion === m.id
+            return (
+              <button
+                key={m.id}
+                onClick={() => void updateUi({ motion: m.id })}
+                className={cn(
+                  'flex items-start gap-3 rounded-xl border p-3.5 text-left transition-colors',
+                  active ? 'border-accent bg-accent-soft' : 'border-line hover:border-line-strong hover:bg-surface-2'
+                )}
+              >
+                <span
+                  className={cn(
+                    'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border',
+                    active ? 'border-accent bg-accent text-on-accent' : 'border-line-strong'
+                  )}
+                >
+                  {active && <Check size={12} strokeWidth={3} />}
+                </span>
+                <span className="min-w-0">
+                  <span className="flex items-center gap-1.5 text-[13px] font-semibold">
+                    {m.id === 'full' && <Sparkles size={13} className="text-accent" />}
+                    {m.label}
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-relaxed text-ink-3">{m.hint}</span>
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </Card>
     </div>
   )
 }

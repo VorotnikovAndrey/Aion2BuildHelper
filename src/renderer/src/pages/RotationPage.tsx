@@ -392,14 +392,7 @@ function OpenerStep({ n, skill, note, use, namer }: { n: number; skill: number; 
 const ADVICE_ORDER: Record<AdviceTone, number> = { bad: 0, warn: 1, ok: 2, info: 3 }
 
 function AdviceIcon({ tone }: { tone: AdviceTone }) {
-  if (tone === 'info') {
-    return (
-      <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-info/15 text-info">
-        <Info size={12} strokeWidth={2.5} />
-      </span>
-    )
-  }
-  return <StatusBadge tone={tone} size={18} className="shrink-0" />
+  return <StatusBadge tone={tone} size={18} />
 }
 
 function AdviceCard({ advice, onOpen }: { advice: RotationAdvice[]; onOpen: (to: string) => void }) {

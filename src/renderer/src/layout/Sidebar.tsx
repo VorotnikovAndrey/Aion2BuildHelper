@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { motion } from 'motion/react'
 import { NavLink, useNavigate } from 'react-router'
 import {
   BookOpen,
@@ -19,10 +20,12 @@ import {
   type LucideIcon
 } from 'lucide-react'
 import { classInfo } from '@shared/gamedata/classes'
+import { CountUp } from '@/components/fx'
 import { ClassIcon } from '@/components/game'
 import { Tooltip } from '@/components/ui/InfoTip'
 import { toneOfScore } from '@/components/ui/Pill'
 import { ago, cn, compact } from '@/lib/format'
+import { useAnimate } from '@/lib/motion'
 import { useCharacterContext } from '@/lib/report'
 import { useApp, useCharacters } from '@/lib/store'
 
@@ -99,6 +102,19 @@ export function Sidebar() {
   const source = useApp((s) => s.source)
   const reload = useApp((s) => s.reload)
   const [spinning, setSpinning] = useState(false)
+  const animate = useAnimate()
+  // Свежие данные от оверлея — точка внизу коротко «пингует».
+  const [fresh, setFresh] = useState(false)
+  const lastModified = useRef(source?.modifiedAt)
+  useEffect(() => {
+    if (!source?.modifiedAt || source.modifiedAt === lastModified.current) return
+    const first = lastModified.current === undefined
+    lastModified.current = source.modifiedAt
+    if (first) return
+    setFresh(true)
+    const t = setTimeout(() => setFresh(false), 4000)
+    return () => clearTimeout(t)
+  }, [source?.modifiedAt])
 
   const refresh = async () => {
     setSpinning(true)
@@ -140,19 +156,32 @@ export function Sidebar() {
                     end={item.to === '/'}
                     className={({ isActive }) =>
                       cn(
-                        'group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-colors',
-                        isActive ? 'bg-accent-soft text-ink' : 'text-ink-2 hover:bg-surface hover:text-ink'
+                        'group relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-colors',
+                        isActive ? 'text-ink' : 'text-ink-2 hover:bg-surface hover:text-ink'
                       )
                     }
                   >
                     {({ isActive }) => (
                       <>
-                        <item.icon size={16} className={isActive ? 'text-accent' : 'text-ink-3 group-hover:text-ink-2'} />
-                        <span className="flex-1 truncate">{item.label}</span>
+                        {/* Подсветка активного раздела переезжает между пунктами. */}
+                        {isActive && (
+                          <motion.span
+                            layoutId="nav-active"
+                            className="absolute inset-0 rounded-lg bg-accent-soft"
+                            transition={animate ? { type: 'spring', stiffness: 520, damping: 40 } : { duration: 0 }}
+                          >
+                            <span className="absolute top-2 bottom-2 left-0 w-[3px] rounded-full bg-accent" />
+                          </motion.span>
+                        )}
+                        <item.icon
+                          size={16}
+                          className={cn('relative transition-transform group-hover:scale-115', isActive ? 'text-accent' : 'text-ink-3 group-hover:text-ink-2')}
+                        />
+                        <span className="relative flex-1 truncate">{item.label}</span>
                         {score !== null && (
-                          <span className="tnum flex items-center gap-1.5 text-[11px] text-ink-3">
+                          <span className="tnum relative flex items-center gap-1.5 text-[11px] text-ink-3">
                             <span className={cn('h-1.5 w-1.5 rounded-full', DOT[toneOfScore(score)])} />
-                            {score}
+                            <CountUp value={score} />
                           </span>
                         )}
                       </>
@@ -178,7 +207,10 @@ export function Sidebar() {
             <span className="flex-1 truncate">
               {source?.exists ? (source.modifiedAt ? `Данные: ${ago(source.modifiedAt)}` : 'Данные загружены') : 'Нет данных оверлея'}
             </span>
-            <span className={cn('h-2 w-2 rounded-full', source?.exists && !source.error ? 'bg-good' : 'bg-critical')} />
+            <span className="relative flex h-2 w-2">
+              {fresh && <span className="fx-ping absolute inset-0 rounded-full bg-good" />}
+              <span className={cn('relative h-2 w-2 rounded-full', source?.exists && !source.error ? 'bg-good' : 'bg-critical')} />
+            </span>
           </button>
         </Tooltip>
         <NavLink

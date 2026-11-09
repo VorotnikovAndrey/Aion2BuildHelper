@@ -8,7 +8,7 @@ import { BUILTIN_GUIDES } from '@shared/guide'
 import type { Guide } from '@shared/guide/types'
 import { normalizeUi, type UiPrefs } from '@shared/theme'
 import type { Character } from '@shared/types'
-import { applyCssZoom, applyTheme } from './theme'
+import { applyCssZoom, applyMotion, applyTheme } from './theme'
 import { createWebApi } from './webApi'
 
 export const api: AppApi = window.api ?? createWebApi()
@@ -88,6 +88,7 @@ export const useApp = create<AppState>((set, get) => ({
 
 function applyUi(ui: UiPrefs) {
   applyTheme(ui)
+  applyMotion(ui.motion)
   if (isWebMode) applyCssZoom(ui.zoom)
 }
 
