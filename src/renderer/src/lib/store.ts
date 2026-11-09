@@ -5,7 +5,8 @@ import { create } from 'zustand'
 import type { AppApi, CharacterPrefs, Settings, SourceState } from '@shared/api'
 import { DEFAULT_SETTINGS } from '@shared/api'
 import { BUILTIN_GUIDES } from '@shared/guide'
-import type { Guide } from '@shared/guide/types'
+import { pickStage } from '@shared/guide/stages'
+import type { Guide, GuideStage } from '@shared/guide/types'
 import { normalizeUi, type UiPrefs } from '@shared/theme'
 import type { Character } from '@shared/types'
 import { applyCssZoom, applyMotion, applyTheme } from './theme'
@@ -115,6 +116,14 @@ export function useCharacter(): Character | null {
 export function useCharacterPrefs(key: string | undefined): CharacterPrefs {
   const prefs = useApp((s) => (key ? s.settings.characters[key] : undefined))
   return prefs ?? {}
+}
+
+/** Целевая стадия гайда: выбранная вручную или ближайшая впереди по уровню снаряжения. */
+export function useActiveStage(char: Character | null, guide: Guide | null): { stage: GuideStage | null; auto: boolean } {
+  const prefs = useCharacterPrefs(char?.key)
+  const chosen = guide ? prefs.stages?.[guide.id] : undefined
+  const stage = pickStage(guide, chosen, char?.gearScore ?? 0)
+  return { stage, auto: !chosen || stage?.id !== chosen }
 }
 
 /** Гайд персонажа: выбранный в настройках, иначе первый подходящий по классу. */

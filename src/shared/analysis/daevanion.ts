@@ -1,6 +1,6 @@
 // Даэванион: что взято на досках, сколько очков вложено, что осталось до целей гайда и во что это обойдётся.
 
-import { boardCost, classBoards, routeTo, type DaevanionBoard, type DaevanionNode } from '../gamedata/daevanion'
+import { boardCost, classBoards, pathFrom, routesFrom, type BoardRoutes, type DaevanionBoard, type DaevanionNode, type NodeRoute } from '../gamedata/daevanion'
 import { statByKey } from '../gamedata/stats'
 import type { DaevanionGoal, Guide } from '../guide/types'
 import type { Character } from '../types'
@@ -112,20 +112,28 @@ function analyzeGoal(goal: DaevanionGoal, boards: BoardReport[]): GoalReport {
   }
 
   // Жадный план: каждый раз берём самый дешёвый оставшийся узел, «покупаем» путь к нему и пересчитываем.
+  // Расстояния считаются на всю доску сразу и пересчитываются только у доски, где что-то взяли.
   const takenByBoard = new Map(scope.map((b) => [b.board.id, new Set(b.taken)]))
+  const routes = new Map<number, BoardRoutes>()
+  const routesOf = (board: DaevanionBoard) => {
+    let r = routes.get(board.id)
+    if (!r) routes.set(board.id, (r = routesFrom(board, takenByBoard.get(board.id)!)))
+    return r
+  }
   const left = required.filter((r) => !r.taken && !r.locked)
   const plan: GoalStep[] = []
   while (left.length) {
-    let best: { i: number; route: NonNullable<ReturnType<typeof routeTo>> } | null = null
+    let best: { i: number; route: NodeRoute } | null = null
     left.forEach((r, i) => {
-      const route = routeTo(r.board, takenByBoard.get(r.board.id)!, r.node.id)
+      const route = pathFrom(r.board, routesOf(r.board), r.node.id)
       if (route && (!best || route.cost < best.route.cost)) best = { i, route }
     })
     if (!best) break
-    const { i, route } = best as { i: number; route: NonNullable<ReturnType<typeof routeTo>> }
+    const { i, route } = best as { i: number; route: NodeRoute }
     const r = left.splice(i, 1)[0]
     const set = takenByBoard.get(r.board.id)!
     for (const id of route.path) set.add(id)
+    routes.delete(r.board.id)
     plan.push({ node: r.node, board: r.board, cost: route.cost, via: Math.max(0, route.path.length - 1), path: route.path })
   }
 

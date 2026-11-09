@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { templarPveConsensus } from '../guide/builtin/templarPveConsensus'
+import { templarPveConsensus } from '../testing/templarPveConsensus'
 import { makeTemplar } from '../testing/fixtures'
 import { analyzeGear } from './gear'
 import { statTargetStatus, stoneWeightFn } from './targets'

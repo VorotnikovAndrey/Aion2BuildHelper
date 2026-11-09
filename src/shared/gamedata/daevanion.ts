@@ -99,42 +99,63 @@ export interface NodeRoute {
   path: number[]
 }
 
-/**
- * Самый дешёвый путь до узла от уже взятых (алгоритм Дейкстры, вес — стоимость узла).
- * Стартовый узел доски считается взятым всегда.
- */
-export function routeTo(board: DaevanionBoard, taken: Set<number>, targetId: number): NodeRoute | null {
-  if (taken.has(targetId)) return { cost: 0, path: [] }
-  const target = board.nodes.find((n) => n.id === targetId)
-  if (!target) return null
-  const isTaken = (n: DaevanionNode) => taken.has(n.id) || n.type === 'Start'
+/** Расстояния от уже взятых узлов до всех узлов доски (Дейкстра, вес — стоимость узла). */
+export interface BoardRoutes {
+  dist: Map<number, number>
+  prev: Map<number, number>
+  taken: Set<number>
+}
 
+const idCache = new WeakMap<DaevanionBoard, Map<number, DaevanionNode>>()
+function nodeById(board: DaevanionBoard): Map<number, DaevanionNode> {
+  let m = idCache.get(board)
+  if (!m) {
+    m = new Map(board.nodes.map((n) => [n.id, n]))
+    idCache.set(board, m)
+  }
+  return m
+}
+
+/**
+ * Один проход Дейкстры сразу до всех узлов: так план из сотен узлов (раскладка автора билда)
+ * считается за миллисекунды, а не за секунды. Стартовый узел доски считается взятым всегда.
+ */
+export function routesFrom(board: DaevanionBoard, taken: Set<number>): BoardRoutes {
+  const isTaken = (n: DaevanionNode) => taken.has(n.id) || n.type === 'Start'
+  const byId = nodeById(board)
   const dist = new Map<number, number>()
   const prev = new Map<number, number>()
-  const queue: { id: number; d: number }[] = []
-  for (const n of board.nodes) {
-    if (isTaken(n)) {
-      dist.set(n.id, 0)
-      queue.push({ id: n.id, d: 0 })
-    }
-  }
-  const byId = new Map(board.nodes.map((n) => [n.id, n]))
-  while (queue.length) {
-    queue.sort((a, b) => a.d - b.d)
-    const { id, d } = queue.shift()!
-    if (d > (dist.get(id) ?? Infinity)) continue
-    if (id === targetId) break
-    for (const nb of neighbors(board, byId.get(id)!)) {
-      const nd = d + (isTaken(nb) ? 0 : nb.cost)
+  const done = new Set<number>()
+  for (const n of board.nodes) if (isTaken(n)) dist.set(n.id, 0)
+  for (;;) {
+    let cur = -1
+    let best = Infinity
+    for (const [id, d] of dist) if (d < best && !done.has(id)) ((best = d), (cur = id))
+    if (cur < 0) break
+    done.add(cur)
+    for (const nb of neighbors(board, byId.get(cur)!)) {
+      const nd = best + (isTaken(nb) ? 0 : nb.cost)
       if (nd < (dist.get(nb.id) ?? Infinity)) {
         dist.set(nb.id, nd)
-        prev.set(nb.id, id)
-        queue.push({ id: nb.id, d: nd })
+        prev.set(nb.id, cur)
       }
     }
   }
-  if (!dist.has(targetId)) return null
+  return { dist, prev, taken }
+}
+
+/** Путь до узла по уже посчитанным расстояниям. null — узла нет на доске или до него не дойти. */
+export function pathFrom(board: DaevanionBoard, routes: BoardRoutes, targetId: number): NodeRoute | null {
+  if (routes.taken.has(targetId)) return { cost: 0, path: [] }
+  const byId = nodeById(board)
+  if (!byId.has(targetId) || !routes.dist.has(targetId)) return null
+  const isTaken = (id: number) => routes.taken.has(id) || byId.get(id)?.type === 'Start'
   const path: number[] = []
-  for (let cur: number | undefined = targetId; cur !== undefined && !isTaken(byId.get(cur)!); cur = prev.get(cur)) path.unshift(cur)
-  return { cost: dist.get(targetId)!, path }
+  for (let cur: number | undefined = targetId; cur !== undefined && !isTaken(cur); cur = routes.prev.get(cur)) path.unshift(cur)
+  return { cost: routes.dist.get(targetId)!, path }
+}
+
+/** Самый дешёвый путь до узла от уже взятых. */
+export function routeTo(board: DaevanionBoard, taken: Set<number>, targetId: number): NodeRoute | null {
+  return pathFrom(board, routesFrom(board, taken), targetId)
 }

@@ -1,7 +1,7 @@
 import { Fragment, useMemo, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
 import { ArrowDown, ArrowRight, ArrowUp, BookOpen, Check, ChevronRight, Info, Lightbulb, MousePointerClick, Repeat } from 'lucide-react'
-import { analyzeInputMacro } from '@shared/analysis/inputMacro'
+import { analyzeInputMacro, DEFAULT_MACRO_KEY, DEFAULT_ONE_BUTTON } from '@shared/analysis/inputMacro'
 import { MacroTimeline } from '@/components/MacroTimeline'
 import type { AdviceTone, MacroReport, ManualReport, RotationAdvice, RotationSkill, SkillUse } from '@shared/analysis/rotation'
 import type { Guide, GuideOneButton } from '@shared/guide/types'
@@ -59,6 +59,9 @@ export function RotationPage() {
   const steps = rot ? rot.macros.filter((m) => m.active && !m.macro.key) : []
   const keyed = rot ? rot.macros.filter((m) => m.active && m.macro.key) : []
   const later = rot ? rot.macros.filter((m) => !m.active) : []
+  // В билдах Questlog нет клавиш и «одной кнопки» — подставляем макрос мыши владельца и ПКМ для связки.
+  const macroKey = combat?.macroKey ?? (steps.length ? DEFAULT_MACRO_KEY : undefined)
+  const oneButton = combat?.oneButton ?? (steps.length ? DEFAULT_ONE_BUTTON : undefined)
 
   return (
     <>
@@ -71,9 +74,9 @@ export function RotationPage() {
               hint="В игре: окно «Умения» → «Связки». Связка работает, пока её клавиша зажата: идёт по шагам сверху вниз и по кругу, пропуская то, что на откате. Каждый шаг — ячейка панели: до 4 умений столбиком, игра применяет первое готовое, нижний ряд 0 — главный. Красный значок — умение не изучено, жёлтый — стигма не надета."
               actions={
                 <>
-                  {combat.macroKey && (
+                  {macroKey && (
                     <span className="flex items-center gap-1.5 text-xs text-ink-3">
-                      клавиша <Key>{combat.macroKey}</Key>
+                      клавиша <Key>{macroKey}</Key>
                     </span>
                   )}
                   {combat.delayMs !== undefined && <Pill tip="Пауза между шагами связки.">задержка {combat.delayMs} мс</Pill>}
@@ -95,7 +98,7 @@ export function RotationPage() {
             </Card>
           )}
 
-          {combat?.oneButton && <OneButtonCard ob={combat.oneButton} macroKey={combat.macroKey} manual={rot?.manual ?? []} namer={namer} />}
+          {oneButton && <OneButtonCard ob={oneButton} macroKey={macroKey} manual={rot?.manual ?? []} namer={namer} />}
 
           {rot && rot.manual.length > 0 && (
             <Card

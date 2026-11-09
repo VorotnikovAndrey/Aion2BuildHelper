@@ -26,6 +26,8 @@ export interface SourceState {
 export interface CharacterPrefs {
   /** Какой гайд сейчас ведёт персонажа. */
   guideId?: string
+  /** Целевая стадия, выбранная вручную: ID гайда → ID стадии. Нет — ближайшая впереди по уровню снаряжения. */
+  stages?: Record<string, string>
   /** Специализации, отмеченные вручную: ID умения → номера вариантов. */
   manualSpecs?: Record<string, number[]>
   /** Отметки чек-листа гайда: ID пункта → сделано. */

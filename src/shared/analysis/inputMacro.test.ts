@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { templarPveConsensus } from '../guide/builtin/templarPveConsensus'
+import { templarPveConsensus } from '../testing/templarPveConsensus'
 import type { InputEvent } from '../guide/types'
 import { analyzeInputMacro, keyIntervals } from './inputMacro'
 

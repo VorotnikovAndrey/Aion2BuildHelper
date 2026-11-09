@@ -1,7 +1,7 @@
 {
   "name": "aion2-build-helper",
   "productName": "Aion2 Build Helper",
-  "version": "0.15.1",
+  "version": "0.16.0",
   "description": "Десктоп-помощник для сборки персонажа в AION 2: что надето, что заменить и чего не хватает по выбранному гайду",
   "author": "VorotnikovAndrey",
   "main": "./out/main/index.js",
@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "test": "vitest run",
     "gamedata": "node scripts/gamedata/build-gamedata.mjs",
+    "guides": "node scripts/guides/questlog-guides.mjs",
     "art": "node scripts/gamedata/fetch-art.mjs",
     "shortcut": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/create-shortcut.ps1",
     "shots": "electron-vite build && node scripts/shots.mjs",

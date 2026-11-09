@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { templarPveConsensus } from '../guide/builtin/templarPveConsensus'
+import { templarPveConsensus } from '../testing/templarPveConsensus'
 import { normalizeGuide } from '../guide'
 import { createNamer } from '../names'
 import { makeTemplar } from '../testing/fixtures'

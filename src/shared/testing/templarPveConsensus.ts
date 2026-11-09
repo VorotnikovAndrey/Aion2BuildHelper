@@ -3,7 +3,7 @@
 // согласия и что взято откуда — docs/research/templar-pve-2026-11.md.
 // В заметках: «N из M» — сколько гайдов, где это вообще сказано, советуют то же; «топ: X%» — доля топ-игроков.
 
-import type { Guide } from '../types'
+import type { Guide } from '../guide/types'
 
 // Умения стража (ID игры)
 const VICIOUS_STRIKE = 12010000

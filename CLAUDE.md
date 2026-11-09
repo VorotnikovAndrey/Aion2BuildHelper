@@ -18,7 +18,7 @@ src/shared/            — чистая логика без Electron и React. �
   questlog/parse.ts    — разбор characters.json оверлея Questlog
   gamedata/            — справочники: статы, умения+специализации, слоты, арканы, доски, род, опции шмота, топ-игроки, названия умений (skills-ru.json) и вещей (items.json)
   gamedata/generated/  — JSON, собранный скриптом npm run gamedata (руками не править)
-  guide/               — формат гайда, проверка импорта, встроенные гайды (builtin/)
+  guide/               — формат гайда (со стадиями), проверка импорта, встроенные гайды: builtin/questlog/ — билды Questlog (npm run guides, руками не править)
   analysis/            — разбор персонажа по гайду: skills, gear, arcana, daevanion, genus, pets, titles, targets, rotation, inputMacro, progress, top, build (итог+шаги), history
   names.ts             — как называть сущности (ru/en/оба + свои названия пользователя)
   api.ts               — контракт window.api
@@ -42,6 +42,7 @@ npm run typecheck  # проверка типов
 npm run shots      # сборка + автоскриншоты всех экранов в out/shots (на реальных данных оверлея)
 npm run format     # prettier
 npm run gamedata   # обновить справочники (по умолчанию — страж; --classes all — все классы)
+npm run guides     # встроенные гайды из собранных билдов Questlog (.cache/questlog-builds → guide/builtin/questlog)
 npm run art        # скачать арт игры по списку src/shared/gamedata/art.json
 npm run icon       # перерисовать build/icon.png и icon.ico
 npm run shortcut   # ярлык на рабочем столе
@@ -63,7 +64,7 @@ Node.js установлен в `C:\Program Files\nodejs`. Если `node` не 
 - **Логика — в `src/shared`, без React и Electron.** Интерфейс только показывает то, что посчитал `analysis/*`.
 - **Всё — по игровым ID.** Названия берутся через `Namer` (`names.ts`), никогда не пишите игровые названия строкой в логике. Новые русские названия — в `gamedata/stats.ts` / `gamedata/skills.ts`.
 - **Цвета — только токены** из `src/renderer/src/styles.css` (`bg-surface`, `text-ink-2`, `text-accent`…). Hex в компонентах не пишем. Фон и акцент меняет тема пользователя (`shared/theme.ts`) — текст на акценте только `text-on-accent`, а вёрстка должна держать масштаб до 200%. Статус — всегда с подписью или иконкой, не только цветом. См. [docs/design.md](docs/design.md).
-- **Сгенерированные справочники не правим руками** — только через `npm run gamedata` (скрипт кэширует страницы в `.cache/`).
+- **Сгенерированные справочники не правим руками** — только через `npm run gamedata` (скрипт кэширует страницы в `.cache/`). Встроенные гайды — только билды Questlog через `npm run guides` (5 популярных на класс); сторонние сайты для гайдов не используем.
 - **Каждый элемент объясняет себя.** Цвет — только через `lib/status.ts` (зелёный — как в гайде, жёлтый — обратить внимание, красный — не по гайду) и всегда с подсказкой «почему». Новые элементы — с `Tooltip` / `tip` / `hint`. Иконки умений — `SkillIcon`, вещей и прочего арта — `components/art.tsx`.
 - **Честность данных.** Если данные оверлея сомнительны (пример: специализации у всех умений «1, 2» — это открытые слоты, а не выбор), интерфейс так и говорит и даёт поправить вручную. Свои догадки (приоритеты статов, которых нет в гайде) помечаем как «оценка помощника».
 - **Формат гайда меняется осторожно**: старые файлы гайдов должны импортироваться (`normalizeGuide`). Поле `schema` — на будущее.

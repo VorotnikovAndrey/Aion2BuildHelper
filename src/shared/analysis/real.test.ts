@@ -3,7 +3,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { templarPveConsensus } from '../guide/builtin/templarPveConsensus'
+import { templarPveConsensus } from '../testing/templarPveConsensus'
 import { createNamer } from '../names'
 import { parseQuestlogCharacters } from '../questlog/parse'
 import { analyzeBuild } from './build'

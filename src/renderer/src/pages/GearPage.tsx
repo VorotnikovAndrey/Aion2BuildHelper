@@ -1,10 +1,10 @@
 import { useState, type ReactNode } from 'react'
 import { ArrowRight, Check, Pencil, Shirt } from 'lucide-react'
 import type { GearLine, ItemReport, LineSwap, ManastoneLine, StoneSwap } from '@shared/analysis/gear'
-import { stoneInfo } from '@shared/gamedata/art'
+import { itemArt, stoneInfo } from '@shared/gamedata/art'
 import { godstoneDef, godstoneEffectRu, godstoneIconSrc } from '@shared/gamedata/godstones'
 import { formatStatValue } from '@shared/gamedata/stats'
-import { GRADES, slotDef, type SlotGroup } from '@shared/gamedata/slots'
+import { GRADES, gradeOfItem, slotDef, type SlotGroup } from '@shared/gamedata/slots'
 import { GameSlot, ItemIcon, StatusBadge, StoneIcon } from '@/components/art'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
 import { TargetBar } from '@/components/targets'
@@ -303,6 +303,7 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
           <div className="tnum mt-0.5 text-[11px] text-ink-3">
             {slot.ru} · ур. предмета {item.item.itemLevel}
           </div>
+          <StageItem item={item} ctx={ctx} />
         </div>
       </div>
 
@@ -324,6 +325,47 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
         <Target item={item} ctx={ctx} />
       </div>
     </div>
+  )
+}
+
+/** Что носит автор билда на целевой стадии в этом слоте: та же вещь — сравнить заточку, другая — показать её. */
+function StageItem({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
+  const { namer, stage } = ctx
+  const target = stage?.gear?.find((g) => g.slot === item.slot)
+  if (!stage || !target) return null
+  const same = target.item === item.item.item
+  const enough = same && item.item.enchant >= target.enchant
+  const grade = itemArt(target.item)?.grade ?? gradeOfItem(target.item)
+  const name = namer.item(target.item, target.slot).main
+  const lines = (target.stats ?? []).map((s) => `${namer.stat(s.stat).main} ${formatStatValue(s.stat, s.value)}`)
+  const skills = (target.skills ?? []).map((id) => namer.skill(id).main)
+  const tip = (
+    <>
+      <b className="text-ink">
+        Стадия «{stage.name}»: {name} +{target.enchant}
+        {target.surpass ? ` (превосхождение ${target.surpass})` : ''}
+      </b>
+      {lines.length > 0 && <span className="mt-1 block">Строки у автора: {lines.join(', ')}.</span>}
+      {skills.length > 0 && <span className="mt-1 block">Умения: {skills.join(', ')}.</span>}
+      <span className={cn('mt-1 block', enough ? 'text-good' : 'text-warning')}>
+        {enough
+          ? 'Эта вещь и заточка — как у автора на этой стадии.'
+          : same
+            ? `Та же вещь — заточить до +${target.enchant}.`
+            : 'У автора на этой стадии другая вещь.'}
+      </span>
+    </>
+  )
+  return (
+    <Tooltip content={tip} wide>
+      <div className="mt-1.5 flex max-w-full items-center gap-1.5 text-[11px]">
+        {enough ? <Check size={12} className="shrink-0 text-good" /> : <ArrowRight size={12} className="shrink-0 text-warning" />}
+        {!same && <ItemIcon itemId={target.item} slot={target.slot} enchant={target.enchant} size={18} />}
+        <span className="min-w-0 truncate text-ink-3">
+          {enough ? 'как у автора' : same ? `у автора +${target.enchant}` : <GradeText grade={grade}>{`${name} +${target.enchant}`}</GradeText>}
+        </span>
+      </div>
+    </Tooltip>
   )
 }
 

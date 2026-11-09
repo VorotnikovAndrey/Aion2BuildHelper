@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { arcanaInfo } from '../gamedata/arcana'
-import { templarPveMobalytics } from '../guide/builtin/templarPveMobalytics'
+import { templarPveMobalytics } from '../testing/templarPveMobalytics'
 import { makeTemplar } from '../testing/fixtures'
 import { analyzeArcana, analyzeArcanaCard, atLeast, choose, oneIn, pContainsAll } from './arcana'
 

@@ -59,8 +59,10 @@ export interface GuideSource {
   date?: string
   /** Для какой версии игры писался: глобальная, Корея/Тайвань или смешанно. */
   region?: 'global' | 'korea' | 'mixed'
-  /** Статья-гайд или статистика того, что носят игроки. */
-  kind?: 'guide' | 'data'
+  /** Статья-гайд, статистика того, что носят игроки, или билд с Questlog. */
+  kind?: 'guide' | 'data' | 'questlog'
+  /** Сколько лайков у билда на Questlog (на момент сбора). */
+  likes?: number
   note?: string
 }
 
@@ -75,8 +77,8 @@ export interface StatTarget {
   goals: { value: number; label: string }[]
   /** Какие статы поднимают этот показатель (их приоритет растёт, пока порог не взят). */
   raise?: number[]
-  /** content — сколько нужно для контента; top — сколько в среднем у топ-игроков класса (ориентир). */
-  kind?: 'content' | 'top'
+  /** content — сколько нужно для контента; top — сколько в среднем у топ-игроков класса; stage — как у автора на этой стадии. */
+  kind?: 'content' | 'top' | 'stage'
   note?: string
 }
 
@@ -159,6 +161,40 @@ export interface GuideCombat {
   notes?: string
 }
 
+/** Вещь автора на стадии: что носит, с каким усилением и строками. */
+export interface GuideStageItem {
+  slot: number
+  item: number
+  enchant: number
+  /** Превосхождение (сверх +20 / +10). */
+  surpass?: number
+  stats?: { stat: number; value: number }[]
+  /** Умения строкой на вещи. */
+  skills?: number[]
+  /** Статы камней маны. */
+  manastones?: number[]
+}
+
+/**
+ * Стадия прокачки — как в билдах Questlog («1600 GS», «Final Setup»). Что задано у стадии, заменяет
+ * то же поле гайда, пока выбрана эта стадия (см. `applyStage`); остальное берётся из гайда.
+ */
+export interface GuideStage {
+  id: string
+  name: string
+  /** Уровень снаряжения стадии (как считает Questlog). */
+  gearScore?: number
+  tags?: string[]
+  note?: string
+  skills?: SkillTarget[]
+  combat?: GuideCombat
+  daevanion?: { goals: DaevanionGoal[]; notes?: string }
+  titles?: GuideTitles
+  arcana?: Guide['arcana']
+  statTargets?: StatTarget[]
+  gear?: GuideStageItem[]
+}
+
 export interface Guide {
   schema: number
   id: string
@@ -198,6 +234,8 @@ export interface Guide {
     notes?: string
   }
   daevanion: { goals: DaevanionGoal[]; notes?: string }
+  /** Стадии прокачки, от ранней к финальной. Нет — гайд один на всю игру. */
+  stages?: GuideStage[]
   genus: { stats?: StatWeight[]; notes?: string }
   titles?: GuideTitles
   /** Пороги статов для контента (меткость, крит) — по ним камни советуются с учётом ваших цифр. */

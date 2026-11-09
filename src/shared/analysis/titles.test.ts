@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { titleDef } from '../gamedata/titles'
-import { templarPveConsensus } from '../guide/builtin/templarPveConsensus'
-import { templarPveMobalytics } from '../guide/builtin/templarPveMobalytics'
+import { templarPveConsensus } from '../testing/templarPveConsensus'
+import { templarPveMobalytics } from '../testing/templarPveMobalytics'
 import { makeTemplar } from '../testing/fixtures'
 import { analyzeTitles, titleScore } from './titles'
 

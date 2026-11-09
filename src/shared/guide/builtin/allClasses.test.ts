@@ -1,11 +1,11 @@
-// Любой класс должен работать так же, как страж: свой встроенный гайд, русские названия умений
-// и специализаций, разбор персонажа, связка и сравнение с топом.
+// Любой класс должен работать так же, как страж: встроенные гайды с Questlog (со стадиями),
+// русские названия умений и специализаций, разбор персонажа на каждой стадии, сравнение с топом.
 
 import { describe, expect, it } from 'vitest'
 import { analyzeBuild } from '../../analysis/build'
 import { compareWithTop } from '../../analysis/top'
 import { CLASSES, classInfo, classOfSkill } from '../../gamedata/classes'
-import { classBoards } from '../../gamedata/daevanion'
+import { classBoards, findNode } from '../../gamedata/daevanion'
 import { classSkills, skillDef, skillSpecs } from '../../gamedata/skills'
 import { statDef } from '../../gamedata/stats'
 import { titleDef } from '../../gamedata/titles'
@@ -14,6 +14,7 @@ import { createNamer } from '../../names'
 import { makeTemplar } from '../../testing/fixtures'
 import type { Character, ClassKey } from '../../types'
 import { BUILTIN_GUIDES, normalizeGuide } from '../index'
+import { applyStage } from '../stages'
 import type { Guide } from '../types'
 
 const namer = createNamer('ru')
@@ -29,31 +30,22 @@ function makeChar(cls: ClassKey): Character {
   }
 }
 
-/** Все ID умений, которые упоминает гайд. */
+/** Все ID умений, которые упоминает гайд (с учётом стадий). */
 function guideSkillIds(g: Guide): number[] {
-  const c = g.combat
-  return [
-    ...g.skills.map((s) => s.skill),
-    ...g.gear.skills.map((s) => s.skill),
-    ...g.arcana.attack,
-    ...g.arcana.passive,
-    ...g.arcana.useless,
-    ...g.daevanion.goals.flatMap((d) => d.skills ?? []),
-    ...(c?.macros ?? []).flatMap((m) => [...m.skills, ...(m.when ? [m.when.skill] : [])]),
-    ...(c?.manual ?? []).map((m) => m.skill),
-    ...(c?.opener ?? []).map((o) => o.skill)
-  ]
+  const views = [g, ...(g.stages ?? []).map((s) => applyStage(g, s))]
+  return views.flatMap((v) => [
+    ...v.skills.map((s) => s.skill),
+    ...v.gear.skills.map((s) => s.skill),
+    ...v.arcana.attack,
+    ...v.arcana.passive,
+    ...v.daevanion.goals.flatMap((d) => d.skills ?? []),
+    ...(v.combat?.macros ?? []).flatMap((m) => m.skills)
+  ])
 }
 
-function guideStatIds(g: Guide): number[] {
-  return [...g.stats, ...(g.gear.weapon ?? []), ...(g.gear.armor ?? []), ...(g.gear.accessory ?? []), ...(g.manastones ?? []), ...(g.genus.stats ?? [])].map(
-    (s) => s.stat
-  )
-}
+const byClass = (cls: ClassKey) => BUILTIN_GUIDES.filter((g) => g.cls === cls)
 
 describe.each(CLASSES.map((c) => [c.ru, c.key] as const))('%s', (_ru, cls) => {
-  const guide = BUILTIN_GUIDES.find((g) => g.cls === cls)
-
   it('есть справочники: умения с русскими названиями, специализации, доски, топ-игроки', () => {
     const skills = classSkills(cls)
     expect(skills.length).toBeGreaterThan(20)
@@ -71,38 +63,54 @@ describe.each(CLASSES.map((c) => [c.ru, c.key] as const))('%s', (_ru, cls) => {
     expect(missing).toEqual([])
   })
 
-  it('есть встроенный гайд, и он ссылается только на существующие умения, специализации, статы и титулы этого класса', () => {
-    expect(guide, `нет встроенного гайда для ${cls}`).toBeDefined()
-    const g = guide!
-    expect(g.builtin).toBe(true)
-    for (const id of guideSkillIds(g)) {
-      expect(skillDef(id), `умение ${id}`).toBeDefined()
-      expect(classOfSkill(id), `умение ${id} — другого класса`).toBe(cls)
+  it('встроенные гайды — 5 популярных билдов Questlog, по убыванию лайков, со стадиями', () => {
+    const guides = byClass(cls)
+    expect(guides.length).toBe(5)
+    const likes = guides.map((g) => g.source?.likes ?? 0)
+    expect(likes).toEqual([...likes].sort((a, b) => b - a))
+    for (const g of guides) {
+      expect(g.builtin).toBe(true)
+      expect(g.source?.kind).toBe('questlog')
+      expect(g.source?.url).toMatch(/^https:\/\/questlog\.gg\/aion-2\//)
+      expect(g.stages?.length, g.name).toBeGreaterThan(0)
     }
-    for (const t of g.skills) {
-      const known = skillSpecs(t.skill).map((s) => s.n)
-      for (const n of [...(t.specs ?? []), ...(t.earlySpecs ?? [])]) expect(known, `специализация ${t.skill}/${n}`).toContain(n)
-    }
-    for (const id of guideStatIds(g)) expect(statDef(id), `стат ${id}`).toBeDefined()
-    for (const id of [...(g.titles?.attack ?? []), ...(g.titles?.defense ?? []), ...(g.titles?.utility ?? [])])
-      expect(titleDef(id), `титул ${id}`).toBeDefined()
-    expect(g.sources?.length ?? 0).toBeGreaterThan(1)
   })
 
-  it('разбор персонажа, связка и сравнение с топом работают', () => {
+  it('гайды ссылаются только на существующие умения своего класса, специализации, статы, титулы и узлы', () => {
+    for (const g of byClass(cls)) {
+      for (const id of guideSkillIds(g)) {
+        expect(skillDef(id), `${g.name}: умение ${id}`).toBeDefined()
+        expect(classOfSkill(id), `${g.name}: умение ${id} — другого класса`).toBe(cls)
+      }
+      for (const st of [g, ...(g.stages ?? [])]) {
+        for (const t of st.skills ?? []) {
+          const known = skillSpecs(t.skill).map((s) => s.n)
+          for (const n of t.specs ?? []) expect(known, `${g.name}: специализация ${t.skill}/${n}`).toContain(n)
+        }
+        for (const id of [...(st.titles?.attack ?? []), ...(st.titles?.defense ?? []), ...(st.titles?.utility ?? [])])
+          expect(titleDef(id), `${g.name}: титул ${id}`).toBeDefined()
+        for (const goal of st.daevanion?.goals ?? []) for (const n of goal.nodes ?? []) expect(findNode(n), `${g.name}: узел ${n}`).toBeDefined()
+      }
+      for (const w of [...g.stats, ...(g.manastones ?? [])]) expect(statDef(w.stat), `${g.name}: стат ${w.stat}`).toBeDefined()
+    }
+  })
+
+  it('разбор персонажа работает на каждой стадии каждого гайда, сравнение с топом — тоже', () => {
     const char = makeChar(cls)
-    const report = analyzeBuild(char, guide!, namer)
-    expect(report.scores.overall).toBeGreaterThanOrEqual(0)
-    expect(report.steps.length).toBeGreaterThan(0)
-    if (guide!.combat?.macros?.length) expect(report.rotation?.macros.length).toBeGreaterThan(0)
-    const cmp = compareWithTop(char, report, topData(cls)!)
-    expect(cmp.skills.length).toBeGreaterThan(10)
+    for (const g of byClass(cls))
+      for (const st of g.stages ?? []) {
+        const report = analyzeBuild(char, applyStage(g, st), namer)
+        expect(report.scores.overall, `${g.name} / ${st.name}`).toBeGreaterThanOrEqual(0)
+      }
+    const report = analyzeBuild(char, byClass(cls)[0], namer)
+    expect(compareWithTop(char, report, topData(cls)!).skills.length).toBeGreaterThan(10)
   })
 
-  it('гайд переживает экспорт и импорт', () => {
-    const back = normalizeGuide(JSON.parse(JSON.stringify(guide)), 'x')
-    expect(back.skills).toEqual(guide!.skills)
-    expect(back.combat).toEqual(guide!.combat)
-    expect(back.statTargets?.length).toBe(guide!.statTargets?.length)
+  it('гайды переживают экспорт и импорт вместе со стадиями', () => {
+    for (const g of byClass(cls)) {
+      const back = normalizeGuide(JSON.parse(JSON.stringify(g)), 'x')
+      expect(back.stages).toEqual(g.stages)
+      expect(back.skills).toEqual(g.skills)
+    }
   })
 })

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { GENUS_MAX, genusGradeChances, genusLockFrom, genusRange, genusSlotRolls, genusStatChance } from '../gamedata/genus'
-import { templarPveConsensus } from '../guide/builtin/templarPveConsensus'
+import { templarPveConsensus } from '../testing/templarPveConsensus'
 import { makeTemplar } from '../testing/fixtures'
 import { analyzeGenus } from './genus'
 

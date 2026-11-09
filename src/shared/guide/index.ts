@@ -2,21 +2,15 @@
 
 import { classInfo } from '../gamedata/classes'
 import { toClassKey } from '../questlog/parse'
-import { assassinPveConsensus } from './builtin/assassinPveConsensus'
-import { chanterPveConsensus } from './builtin/chanterPveConsensus'
-import { clericPveConsensus } from './builtin/clericPveConsensus'
-import { gladiatorPveConsensus } from './builtin/gladiatorPveConsensus'
-import { rangerPveConsensus } from './builtin/rangerPveConsensus'
-import { sorcererPveConsensus } from './builtin/sorcererPveConsensus'
-import { spiritmasterPveConsensus } from './builtin/spiritmasterPveConsensus'
-import { templarPveConsensus } from './builtin/templarPveConsensus'
-import { templarPveMobalytics } from './builtin/templarPveMobalytics'
 import {
   GUIDE_SCHEMA,
   type Guide,
   type GuideCombat,
   type GuideMacro,
   type GuideOneButton,
+  type GuideStage,
+  type GuideStageItem,
+  type GuideTitles,
   type GuideManualSkill,
   type GuideMode,
   type GuideSource,
@@ -28,19 +22,6 @@ import {
 } from './types'
 
 export * from './types'
-
-/** Первый подходящий по классу — гайд по умолчанию. Сводный идёт первым: приложение не следует одному гайду вслепую. */
-export const BUILTIN_GUIDES: Guide[] = [
-  templarPveConsensus,
-  templarPveMobalytics,
-  clericPveConsensus,
-  chanterPveConsensus,
-  assassinPveConsensus,
-  gladiatorPveConsensus,
-  rangerPveConsensus,
-  sorcererPveConsensus,
-  spiritmasterPveConsensus
-]
 
 type Obj = Record<string, unknown>
 const isObj = (v: unknown): v is Obj => typeof v === 'object' && v !== null && !Array.isArray(v)
@@ -70,36 +51,134 @@ export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
   if (!cls || !classInfo(cls)) throw new Error('В гайде не указан класс (поле cls, например "templar")')
   if (typeof raw.name !== 'string' || !raw.name.trim()) throw new Error('У гайда нет названия (поле name)')
 
-  const skills: SkillTarget[] = (Array.isArray(raw.skills) ? raw.skills : []).filter(isObj).flatMap((s) => {
-    if (typeof s.skill !== 'number') return []
-    const role = ROLES.includes(s.role as SkillRole) ? (s.role as SkillRole) : 'support'
-    return [
-      {
-        skill: s.skill,
-        role,
-        level: typeof s.level === 'number' ? s.level : undefined,
-        specs: nums(s.specs).length ? nums(s.specs) : undefined,
-        earlySpecs: nums(s.earlySpecs).length ? nums(s.earlySpecs) : undefined,
-        equip: typeof s.equip === 'boolean' ? s.equip : undefined,
-        note: typeof s.note === 'string' ? s.note : undefined
-      }
-    ]
-  })
+  const toSkills = (v: unknown): SkillTarget[] =>
+    (Array.isArray(v) ? v : []).filter(isObj).flatMap((s) => {
+      if (typeof s.skill !== 'number') return []
+      const role = ROLES.includes(s.role as SkillRole) ? (s.role as SkillRole) : 'support'
+      return [
+        {
+          skill: s.skill,
+          role,
+          level: typeof s.level === 'number' ? s.level : undefined,
+          specs: nums(s.specs).length ? nums(s.specs) : undefined,
+          earlySpecs: nums(s.earlySpecs).length ? nums(s.earlySpecs) : undefined,
+          equip: typeof s.equip === 'boolean' ? s.equip : undefined,
+          note: typeof s.note === 'string' ? s.note : undefined
+        }
+      ]
+    })
+  const skills = toSkills(raw.skills)
 
   const gear = isObj(raw.gear) ? raw.gear : {}
-  const arcana = isObj(raw.arcana) ? raw.arcana : {}
-  const daev = isObj(raw.daevanion) ? raw.daevanion : {}
   const genus = isObj(raw.genus) ? raw.genus : {}
   const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v : undefined)
   const toSource = (v: unknown): GuideSource | undefined => {
     if (!isObj(v)) return undefined
     const out: GuideSource = { title: str(v.title), url: str(v.url), author: str(v.author), date: str(v.date) }
     if (v.region === 'global' || v.region === 'korea' || v.region === 'mixed') out.region = v.region
-    if (v.kind === 'guide' || v.kind === 'data') out.kind = v.kind
+    if (v.kind === 'guide' || v.kind === 'data' || v.kind === 'questlog') out.kind = v.kind
+    if (typeof v.likes === 'number') out.likes = v.likes
     if (str(v.note)) out.note = str(v.note)
     return out
   }
-  const titles = isObj(raw.titles) ? raw.titles : undefined
+  const toTitles = (titles: unknown): GuideTitles | undefined =>
+    isObj(titles)
+      ? {
+          attack: nums(titles.attack).length ? nums(titles.attack) : undefined,
+          defense: nums(titles.defense).length ? nums(titles.defense) : undefined,
+          utility: nums(titles.utility).length ? nums(titles.utility) : undefined,
+          notes: str(titles.notes)
+        }
+      : undefined
+  const toArcana = (a: unknown): Guide['arcana'] => {
+    const arcana = isObj(a) ? a : {}
+    return {
+      attack: nums(arcana.attack),
+      passive: nums(arcana.passive),
+      useless: nums(arcana.useless),
+      preferredSet: arcana.preferredSet === 'magic' || arcana.preferredSet === 'vigor' ? arcana.preferredSet : undefined,
+      notes: str(arcana.notes)
+    }
+  }
+  const toDaevanion = (d: unknown): Guide['daevanion'] => {
+    const daev = isObj(d) ? d : {}
+    return {
+      goals: (Array.isArray(daev.goals) ? daev.goals : []).filter(isObj).map((g, i) => ({
+        id: str(g.id) ?? `goal-${i + 1}`,
+        name: str(g.name) ?? `Цель ${i + 1}`,
+        description: str(g.description),
+        skills: nums(g.skills).length ? nums(g.skills) : undefined,
+        boards: nums(g.boards).length ? nums(g.boards) : undefined,
+        nodes: nums(g.nodes).length ? nums(g.nodes) : undefined
+      })),
+      notes: str(daev.notes)
+    }
+  }
+  const toStatTargets = (v: unknown): StatTarget[] | undefined =>
+    Array.isArray(v)
+      ? v.filter(isObj).flatMap((t, i): StatTarget[] => {
+          const goals = (Array.isArray(t.goals) ? t.goals : [])
+            .filter(isObj)
+            .flatMap((g) => (typeof g.value === 'number' ? [{ value: g.value, label: str(g.label) ?? String(g.value) }] : []))
+            .sort((a, b) => a.value - b.value)
+          if (!nums(t.stats).length || !goals.length) return []
+          return [
+            {
+              id: str(t.id) ?? `target-${i + 1}`,
+              name: str(t.name) ?? `Порог ${i + 1}`,
+              stats: nums(t.stats),
+              goals,
+              raise: nums(t.raise).length ? nums(t.raise) : undefined,
+              kind: t.kind === 'top' ? 'top' : t.kind === 'stage' ? 'stage' : 'content',
+              note: str(t.note)
+            }
+          ]
+        })
+      : undefined
+  const toStages = (v: unknown): GuideStage[] | undefined => {
+    if (!Array.isArray(v)) return undefined
+    const out = v.filter(isObj).flatMap((st, i): GuideStage[] => {
+      const name = str(st.name)
+      if (!name) return []
+      return [
+        {
+          id: str(st.id) ?? `stage-${i + 1}`,
+          name,
+          gearScore: typeof st.gearScore === 'number' ? st.gearScore : undefined,
+          tags: Array.isArray(st.tags) ? st.tags.filter((x): x is string => typeof x === 'string') : undefined,
+          note: str(st.note),
+          skills: Array.isArray(st.skills) ? toSkills(st.skills) : undefined,
+          combat: normalizeCombat(st.combat),
+          daevanion: isObj(st.daevanion) ? toDaevanion(st.daevanion) : undefined,
+          titles: toTitles(st.titles),
+          arcana: isObj(st.arcana) ? toArcana(st.arcana) : undefined,
+          statTargets: toStatTargets(st.statTargets),
+          gear: Array.isArray(st.gear)
+            ? st.gear.filter(isObj).flatMap((g): GuideStageItem[] =>
+                typeof g.slot === 'number' && typeof g.item === 'number'
+                  ? [
+                      {
+                        slot: g.slot,
+                        item: g.item,
+                        enchant: typeof g.enchant === 'number' ? g.enchant : 0,
+                        surpass: typeof g.surpass === 'number' && g.surpass > 0 ? g.surpass : undefined,
+                        stats: Array.isArray(g.stats)
+                          ? g.stats
+                              .filter(isObj)
+                              .flatMap((x) => (typeof x.stat === 'number' && typeof x.value === 'number' ? [{ stat: x.stat, value: x.value }] : []))
+                          : undefined,
+                        skills: nums(g.skills).length ? nums(g.skills) : undefined,
+                        manastones: nums(g.manastones).length ? nums(g.manastones) : undefined
+                      }
+                    ]
+                  : []
+              )
+            : undefined
+        }
+      ]
+    })
+    return out.length ? out : undefined
+  }
 
   return {
     schema: GUIDE_SCHEMA,
@@ -123,53 +202,12 @@ export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
       notes: str(gear.notes)
     },
     manastones: raw.manastones ? weights(raw.manastones) : undefined,
-    arcana: {
-      attack: nums(arcana.attack),
-      passive: nums(arcana.passive),
-      useless: nums(arcana.useless),
-      preferredSet: arcana.preferredSet === 'magic' || arcana.preferredSet === 'vigor' ? arcana.preferredSet : undefined,
-      notes: str(arcana.notes)
-    },
-    daevanion: {
-      goals: (Array.isArray(daev.goals) ? daev.goals : []).filter(isObj).map((g, i) => ({
-        id: str(g.id) ?? `goal-${i + 1}`,
-        name: str(g.name) ?? `Цель ${i + 1}`,
-        description: str(g.description),
-        skills: nums(g.skills).length ? nums(g.skills) : undefined,
-        boards: nums(g.boards).length ? nums(g.boards) : undefined,
-        nodes: nums(g.nodes).length ? nums(g.nodes) : undefined
-      })),
-      notes: str(daev.notes)
-    },
+    arcana: toArcana(raw.arcana),
+    daevanion: toDaevanion(raw.daevanion),
+    stages: toStages(raw.stages),
     genus: { stats: genus.stats ? weights(genus.stats) : undefined, notes: str(genus.notes) },
-    titles: titles
-      ? {
-          attack: nums(titles.attack).length ? nums(titles.attack) : undefined,
-          defense: nums(titles.defense).length ? nums(titles.defense) : undefined,
-          utility: nums(titles.utility).length ? nums(titles.utility) : undefined,
-          notes: str(titles.notes)
-        }
-      : undefined,
-    statTargets: Array.isArray(raw.statTargets)
-      ? raw.statTargets.filter(isObj).flatMap((t, i): StatTarget[] => {
-          const goals = (Array.isArray(t.goals) ? t.goals : [])
-            .filter(isObj)
-            .flatMap((g) => (typeof g.value === 'number' ? [{ value: g.value, label: str(g.label) ?? String(g.value) }] : []))
-            .sort((a, b) => a.value - b.value)
-          if (!nums(t.stats).length || !goals.length) return []
-          return [
-            {
-              id: str(t.id) ?? `target-${i + 1}`,
-              name: str(t.name) ?? `Порог ${i + 1}`,
-              stats: nums(t.stats),
-              goals,
-              raise: nums(t.raise).length ? nums(t.raise) : undefined,
-              kind: t.kind === 'top' ? 'top' : 'content',
-              note: str(t.note)
-            }
-          ]
-        })
-      : undefined,
+    titles: toTitles(raw.titles),
+    statTargets: toStatTargets(raw.statTargets),
     rotation: Array.isArray(raw.rotation) ? raw.rotation.filter((x): x is string => typeof x === 'string') : undefined,
     combat: normalizeCombat(raw.combat),
     tips: Array.isArray(raw.tips)
@@ -251,3 +289,16 @@ function normalizeCombat(v: unknown): GuideCombat | undefined {
   }
   return Object.values(combat).some((x) => x !== undefined) ? combat : undefined
 }
+
+/**
+ * Встроенные гайды — билды с Questlog: по 5 самых популярных на класс (builtin/questlog/<класс>.json,
+ * собираются `npm run guides`). Внутри класса — по убыванию лайков: первый подходящий — гайд по умолчанию.
+ * В конце файла: normalizeGuide и его помощники должны быть уже объявлены.
+ */
+const QUESTLOG_FILES = import.meta.glob<{ guides: unknown[] }>('./builtin/questlog/*.json', { eager: true, import: 'default' })
+const CLASS_ORDER = ['templar', 'gladiator', 'assassin', 'ranger', 'sorcerer', 'spiritmaster', 'cleric', 'chanter']
+const fileClass = (file: string) => CLASS_ORDER.indexOf(file.match(/(\w+)\.json$/)?.[1] ?? '')
+
+export const BUILTIN_GUIDES: Guide[] = Object.entries(QUESTLOG_FILES)
+  .sort(([a], [b]) => fileClass(a) - fileClass(b))
+  .flatMap(([file, data]) => data.guides.map((g, i) => ({ ...normalizeGuide(g, `${file}-${i}`), builtin: true })))
