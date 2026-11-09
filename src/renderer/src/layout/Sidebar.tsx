@@ -10,6 +10,7 @@ import {
   ListChecks,
   PawPrint,
   RefreshCw,
+  Repeat,
   Settings,
   Shirt,
   Sparkles,
@@ -55,6 +56,12 @@ const NAV: { title?: string; items: NavItem[] }[] = [
         icon: Swords,
         tip: 'Уровни умений против гайда, откуда они берутся и какие специализации нужны. Стигмы и пассивки.',
         score: (s) => s.skills
+      },
+      {
+        to: '/rotation',
+        label: 'Ротация',
+        icon: Repeat,
+        tip: 'Как играть: стопки умений для макроса, что жать вручную, начало боя и советы под вашего персонажа.'
       },
       { to: '/gear', label: 'Шмот', icon: Shirt, tip: 'Каждая строка вещи и манакамни: что по гайду, что менять, что ловить.', score: (s) => s.gear },
       { to: '/arcana', label: 'Арканы', icon: Sparkles, tip: 'Пять карт: нужные умения, шансы заточки и новой карты, сеты.', score: (s) => s.arcana },

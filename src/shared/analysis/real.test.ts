@@ -28,6 +28,9 @@ describe.skipIf(!existsSync(file))('реальные данные (samples/priva
           `${n.item(g.item.item, g.slot).main}: ${g.swaps.map((x) => `${ln(x.from)}(${x.from.weight}) → ${ln(x.to)}(${x.to.weight})`).join(', ') || '—'}`
         )
       for (const t of r.statTargets) console.log(`порог ${t.target.name}: ${t.current} → ${t.next ? `${t.next.value} (${t.next.label})` : 'взят'}`)
+      for (const m of r.rotation?.macros ?? [])
+        console.log(`стопка ${m.macro.name}: ${m.active ? 'подходит' : 'нет'} ${m.skills.map((s) => n.skill(s.skill).main + ':' + s.use).join(', ')}`)
+      for (const a of r.rotation?.advice ?? []) console.log(`ротация [${a.tone}] ${a.title} — ${a.text}`)
       for (const g of r.gear)
         if (g.stoneSwaps.length)
           console.log(

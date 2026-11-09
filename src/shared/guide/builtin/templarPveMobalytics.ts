@@ -320,6 +320,31 @@ export const templarPveMobalytics: Guide = {
     'Обновляйте баффы; Щит защиты — прямо перед ударами босса.'
   ],
 
+  combat: {
+    macroKey: 'ПКМ',
+    macros: [
+      { id: 'smash', name: 'Стопка Истребления', skills: [ANNIHILATE, DEBILITATING_SMASH] },
+      {
+        id: 'judgment',
+        name: 'Стопка Суда',
+        skills: [JUDGMENT, SHIELD_SMITE, WARDING_STRIKE, PUMMEL],
+        note: 'Град ударов — в этой же стопке: иначе макрос будет уходить от Суда, пока он доступен.'
+      }
+    ],
+    delayMs: 10,
+    delayNote: 'В макросе две записи — стопки Истребления и Суда; режим «по кругу», пока зажато.',
+    manual: [
+      { skill: VICIOUS_STRIKE, key: 'ЛКМ', when: 'Держать зажатой вместе с макросом.' },
+      { skill: PUNISHMENT, when: 'Полностью зарядить и отпустить; снова — как откатится, между окнами Суда.' },
+      { skill: DOOM_SHIELD, when: 'Новое окно Суда — когда все применения Суда потрачены.' },
+      { skill: SHIELD_RUSH, when: 'Новое окно Суда или сближение. Авто-рывок может затащить в механику босса.' },
+      { skill: POACH, when: 'Подойти к боссу — со специализацией на перемещение.' },
+      { skill: SHIELD_OF_PROTECTION, when: 'Прямо перед ударами босса.' },
+      { skill: NOBLE_ARMOR, when: 'До боя; обновлять.' },
+      { skill: BATTLEFIELD_BANNER, optional: true, when: 'До боя, если стоит.' }
+    ]
+  },
+
   tips: [
     {
       title: 'Макрос: две стопки',

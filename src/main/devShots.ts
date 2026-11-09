@@ -4,7 +4,7 @@
 // Это способ для AI-агента увидеть приложение без ручных кликов.
 
 import { app, type BrowserWindow } from 'electron'
-import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { updateUi } from './storage'
@@ -31,17 +31,18 @@ export function prepareShots(): void {
 const ROUTES: [string, string][] = [
   ['01-overview', '/'],
   ['02-skills', '/skills'],
-  ['03-gear', '/gear'],
-  ['04-arcana', '/arcana'],
-  ['05-daevanion', '/daevanion'],
-  ['06-genus', '/genus'],
-  ['07-collections', '/collections'],
-  ['08-stats', '/stats'],
-  ['09-history', '/history'],
-  ['10-guides', '/guides'],
-  ['11-checklist', '/checklist'],
-  ['12-settings', '/settings'],
-  ['13-appearance', '/settings?tab=appearance']
+  ['03-rotation', '/rotation'],
+  ['04-gear', '/gear'],
+  ['05-arcana', '/arcana'],
+  ['06-daevanion', '/daevanion'],
+  ['07-genus', '/genus'],
+  ['08-collections', '/collections'],
+  ['09-stats', '/stats'],
+  ['10-history', '/history'],
+  ['11-guides', '/guides'],
+  ['12-checklist', '/checklist'],
+  ['13-settings', '/settings'],
+  ['14-appearance', '/settings?tab=appearance']
 ]
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
@@ -53,6 +54,8 @@ export async function runShots(win: BrowserWindow): Promise<void> {
   }, 120_000).unref()
   const out = join(resolve(app.getAppPath()), 'out', 'shots')
   mkdirSync(out, { recursive: true })
+  // Старые снимки убираем: номера страниц сдвигаются, и прежние файлы путались бы с новыми.
+  for (const f of readdirSync(out)) if (f.endsWith('.png')) rmSync(join(out, f))
   win.setContentSize(1440, 900)
   // A2BH_SHOTS_UI='{"themeId":"crimson","base":"asmodae","accent":"#e0525e","zoom":1.25}' — снять в другой теме и масштабе.
   if (process.env.A2BH_SHOTS_UI || process.env.A2BH_SHOTS_SETTINGS) {

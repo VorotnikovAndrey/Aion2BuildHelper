@@ -9,6 +9,7 @@ import { analyzeDaevanion, type DaevanionReport } from './daevanion'
 import { analyzeGear, gearScore, type ItemReport } from './gear'
 import { analyzeGenus } from './genus'
 import { analyzePets, type PetsReport } from './pets'
+import { analyzeRotation, type RotationReport } from './rotation'
 import { analyzeSkills, skillsScore, specsLookLikeSlots, stigmaLoadout, unexplainedLevels, type SkillReport, type UnexplainedLevel } from './skills'
 import { statTargetStatus, type TargetStatus } from './targets'
 import { analyzeTitles, type TitlesReport } from './titles'
@@ -52,6 +53,8 @@ export interface BuildReport {
   titles: TitlesReport
   /** Пороги статов из гайда и где персонаж сейчас. */
   statTargets: TargetStatus[]
+  /** Стопки макроса, ручные умения и личные советы по ротации (если в гайде есть раздел «Бой»). */
+  rotation: RotationReport | null
   scores: SectionScores
   steps: NextStep[]
 }
@@ -105,6 +108,7 @@ export function analyzeBuild(char: Character, guide: Guide | null, namer: Namer,
     pets,
     titles,
     statTargets: statTargetStatus(char, guide),
+    rotation: analyzeRotation(char, guide, skills, specsUncertain, namer),
     scores: { ...parts, overall },
     steps: []
   }

@@ -5,6 +5,7 @@ import { ZoomToast } from './components/ZoomToast'
 import { NoData } from './pages/NoData'
 import { OverviewPage } from './pages/OverviewPage'
 import { SkillsPage } from './pages/SkillsPage'
+import { RotationPage } from './pages/RotationPage'
 import { GearPage } from './pages/GearPage'
 import { ArcanaPage } from './pages/ArcanaPage'
 import { DaevanionPage } from './pages/DaevanionPage'
@@ -46,6 +47,7 @@ function Shell() {
               <>
                 <Route path="/" element={<OverviewPage />} />
                 <Route path="/skills" element={<SkillsPage />} />
+                <Route path="/rotation" element={<RotationPage />} />
                 <Route path="/gear" element={<GearPage />} />
                 <Route path="/arcana" element={<ArcanaPage />} />
                 <Route path="/daevanion" element={<DaevanionPage />} />

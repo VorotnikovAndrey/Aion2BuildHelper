@@ -93,6 +93,54 @@ export interface GuideTip {
   text: string
 }
 
+/**
+ * Стопка умений: несколько умений в одной ячейке — игра применяет первое готовое по списку.
+ * Стопки кладут в макрос (он перебирает их по кругу, пока клавиша зажата) или на отдельные клавиши.
+ */
+export interface GuideMacro {
+  id: string
+  name: string
+  /** По убыванию приоритета: первое готовое и применится. */
+  skills: number[]
+  /** Своя клавиша, если стопка не в общем макросе. */
+  key?: string
+  /** Когда стопка подходит — по уровню умения (например, «Суд ниже 16» и «Суд от 16»). */
+  when?: { skill: number; minLevel?: number; maxLevel?: number }
+  note?: string
+}
+
+/** Подсказка, которая зависит от стата персонажа: берётся первая строка, где стат ниже `below`. */
+export interface StatHint {
+  stat: number
+  ranges: { below?: number; text: string }[]
+}
+
+/** Умение на отдельной клавише — когда его жать. */
+export interface GuideManualSkill {
+  skill: number
+  when: string
+  key?: string
+  /** Необязательное (например, запасная стигма): если не надето — просто пропустить. */
+  optional?: boolean
+  byStat?: StatHint
+}
+
+/** Бой: макросы, ручные умения и открытие боя. Текстовые принципы — в `rotation`. */
+export interface GuideCombat {
+  /** Стопки умений для макроса. */
+  macros?: GuideMacro[]
+  /** Клавиша общего макроса со стопками. */
+  macroKey?: string
+  /** Задержка между умениями в макросах, мс. */
+  delayMs?: number
+  delayNote?: string
+  manual?: GuideManualSkill[]
+  /** Открытие боя по шагам. */
+  opener?: { skill: number; note?: string }[]
+  openerNote?: string
+  notes?: string
+}
+
 export interface Guide {
   schema: number
   id: string
@@ -136,7 +184,10 @@ export interface Guide {
   titles?: GuideTitles
   /** Пороги статов для контента (меткость, крит) — по ним камни советуются с учётом ваших цифр. */
   statTargets?: StatTarget[]
+  /** Принципы ротации — текстом, по шагам. */
   rotation?: string[]
+  /** Макросы, ручные умения и открытие боя — по ID умений. */
+  combat?: GuideCombat
   tips?: GuideTip[]
   /** Собственные пункты для чек-листа («сделать один раз»). */
   checklist?: { id: string; text: string }[]

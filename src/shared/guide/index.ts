@@ -4,7 +4,20 @@ import { classInfo } from '../gamedata/classes'
 import { toClassKey } from '../questlog/parse'
 import { templarPveConsensus } from './builtin/templarPveConsensus'
 import { templarPveMobalytics } from './builtin/templarPveMobalytics'
-import { GUIDE_SCHEMA, type Guide, type GuideMode, type GuideSource, type StatTarget, type SkillRole, type SkillTarget, type StatWeight } from './types'
+import {
+  GUIDE_SCHEMA,
+  type Guide,
+  type GuideCombat,
+  type GuideMacro,
+  type GuideManualSkill,
+  type GuideMode,
+  type GuideSource,
+  type StatHint,
+  type StatTarget,
+  type SkillRole,
+  type SkillTarget,
+  type StatWeight
+} from './types'
 
 export * from './types'
 
@@ -140,6 +153,7 @@ export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
         })
       : undefined,
     rotation: Array.isArray(raw.rotation) ? raw.rotation.filter((x): x is string => typeof x === 'string') : undefined,
+    combat: normalizeCombat(raw.combat),
     tips: Array.isArray(raw.tips)
       ? raw.tips.filter(isObj).flatMap((t) => (typeof t.title === 'string' && typeof t.text === 'string' ? [{ title: t.title, text: t.text }] : []))
       : undefined,
@@ -147,4 +161,61 @@ export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
       ? raw.checklist.filter(isObj).flatMap((c, i) => (typeof c.text === 'string' ? [{ id: str(c.id) ?? `item-${i + 1}`, text: c.text }] : []))
       : undefined
   }
+}
+
+const optStr = (v: unknown): string | undefined => (typeof v === 'string' && v.trim() ? v : undefined)
+
+function normalizeStatHint(v: unknown): StatHint | undefined {
+  if (!isObj(v) || typeof v.stat !== 'number' || !Array.isArray(v.ranges)) return undefined
+  const ranges = v.ranges
+    .filter(isObj)
+    .flatMap((r) => (typeof r.text === 'string' ? [{ below: typeof r.below === 'number' ? r.below : undefined, text: r.text }] : []))
+  return ranges.length ? { stat: v.stat, ranges } : undefined
+}
+
+/** Раздел «Бой» (макросы, ручные умения, открытие) — необязательный; кривые записи отбрасываются. */
+function normalizeCombat(v: unknown): GuideCombat | undefined {
+  if (!isObj(v)) return undefined
+  const macros = (Array.isArray(v.macros) ? v.macros : []).filter(isObj).flatMap((m, i): GuideMacro[] => {
+    const skills = nums(m.skills)
+    if (!skills.length) return []
+    const when = isObj(m.when) && typeof m.when.skill === 'number' ? m.when : undefined
+    return [
+      {
+        id: optStr(m.id) ?? `macro-${i + 1}`,
+        name: optStr(m.name) ?? `Макрос ${i + 1}`,
+        skills,
+        key: optStr(m.key),
+        when: when
+          ? {
+              skill: when.skill as number,
+              minLevel: typeof when.minLevel === 'number' ? when.minLevel : undefined,
+              maxLevel: typeof when.maxLevel === 'number' ? when.maxLevel : undefined
+            }
+          : undefined,
+        note: optStr(m.note)
+      }
+    ]
+  })
+  const manual = (Array.isArray(v.manual) ? v.manual : [])
+    .filter(isObj)
+    .flatMap((m): GuideManualSkill[] =>
+      typeof m.skill === 'number'
+        ? [{ skill: m.skill, when: optStr(m.when) ?? '', key: optStr(m.key), optional: m.optional === true || undefined, byStat: normalizeStatHint(m.byStat) }]
+        : []
+    )
+  const opener = (Array.isArray(v.opener) ? v.opener : [])
+    .filter(isObj)
+    .flatMap((o) => (typeof o.skill === 'number' ? [{ skill: o.skill, note: optStr(o.note) }] : []))
+  const combat: GuideCombat = {
+    macros: macros.length ? macros : undefined,
+    macroKey: optStr(v.macroKey),
+    delayMs: typeof v.delayMs === 'number' && v.delayMs >= 0 ? v.delayMs : undefined,
+    delayNote: optStr(v.delayNote),
+    manual: manual.length ? manual : undefined,
+    opener: opener.length ? opener : undefined,
+    openerNote: optStr(v.openerNote),
+    notes: optStr(v.notes)
+  }
+  return Object.values(combat).some((x) => x !== undefined) ? combat : undefined
 }
