@@ -2,6 +2,7 @@ import { Fragment, useMemo, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
 import { ArrowDown, ArrowRight, ArrowUp, BookOpen, Check, ChevronRight, Info, Lightbulb, MousePointerClick, Repeat } from 'lucide-react'
 import { analyzeInputMacro } from '@shared/analysis/inputMacro'
+import { MacroTimeline } from '@/components/MacroTimeline'
 import type { AdviceTone, MacroReport, ManualReport, RotationAdvice, RotationSkill, SkillUse } from '@shared/analysis/rotation'
 import type { Guide, GuideOneButton } from '@shared/guide/types'
 import type { Namer } from '@shared/names'
@@ -300,6 +301,8 @@ function OneButtonCard({ ob, macroKey, manual, namer }: { ob: GuideOneButton; ma
           </div>
         ))}
       </div>
+
+      <MacroTimeline events={ob.events} repeatMs={ob.repeatMs} macroKey={macroKey} purpose={purpose} />
 
       {r.warnings.length > 0 && (
         <ul className="mt-3 space-y-2">

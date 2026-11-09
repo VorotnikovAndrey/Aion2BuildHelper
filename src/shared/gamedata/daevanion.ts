@@ -30,7 +30,7 @@ export interface DaevanionBoard {
   nodes: DaevanionNode[]
 }
 
-const BOARD_RU: Record<string, string> = {
+export const BOARD_RU: Record<string, string> = {
   Nezekan: 'Неджакан',
   Zikel: 'Джикел',
   Vaizel: 'Байзел',

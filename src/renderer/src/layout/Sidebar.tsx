@@ -16,6 +16,7 @@ import {
   Shirt,
   Sparkles,
   Swords,
+  Trophy,
   Waypoints,
   type LucideIcon
 } from 'lucide-react'
@@ -83,7 +84,13 @@ const NAV: { title?: string; items: NavItem[] }[] = [
     items: [
       { to: '/collections', label: 'Питомцы и коллекции', icon: PawPrint, tip: 'Питомцы и их уровни, крылья, титулы, облики, монолиты, персонажи аккаунта.' },
       { to: '/stats', label: 'Статы', icon: Gem, tip: 'Полный лист характеристик с важностью по гайду и вкладом досок.' },
-      { to: '/history', label: 'История', icon: History, tip: 'График боевой мощи и лента изменений: заточки, вещи, уровни, узлы.' }
+      { to: '/history', label: 'История', icon: History, tip: 'График боевой мощи и лента изменений: заточки, вещи, уровни, узлы.' },
+      {
+        to: '/top',
+        label: 'Сравнение с топом',
+        icon: Trophy,
+        tip: 'Вы против тысяч топ-игроков класса: боевая мощь, умения, стигмы, заточка, арканы, доски — и где отставание больше всего.'
+      }
     ]
   },
   {

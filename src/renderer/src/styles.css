@@ -354,3 +354,25 @@ textarea,
   animation: none !important;
   transition: none !important;
 }
+
+/* Бегунок на схеме макроса мыши. */
+.fx-playhead {
+  left: 0;
+  animation: fx-playhead linear infinite;
+}
+@keyframes fx-playhead {
+  from {
+    left: 0;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+/* Карточка билда — для снимка: без блеска и «выпрыгивания». */
+.no-fx .fx-shine {
+  display: none;
+}
+.no-fx .fx-pop {
+  animation: none;
+}

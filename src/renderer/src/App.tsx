@@ -3,6 +3,7 @@ import { createHashRouter, Route, RouterProvider, Routes, useLocation } from 're
 import { Sidebar } from './layout/Sidebar'
 import { ZoomToast } from './components/ZoomToast'
 import { AetherBackdrop } from './components/fx'
+import { Celebrations } from './components/Celebrations'
 import { NoData } from './pages/NoData'
 import { OverviewPage } from './pages/OverviewPage'
 import { SkillsPage } from './pages/SkillsPage'
@@ -14,6 +15,7 @@ import { GenusPage } from './pages/GenusPage'
 import { CollectionsPage } from './pages/CollectionsPage'
 import { StatsPage } from './pages/StatsPage'
 import { HistoryPage } from './pages/HistoryPage'
+import { TopPage } from './pages/TopPage'
 import { GuidesPage } from './pages/GuidesPage'
 import { GuideEditorPage } from './pages/GuideEditorPage'
 import { ChecklistPage } from './pages/ChecklistPage'
@@ -58,6 +60,7 @@ function Shell() {
                   <Route path="/collections" element={<CollectionsPage />} />
                   <Route path="/stats" element={<StatsPage />} />
                   <Route path="/history" element={<HistoryPage />} />
+                  <Route path="/top" element={<TopPage />} />
                   <Route path="/checklist" element={<ChecklistPage />} />
                 </>
               ) : (
@@ -68,6 +71,7 @@ function Shell() {
         </main>
       </div>
       <ZoomToast />
+      <Celebrations />
     </div>
   )
 }

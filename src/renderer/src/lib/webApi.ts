@@ -121,12 +121,21 @@ export function createWebApi(): AppApi {
         }
       }
     },
+    gamedata: {
+      // В браузере чужой сайт не отдаст страницы (CORS) — проверка только в приложении.
+      check: async () => {
+        throw new Error('Проверка справочников работает только в приложении')
+      },
+      onProgress: () => () => undefined
+    },
     app: {
       version: async () => __APP_VERSION__,
       openExternal: async (url) => void window.open(url, '_blank', 'noopener'),
       openDataFolder: async () => undefined,
       // В браузере масштабом управляет сам браузер (Ctrl +/−) — событий от приложения нет.
-      onZoomChanged: () => () => undefined
+      onZoomChanged: () => () => undefined,
+      // Снимок окна в браузере недоступен — интерфейс предлагает сделать скриншот.
+      captureImage: async () => false
     }
   }
 }

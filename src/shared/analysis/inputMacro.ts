@@ -100,3 +100,38 @@ export function analyzeInputMacro(events: InputEvent[], repeatMs: number, macroK
   }
   return { cycleMs, keys, warnings }
 }
+
+export interface KeyInterval {
+  key: string
+  /** Начало и конец удержания, мс от начала первого прогона. */
+  start: number
+  end: number
+}
+
+/** Когда какая клавиша зажата за несколько прогонов подряд — для схемы на полосе времени. */
+export function keyIntervals(
+  events: InputEvent[],
+  repeatMs: number,
+  cycles = 2
+): { cycleMs: number; totalMs: number; keys: string[]; intervals: KeyInterval[] } {
+  const cycleMs = events.reduce((sum, e) => sum + e.waitMs, 0) + repeatMs
+  const totalMs = cycleMs * cycles
+  const keys = [...new Set(events.map((e) => e.key))]
+  const intervals: KeyInterval[] = []
+  const open = new Map<string, number>()
+  for (let c = 0; c < cycles; c++) {
+    let t = c * cycleMs
+    for (const e of events) {
+      if (e.down) {
+        if (!open.has(e.key)) open.set(e.key, t)
+      } else if (open.has(e.key)) {
+        intervals.push({ key: e.key, start: open.get(e.key)!, end: t })
+        open.delete(e.key)
+      }
+      t += e.waitMs
+    }
+  }
+  // Не отпущенная к концу клавиша — держится до края схемы.
+  for (const [key, start] of open) intervals.push({ key, start, end: totalMs })
+  return { cycleMs, totalMs, keys, intervals }
+}

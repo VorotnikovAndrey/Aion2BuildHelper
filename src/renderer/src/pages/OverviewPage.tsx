@@ -9,6 +9,7 @@ import { ARCANA_TYPES } from '@shared/gamedata/arcana'
 import { MODE_LABEL } from '@shared/guide/types'
 import { ArcanaCardArt, ItemIcon, TitleEmblem } from '@/components/art'
 import { titleName } from '@/components/collections'
+import { BuildCardButton } from '@/components/BuildCard'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
 import { StaleBoardsNotice } from '@/components/StaleBoardsNotice'
 import { ClassIcon, ImpactPill } from '@/components/game'
@@ -81,7 +82,10 @@ export function OverviewPage() {
               </Tooltip>
             </div>
           </div>
-          <GuideSwitcher char={char} />
+          <div className="flex flex-wrap items-center gap-2">
+            <BuildCardButton ctx={ctx} />
+            <GuideSwitcher char={char} />
+          </div>
         </div>
         <div className="relative mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatTile

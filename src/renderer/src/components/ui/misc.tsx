@@ -1,5 +1,6 @@
 // Мелкие общие элементы: шапка страницы, пустое состояние, плитка с цифрой, вкладки, модальное окно.
 
+import { createPortal } from 'react-dom'
 import { useEffect, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { HelpCircle, X } from 'lucide-react'
@@ -145,7 +146,8 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [open, onClose])
-  return (
+  // Через портал в body: иначе «fixed» привязывается к анимированному контейнеру страницы, а не к окну.
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -174,7 +176,8 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }
 

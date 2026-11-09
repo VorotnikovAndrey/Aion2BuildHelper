@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
-import { FolderOpen, RefreshCw, RotateCcw, Settings } from 'lucide-react'
+import { FolderOpen, PartyPopper, RefreshCw, RotateCcw, Settings } from 'lucide-react'
 import { classSkills } from '@shared/gamedata/skills'
 import { skillDef } from '@shared/gamedata/skills'
+import type { ProgressEvent } from '@shared/analysis/progress'
 import type { NameMode } from '@shared/names'
+import { CELEBRATE_EVENT, showNotification } from '@/components/Celebrations'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { PageHeader, Segmented, Tabs } from '@/components/ui/misc'
@@ -11,6 +13,7 @@ import { Pill } from '@/components/ui/Pill'
 import { ago, cn, compact } from '@/lib/format'
 import { api, isWebMode, useApp, useCharacter } from '@/lib/store'
 import { AppearanceSection } from './settings/AppearanceSection'
+import { GamedataCheckCard } from './settings/GamedataCheckCard'
 
 type Tab = 'general' | 'appearance'
 
@@ -101,6 +104,44 @@ export function SettingsPage() {
               англоязычным гайдом.
             </p>
           </Card>
+
+          <Card
+            title="Уведомления"
+            hint="Когда оверлей присылает свежие данные, приложение сравнивает персонажа «до» и «после» и празднует прогресс: взятый порог меткости, умение на уровне гайда, новая вещь, рост оценки. Всплывашка с искрами — всегда, уведомление Windows — если включено."
+          >
+            <Segmented<'on' | 'off'>
+              value={settings.notifications === false ? 'off' : 'on'}
+              onChange={(v) => void update({ notifications: v === 'on' })}
+              items={[
+                { id: 'on', label: 'Уведомления Windows включены' },
+                { id: 'off', label: 'Только в приложении' }
+              ]}
+            />
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <Button
+                size="sm"
+                icon={<PartyPopper size={14} />}
+                onClick={() => {
+                  const sample: ProgressEvent[] = [
+                    {
+                      id: `demo-${Date.now()}`,
+                      kind: 'threshold',
+                      title: 'Порог взят: Меткость в PvE — Трансцендентность 4',
+                      text: 'Пример: так выглядит празднование.'
+                    },
+                    { id: `demo2-${Date.now()}`, kind: 'score', title: 'Оценка билда 65 → 67' }
+                  ]
+                  window.dispatchEvent(new CustomEvent(CELEBRATE_EVENT, { detail: sample }))
+                  if (settings.notifications !== false) showNotification(sample)
+                }}
+              >
+                Показать пример
+              </Button>
+              {isWebMode && <span className="text-[11px] text-ink-3">В браузерном режиме уведомлений Windows нет — только всплывашки.</span>}
+            </div>
+          </Card>
+
+          <GamedataCheckCard cls={char?.cls ?? null} />
 
           {char?.cls && (
             <Card

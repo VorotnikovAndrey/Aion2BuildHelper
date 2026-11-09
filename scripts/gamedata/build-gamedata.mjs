@@ -21,6 +21,7 @@ import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { homedir } from 'node:os'
+import { CLASSES, linesOf, parseArcanaPools, parseDaevanion, parseGodstones, parseSkills, parseSpecs, parseTitles, parseTop } from './parsers.mjs'
 
 const ROOT = resolve(import.meta.dirname, '../..')
 const CACHE = join(ROOT, '.cache/gamedata')
@@ -29,7 +30,6 @@ const ICONS = join(ROOT, 'src/renderer/public/icons')
 const ICON_BASE = 'https://metabot.gg/web/aion2'
 const BASE = 'https://metabot.gg/en/aion-2'
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36'
-const CLASSES = ['gladiator', 'templar', 'assassin', 'ranger', 'sorcerer', 'spiritmaster', 'cleric', 'chanter']
 
 const args = process.argv.slice(2)
 const refresh = args.includes('--refresh')
@@ -59,25 +59,6 @@ async function page(path) {
   return html
 }
 
-const decode = (s) =>
-  s
-    .replace(/&#x27;/g, "'")
-    .replace(/&quot;/g, '"')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .trim()
-
-/** Текст страницы без разметки — по строке на блок. */
-const textOf = (html) =>
-  decode(
-    html
-      .replace(/<script[\s\S]*?<\/script>/g, '')
-      .replace(/<style[\s\S]*?<\/style>/g, '')
-      .replace(/<[^>]+>/g, '\n')
-      .replace(/\n\s*\n+/g, '\n')
-  )
-
 // ───────────────────────── Статы (из локального Questlog) ─────────────────────────
 
 async function buildStats() {
@@ -106,32 +87,7 @@ async function buildStats() {
 // ───────────────────────── Умения всех классов ─────────────────────────
 
 async function buildSkills() {
-  const html = await page('/skills')
-  // Последние 24 таблицы страницы — 8 классов × (активные, пассивные, стигмы) в порядке открытия.
-  const tables = html
-    .split('<table')
-    .slice(1)
-    .filter((t) => t.includes('nameLink'))
-  const types = ['active', 'passive', 'stigma']
-  const skills = []
-  tables.slice(-24).forEach((t, i) => {
-    const cls = CLASSES[Math.floor(i / 3)]
-    const type = types[i % 3]
-    const re = /href="\/en\/aion-2\/skills\/([a-z0-9-]+)"[\s\S]*?skills%2F(\d+)\.webp[\s\S]*?nameText">([^<]+)<\/span>[\s\S]*?<td[^>]*>([^<]*)<\/td>/g
-    let m
-    let order = 0
-    while ((m = re.exec(t))) {
-      skills.push({
-        id: Number(m[2]),
-        slug: m[1],
-        en: decode(m[3]),
-        cls,
-        type,
-        unlock: Number(m[4].replace(/\D/g, '')) || null,
-        order: order++
-      })
-    }
-  })
+  const skills = parseSkills(await page('/skills'))
   if (skills.length < 250) throw new Error(`Слишком мало умений (${skills.length}) — разметка страницы поменялась?`)
   await writeJson('skills.json', skills)
   console.log('✓ умения:', skills.length)
@@ -151,15 +107,7 @@ async function buildSpecs(skills, classes) {
       console.warn(`! ${s.en}: ${e.message} — специализации не обновлены`)
       continue
     }
-    const re =
-      /specHead">Specialization (\d+)(?:<!-- -->)?(?:[^<]*<span[^>]*>requires skill level (\d+)<\/span>)?[^<]*<\/div><p class="[^"]*specText">([^<]*)<\/p>/g
-    const list = []
-    let m
-    while ((m = re.exec(html))) {
-      const text = decode(m[3])
-      if (/^(A\d)+$/.test(text)) continue // комбинации «A1A2» — служебные, не отдельные варианты
-      list.push({ n: Number(m[1]), level: m[2] ? Number(m[2]) : null, en: text })
-    }
+    const list = parseSpecs(html)
     if (list.length) out[s.id] = list
   }
   await writeJson('specs.json', { ...(await readJsonSafe('specs.json')), ...out })
@@ -169,38 +117,7 @@ async function buildSpecs(skills, classes) {
 // ───────────────────────── Доски Даэваниона ─────────────────────────
 
 async function buildDaevanion(cls) {
-  let t = await page('/daevanion/' + cls)
-  t = t.replace(/\\\\\\"/g, '"').replace(/\\"/g, '"')
-  const boards = {}
-  for (const m of t.matchAll(/\{"id":(\d{2}),"name":"([^"]+)","needLevel":(\d+)/g)) {
-    boards[m[1]] = { id: Number(m[1]), en: m[2], needLevel: Number(m[3]), nodes: [] }
-  }
-  const seen = new Set()
-  const re = /\{"id":(\d{6}),"row":\d+[^{}]*?"stats":\[[^\]]*\][^{}]*?"skillLevels":\d+\}/g
-  let m
-  while ((m = re.exec(t))) {
-    const n = JSON.parse(m[0])
-    if (seen.has(n.id)) continue
-    seen.add(n.id)
-    const board = boards[String(Math.floor(n.id / 10000))]
-    if (!board) continue
-    board.nodes.push({
-      id: n.id,
-      row: n.row,
-      col: n.col,
-      type: n.type,
-      grade: n.grade,
-      cost: n.cost,
-      auto: n.auto || undefined,
-      label: n.label,
-      stats: n.stats.length ? n.stats : undefined,
-      skill: n.skillId || undefined,
-      levels: n.skillId ? n.skillLevels : undefined
-    })
-  }
-  const list = Object.values(boards)
-    .filter((b) => b.nodes.length)
-    .map((b) => ({ ...b, nodes: b.nodes.sort((a, z) => a.id - z.id) }))
+  const list = parseDaevanion(await page('/daevanion/' + cls))
   if (!list.length) throw new Error(`Даэванион ${cls}: узлы не найдены`)
   await writeJson(`daevanion/${cls}.json`, list)
   console.log(`✓ даэванион ${cls}:`, list.map((b) => `${b.en} ${b.nodes.length}`).join(', '))
@@ -209,31 +126,7 @@ async function buildDaevanion(cls) {
 // ───────────────────────── Пулы умений аркан ─────────────────────────
 
 async function buildArcanaPools(skills) {
-  const text = textOf(await page('/arcana'))
-  const pools = {}
-  const names = { Chalice: 'chalice', Parchment: 'parchment', Compass: 'compass', Bell: 'bell', Mirror: 'mirror' }
-  for (const cls of CLASSES) {
-    const title = cls[0].toUpperCase() + cls.slice(1)
-    const start = text.indexOf(`${title} Arcana skill pools`)
-    if (start < 0) continue
-    const lines = text.slice(start).split('\n').slice(3)
-    const byName = new Map(skills.filter((s) => s.cls === cls).map((s) => [s.en, s.id]))
-    const cls_ = {}
-    let card = null
-    for (const line of lines) {
-      if (names[line]) {
-        card = names[line]
-        cls_[card] = []
-        continue
-      }
-      if (/skills in all|Arcana skill pools/.test(line)) break
-      if (!card || /skills$|each, up to/.test(line) || line === 'Arcana' || line === 'Possible skills') continue
-      const id = byName.get(line)
-      if (id) cls_[card].push(id)
-      else if (Object.keys(cls_).length === 5 && cls_.mirror?.length) break
-    }
-    pools[cls] = cls_
-  }
+  const pools = parseArcanaPools(await page('/arcana'), skills)
   await writeJson('arcana-pools.json', pools)
   console.log('✓ пулы аркан:', Object.keys(pools).length, 'классов')
 }
@@ -276,42 +169,7 @@ async function buildIcons(skills, classes) {
  * Названия статов на metabot — официальные английские, поэтому они переводятся в наши ID статов.
  */
 async function buildTitles() {
-  const html = await page('/titles')
-  const stats = await readJsonSafe('stats.json')
-  const byEn = new Map((Array.isArray(stats) ? stats : []).map((s) => [s.en.toLowerCase(), s]))
-  const CATEGORY = { Offensive: 'attack', Defensive: 'defense', Utility: 'utility' }
-  const RACE = { Elyos: 'light', Asmodians: 'dark' }
-  const parseStats = (text) =>
-    decode(text)
-      .split(', ')
-      .map((part) => part.trim().match(/^(.+?) \+([\d.,]+)(%?)$/))
-      .filter(Boolean)
-      .map((m) => {
-        const def = byEn.get(m[1].toLowerCase())
-        if (!def) return null
-        const n = Number(m[2].replace(/,/g, ''))
-        return [def.id, def.percent ? Math.round(n * 100) : n]
-      })
-      .filter(Boolean)
-  const titles = []
-  for (const row of html.matchAll(/<tr><th scope="row">([\s\S]*?)<\/tr>/g)) {
-    const r = row[1]
-    const id = r.match(/own:t:(\d+)" data-g="(\w+)"/)
-    const name = r.match(/nameText"[^>]*>([^<]*)</)
-    const tds = [...r.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((m) => m[1].replace(/<[^>]+>/g, ''))
-    if (!id || !name || tds.length < 6) continue
-    titles.push({
-      id: Number(id[1]),
-      en: decode(name[1]),
-      grade: id[2].toLowerCase(),
-      category: CATEGORY[tds[2]] ?? 'utility',
-      race: RACE[tds[1]] ?? 'both',
-      equip: parseStats(tds[3]),
-      collection: parseStats(tds[4]),
-      source: decode(tds[5])
-    })
-  }
-  titles.sort((a, b) => a.id - b.id)
+  const titles = parseTitles(await page('/titles'), await readJsonSafe('stats.json'))
   await writeJson('titles.json', titles)
   console.log('✓ титулы:', titles.length)
 }
@@ -320,25 +178,7 @@ async function buildTitles() {
 
 /** Священные камни (Theostone): ID, название, грейд, эффект и иконка — для гнёзд оружия и наручей. */
 async function buildGodstones() {
-  const html = await page('/godstones')
-  const list = []
-  for (const row of html.matchAll(/<tr><th scope="row">([\s\S]*?)<\/tr>/g)) {
-    const r = row[1]
-    const id = r.match(/own:g:(\d+)"/)
-    const name = r.match(/nameText"[^>]*>([^<]*)</)
-    const rarity = r.match(/data-rarity="(\w+)"/)
-    const icon = r.match(/items%2F([a-z0-9_]+)\.webp/)
-    const tds = [...r.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((m) => decode(m[1].replace(/<[^>]+>/g, '')))
-    if (!id || !name) continue
-    list.push({
-      id: Number(id[1]),
-      en: decode(name[1]).replace(/^Theostone:\s*/, ''),
-      grade: (rarity?.[1] ?? 'common').toLowerCase(),
-      effect: tds[tds.length - 1] ?? '',
-      icon: icon?.[1] ?? null
-    })
-  }
-  list.sort((a, b) => a.id - b.id)
+  const list = parseGodstones(await page('/godstones'))
   await writeJson('godstones.json', list)
   const dir = join(ICONS, 'godstones')
   await mkdir(dir, { recursive: true })
@@ -350,6 +190,24 @@ async function buildGodstones() {
     if (await download(`${ICON_BASE}/items/${g.icon}.webp`, file)) fetched++
   }
   console.log('✓ священные камни:', list.length, '· иконок скачано', fetched)
+}
+
+// ───────────────────────── Что носят топ-игроки ─────────────────────────
+
+async function buildTop(skills, cls) {
+  const html = await page(`/classes/${cls}/build`)
+  const lines = linesOf(html)
+  const stats = JSON.parse(await readFile(join(OUT, 'stats.json'), 'utf8'))
+  const own = skills.filter((s) => s.cls === cls)
+  const top = parseTop(lines, {
+    cls,
+    skillByName: (name) => own.find((s) => s.en === name)?.id,
+    statByName: (name) => stats.find((s) => s.en === name)?.id
+  })
+  if (top.unknown.length) console.warn(`  ! ${cls}: не сопоставлено —`, top.unknown.join('; '))
+  const { unknown: _u, ...data } = top
+  await writeJson(`top/${cls}.json`, { ...data, source: `https://metabot.gg/en/aion-2/classes/${cls}/build`, fetchedAt: new Date().toISOString().slice(0, 10) })
+  console.log(`✓ топ-игроки ${cls}: ${top.players} игроков, умений ${top.skills.length}, стигм ${top.stigmas.length}`)
 }
 
 // ───────────────────────── Вспомогательное ─────────────────────────
@@ -377,4 +235,6 @@ for (const cls of wanted) await buildDaevanion(cls)
 await buildIcons(skills, wanted)
 await buildTitles()
 await buildGodstones()
+for (const cls of wanted) await buildTop(skills, cls)
+await writeJson('meta.json', { builtAt: new Date().toISOString().slice(0, 10), classes: wanted })
 console.log('Готово →', OUT)

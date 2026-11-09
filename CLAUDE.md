@@ -19,7 +19,7 @@ src/shared/            — чистая логика без Electron и React. �
   gamedata/            — справочники: статы, умения+специализации, слоты, арканы, доски, род, опции шмота
   gamedata/generated/  — JSON, собранный скриптом npm run gamedata (руками не править)
   guide/               — формат гайда, проверка импорта, встроенные гайды (builtin/)
-  analysis/            — разбор персонажа по гайду: skills, gear, arcana, daevanion, genus, pets, titles, targets, rotation, build (итог+шаги), history
+  analysis/            — разбор персонажа по гайду: skills, gear, arcana, daevanion, genus, pets, titles, targets, rotation, inputMacro, progress, top, build (итог+шаги), history
   names.ts             — как называть сущности (ru/en/оба + свои названия пользователя)
   api.ts               — контракт window.api
 src/main/              — Electron: окно, IPC, чтение и слежение за файлом оверлея, хранилище, автоскриншоты

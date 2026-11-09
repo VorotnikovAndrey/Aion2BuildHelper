@@ -1,11 +1,12 @@
 // Контракт между интерфейсом и main-процессом (window.api).
 // В браузерном режиме разработки (npm run dev:web) тот же контракт реализует lib/webApi.ts.
 
+import type { GamedataChange } from './gamedata/diff'
 import type { HistoryEntry } from './analysis/history'
 import type { Guide } from './guide/types'
 import type { NameMode, NameOverrides } from './names'
 import { DEFAULT_UI, type UiPrefs } from './theme'
-import type { QuestlogData } from './types'
+import type { ClassKey, QuestlogData } from './types'
 
 export interface SourceState {
   /** Путь к characters.json оверлея. */
@@ -47,6 +48,8 @@ export interface Settings {
   ui: UiPrefs
   /** Сколько записей ленты изменений показывать на странице (10, 25, 50, 100). */
   historyPageSize?: number
+  /** Уведомления Windows о прогрессе (взятые пороги, новые вещи…). По умолчанию включены. */
+  notifications?: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -55,6 +58,16 @@ export const DEFAULT_SETTINGS: Settings = {
   characters: {},
   hiddenCharacters: [],
   ui: DEFAULT_UI
+}
+
+/** Итог проверки справочников после патча (см. shared/gamedata/diff.ts). */
+export interface GamedataCheckResult {
+  checkedAt: string
+  /** Когда собраны справочники приложения. */
+  builtAt: string
+  changes: GamedataChange[]
+  /** Страницы, которые не удалось скачать или разобрать. */
+  errors: string[]
 }
 
 export interface AppApi {
@@ -85,6 +98,11 @@ export interface AppApi {
   history: {
     list(characterKey: string): Promise<HistoryEntry[]>
   }
+  gamedata: {
+    /** Скачать свежие страницы metabot.gg и сравнить со справочниками приложения. */
+    check(cls: ClassKey): Promise<GamedataCheckResult>
+    onProgress(cb: (p: { done: number; total: number; label: string }) => void): () => void
+  }
   app: {
     version(): Promise<string>
     openExternal(url: string): Promise<void>
@@ -92,5 +110,7 @@ export interface AppApi {
     openDataFolder(): Promise<void>
     /** Масштаб поменяли с клавиатуры или колесом (Ctrl+колесо, Ctrl +/−/0). */
     onZoomChanged(cb: (zoom: number) => void): () => void
+    /** Снимок области окна (CSS-пиксели и масштаб интерфейса): скопировать в буфер или сохранить PNG. */
+    captureImage(rect: { x: number; y: number; width: number; height: number; zoom: number }, action: 'copy' | 'save', name: string): Promise<boolean>
   }
 }

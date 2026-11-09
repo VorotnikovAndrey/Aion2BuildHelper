@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { templarPveConsensus } from '../guide/builtin/templarPveConsensus'
 import type { InputEvent } from '../guide/types'
-import { analyzeInputMacro } from './inputMacro'
+import { analyzeInputMacro, keyIntervals } from './inputMacro'
 
 const ev = (key: string, down: boolean, waitMs: number): InputEvent => ({ key, down, waitMs })
 
@@ -42,5 +42,20 @@ describe('«одна кнопка» в сводном гайде', () => {
     // Последний шаг связки — ячейка Суда (в ней всегда готов Град ударов).
     const steps = c.macros!.filter((m) => !m.when || m.when.minLevel !== undefined)
     expect(steps[steps.length - 1].id).toBe('judgment')
+  })
+})
+
+describe('схема нажатий', () => {
+  it('два прогона ПКМ↓ 10 ЛКМ↓ 10 ЛКМ↑ 10 ПКМ↑, автоповтор 10', () => {
+    const r = keyIntervals([ev('ПКМ', true, 10), ev('ЛКМ', true, 10), ev('ЛКМ', false, 10), ev('ПКМ', false, 0)], 10)
+    expect(r).toMatchObject({ cycleMs: 40, totalMs: 80, keys: ['ПКМ', 'ЛКМ'] })
+    expect(r.intervals.filter((i) => i.key === 'ПКМ')).toEqual([
+      { key: 'ПКМ', start: 0, end: 30 },
+      { key: 'ПКМ', start: 40, end: 70 }
+    ])
+    expect(r.intervals.filter((i) => i.key === 'ЛКМ').map((i) => [i.start, i.end])).toEqual([
+      [10, 20],
+      [50, 60]
+    ])
   })
 })

@@ -1,11 +1,13 @@
 // Обработчики window.api (контракт — src/shared/api.ts).
 
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, clipboard, ClipboardItem, dialog, ipcMain, shell } from 'electron'
 import { readFile, writeFile } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
 import type { Settings } from '@shared/api'
 import type { UiPrefs } from '@shared/theme'
 import { normalizeGuide } from '@shared/guide'
+import type { ClassKey } from '@shared/types'
+import { checkGamedata } from './gamedataCheck'
 import type { Guide } from '@shared/guide/types'
 import { getSourceState, onSourceChange, reloadSource, startWatching } from './questlog'
 import { dataDir, getSettings, listGuides, listHistory, removeGuide, saveGuide, updateSettings, updateUi } from './storage'
@@ -82,4 +84,38 @@ export function registerIpc(): void {
     if (/^https?:\/\//i.test(url)) return shell.openExternal(url)
   })
   ipcMain.handle('app:openDataFolder', () => shell.openPath(dataDir()))
+  ipcMain.handle('gamedata:check', (e, cls: ClassKey) => checkGamedata(cls, (p) => e.sender.send('gamedata:progress', p)))
+  // Карточка билда: снимок области окна. Координаты — CSS-пиксели, масштаб интерфейса переводит их в точки окна.
+  ipcMain.handle(
+    'app:captureImage',
+    async (e, rect: { x: number; y: number; width: number; height: number; zoom: number }, action: 'copy' | 'save', name: string) => {
+      const ok = [rect?.x, rect?.y, rect?.width, rect?.height, rect?.zoom].every((v) => typeof v === 'number' && Number.isFinite(v))
+      if (!ok || rect.width <= 0 || rect.height <= 0) return false
+      const z = rect.zoom > 0 ? rect.zoom : 1
+      const image = await e.sender.capturePage({
+        x: Math.max(0, Math.round(rect.x * z)),
+        y: Math.max(0, Math.round(rect.y * z)),
+        width: Math.round(rect.width * z),
+        height: Math.round(rect.height * z)
+      })
+      if (action === 'copy') {
+        // В Electron 45 буфер обмена — асинхронный, как в браузере: картинка кладётся как image/png.
+        await clipboard.write([new ClipboardItem({ 'image/png': new Blob([new Uint8Array(image.toPNG())], { type: 'image/png' }) })])
+        return true
+      }
+      const win = BrowserWindow.fromWebContents(e.sender)
+      const safe =
+        String(name ?? 'build')
+          .replace(/[\\/:*?"<>|]+/g, ' ')
+          .trim() || 'build'
+      const res = await dialog.showSaveDialog(win!, {
+        title: 'Сохранить карточку билда',
+        defaultPath: `${safe}.png`,
+        filters: [{ name: 'Картинка PNG', extensions: ['png'] }]
+      })
+      if (res.canceled || !res.filePath) return false
+      await writeFile(res.filePath, image.toPNG())
+      return true
+    }
+  )
 }

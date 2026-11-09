@@ -17,8 +17,9 @@ import { EmptyState, PageHeader, Segmented, Tabs } from '@/components/ui/misc'
 import { cn } from '@/lib/format'
 import { useNamer } from '@/lib/report'
 import { useApp, useGuides } from '@/lib/store'
+import { CombatSection } from './guide-editor/CombatSection'
 
-type Section = 'main' | 'skills' | 'stats' | 'gear' | 'arcana' | 'daevanion' | 'texts'
+type Section = 'main' | 'skills' | 'stats' | 'gear' | 'arcana' | 'daevanion' | 'combat' | 'texts'
 
 export function GuideEditorPage() {
   const { id } = useParams()
@@ -70,6 +71,7 @@ export function GuideEditorPage() {
             { id: 'gear', label: 'Умения на шмоте' },
             { id: 'arcana', label: 'Арканы' },
             { id: 'daevanion', label: 'Даэванион' },
+            { id: 'combat', label: 'Связка' },
             { id: 'texts', label: 'Ротация и советы' }
           ]}
         />
@@ -80,6 +82,7 @@ export function GuideEditorPage() {
       {section === 'gear' && <GearSkillsSection g={draft} set={set} />}
       {section === 'arcana' && <ArcanaSection g={draft} set={set} />}
       {section === 'daevanion' && <DaevanionSection g={draft} set={set} />}
+      {section === 'combat' && <CombatSection g={draft} set={set} />}
       {section === 'texts' && <TextsSection g={draft} set={set} />}
     </>
   )

@@ -29,10 +29,19 @@ const api: AppApi = {
     exportFile: call('guides:export')
   } as AppApi['guides'],
   history: { list: call('history:list') } as AppApi['history'],
+  gamedata: {
+    check: call('gamedata:check'),
+    onProgress(cb) {
+      const listener = (_e: unknown, p: { done: number; total: number; label: string }) => cb(p)
+      ipcRenderer.on('gamedata:progress', listener)
+      return () => ipcRenderer.removeListener('gamedata:progress', listener)
+    }
+  } as AppApi['gamedata'],
   app: {
     version: call('app:version'),
     openExternal: call('app:openExternal'),
     openDataFolder: call('app:openDataFolder'),
+    captureImage: call('app:captureImage'),
     onZoomChanged(cb) {
       const listener = (_e: unknown, z: number) => cb(z)
       ipcRenderer.on('ui:zoom-changed', listener)
