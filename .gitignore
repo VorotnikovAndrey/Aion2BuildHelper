@@ -9,3 +9,6 @@ dist/
 
 # Реальные данные персонажа для локальной проверки — не коммитим
 samples/private/
+
+# Описание выпуска для electron-builder (npm run release собирает его из CHANGELOG.md)
+build/release-notes.md

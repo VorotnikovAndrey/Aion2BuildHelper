@@ -201,7 +201,15 @@ async function buildTop(skills, cls) {
   const own = skills.filter((s) => s.cls === cls)
   const top = parseTop(lines, {
     cls,
-    skillByName: (name) => own.find((s) => s.en === name)?.id,
+    // Общие умения (Survival Willpower…) у классов под одним номером: 11790000, 12790000… — если у класса
+    // такого названия нет в списке, берём номер по образцу другого класса.
+    skillByName: (name) => {
+      const mine = own.find((s) => s.en === name)?.id
+      if (mine) return mine
+      const other = skills.find((s) => s.en === name)
+      const prefix = own[0] ? Math.floor(own[0].id / 1000000) : null
+      return other && prefix ? prefix * 1000000 + (other.id % 1000000) : undefined
+    },
     statByName: (name) => stats.find((s) => s.en === name)?.id
   })
   if (top.unknown.length) console.warn(`  ! ${cls}: не сопоставлено —`, top.unknown.join('; '))
@@ -236,5 +244,8 @@ await buildIcons(skills, wanted)
 await buildTitles()
 await buildGodstones()
 for (const cls of wanted) await buildTop(skills, cls)
-await writeJson('meta.json', { builtAt: new Date().toISOString().slice(0, 10), classes: wanted })
+// Классы, для которых собраны доски и специализации, — все, что есть в generated (не только этот запуск).
+const { readdir } = await import('node:fs/promises')
+const built = (await readdir(join(OUT, 'daevanion'))).map((f) => f.replace(/\.json$/, '')).sort()
+await writeJson('meta.json', { builtAt: new Date().toISOString().slice(0, 10), classes: built })
 console.log('Готово →', OUT)

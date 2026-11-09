@@ -2,6 +2,7 @@
 
 import { contextBridge, ipcRenderer } from 'electron'
 import type { AppApi, SourceState } from '@shared/api'
+import type { UpdateState } from '@shared/updates'
 
 const call =
   (channel: string) =>
@@ -29,6 +30,18 @@ const api: AppApi = {
     exportFile: call('guides:export')
   } as AppApi['guides'],
   history: { list: call('history:list') } as AppApi['history'],
+  updates: {
+    get: call('updates:get'),
+    check: call('updates:check'),
+    download: call('updates:download'),
+    install: call('updates:install'),
+    setAuto: call('updates:setAuto'),
+    onState(cb) {
+      const listener = (_e: unknown, s: UpdateState) => cb(s)
+      ipcRenderer.on('updates:state', listener)
+      return () => ipcRenderer.removeListener('updates:state', listener)
+    }
+  } as AppApi['updates'],
   gamedata: {
     check: call('gamedata:check'),
     onProgress(cb) {

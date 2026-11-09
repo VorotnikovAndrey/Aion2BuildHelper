@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { createHashRouter, Route, RouterProvider, Routes, useLocation } from 'react-router'
 import { Sidebar } from './layout/Sidebar'
 import { ZoomToast } from './components/ZoomToast'
@@ -21,6 +21,7 @@ import { GuideEditorPage } from './pages/GuideEditorPage'
 import { ChecklistPage } from './pages/ChecklistPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { useCharacter } from './lib/store'
+import { subscribeUpdates } from './lib/updates'
 
 export function App() {
   return <RouterProvider router={router} />
@@ -32,6 +33,7 @@ function Shell() {
   const char = useCharacter()
   const location = useLocation()
   const main = useRef<HTMLElement>(null)
+  useEffect(() => subscribeUpdates(), [])
   // Новая страница открывается сверху.
   useLayoutEffect(() => {
     main.current?.scrollTo({ top: 0 })

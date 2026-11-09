@@ -1,0 +1,41 @@
+# Сборка установщика: `npm run dist` (только собрать) и `npm run release` (собрать и выпустить обновление).
+# Как устроены установщик и обновления — docs/decisions/0007-installer-and-updates.md.
+appId: com.aion2buildhelper.app
+productName: Aion2 Build Helper
+directories:
+  buildResources: build
+  output: dist
+files:
+  - out/**/*
+  # Автоскриншоты разработчика пользователю не нужны.
+  - "!out/shots/**"
+  - package.json
+  - "!**/*.{map,d.ts,d.mts,d.cts}"
+win:
+  target:
+    - target: nsis
+      arch: x64
+  icon: build/icon.ico
+  # Без пробелов: так имя файла совпадает в latest.yml и на GitHub.
+  artifactName: Aion2BuildHelper-Setup-${version}.${ext}
+nsis:
+  oneClick: false
+  # Для текущего пользователя: установка и обновления без запроса прав администратора.
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: Aion2 Build Helper
+  runAfterFinish: true
+  # Настройки, свои гайды и история в %APPDATA%\Aion2 Build Helper при удалении не трогаем.
+  deleteAppDataOnUninstall: false
+  installerLanguages:
+    - ru_RU
+    - en_US
+# Откуда установленное приложение берёт обновления: выпуски открытого репозитория на GitHub.
+# Ключ нужен только для выкладки (npm run release), приложению — нет.
+publish:
+  provider: github
+  owner: VorotnikovAndrey
+  repo: Aion2BuildHelper
+  releaseType: release

@@ -14,7 +14,8 @@ describe('сравнение с топ-игроками', () => {
     expect(top.players).toBeGreaterThan(1000)
     expect(top.skills.find((s) => s.skill === 12240000)?.avgLevel).toBeGreaterThan(10)
     expect(top.enchant.find((e) => e.label === 'Main hand')?.slots).toEqual([1])
-    expect(topData('gladiator')).toBeNull()
+    expect(topData('cleric')?.players).toBeGreaterThan(500)
+    expect(topData(null)).toBeNull()
   })
 
   it('процентиль боевой мощи по корзинам', () => {

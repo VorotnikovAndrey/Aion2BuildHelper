@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Gem, Search } from 'lucide-react'
 import { guideWeights } from '@shared/analysis/weights'
 import { formatStatValue, statByKey, statDef, STAT_GROUPS } from '@shared/gamedata/stats'
+import { topData } from '@shared/gamedata/top'
 import { CharacterSheet } from '@/components/CharacterSheet'
 import { TargetBar } from '@/components/targets'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
@@ -64,7 +65,7 @@ export function StatsPage() {
       <Card
         title="Показатели персонажа"
         className="mb-5"
-        hint="Как окно «Показатели персонажа» в игре: шесть характеристик в центре, вокруг — статы богов. Рамка круга: зелёная — не ниже среднего у топ-стражей, жёлтая — ниже. Наведите на любой круг — там пояснение."
+        hint="Как окно «Показатели персонажа» в игре: шесть характеристик в центре, вокруг — статы богов. Рамка круга: зелёная — не ниже среднего у топ-игроков класса, жёлтая — ниже. Наведите на любой круг — там пояснение."
       >
         <CharacterSheet values={values} fromBoards={report.daevanion.stats} namer={namer} refs={refs} />
       </Card>
@@ -73,7 +74,7 @@ export function StatsPage() {
         <Card
           title="Где хватает и к чему стремиться"
           className="mb-5"
-          hint="Пороги для контента — сколько нужно (по отчётам игроков глобальной версии). Ориентиры — сколько в среднем у 3 916 топ-стражей. Отметка на шкале — цель; зелёное — хватает, жёлтое — не хватает."
+          hint={`Пороги для контента — сколько нужно (по отчётам игроков глобальной версии). Ориентиры — сколько в среднем у ${topData(char.cls)?.players.toLocaleString('ru-RU') ?? ''} топ-игроков класса (metabot.gg). Отметка на шкале — цель; зелёное — хватает, жёлтое — не хватает.`}
         >
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
             <div className="space-y-4">
@@ -83,7 +84,7 @@ export function StatsPage() {
               ))}
             </div>
             <div className="space-y-4">
-              <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Ориентир: в среднем у топ-стражей</div>
+              <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Ориентир: в среднем у топ-игроков класса</div>
               <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
                 {top.map((t) => (
                   <TargetBar key={t.target.id} t={t} compact />

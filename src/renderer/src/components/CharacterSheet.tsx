@@ -52,9 +52,9 @@ export function CharacterSheet({
   const refText = (id: number) => {
     const r = refs?.get(id)
     if (!r) return ''
-    return `В среднем у топ-стражей: ${r.target.goals[0].value.toLocaleString('ru-RU')} — у вас ${r.next ? 'ниже' : 'не ниже'}.`
+    return `В среднем у топ-игроков класса: ${r.target.goals[0].value.toLocaleString('ru-RU')} — у вас ${r.next ? 'ниже' : 'не ниже'}.`
   }
-  /** Цвет числа или рамки по ориентиру: зелёный — не ниже среднего у топ-стражей, жёлтый — ниже. */
+  /** Цвет числа или рамки по ориентиру: зелёный — не ниже среднего у топ-игроков класса, жёлтый — ниже. */
   const refTone = (id: number): 'ok' | 'warn' | null => {
     const r = refs?.get(id)
     return r ? (r.next ? 'warn' : 'ok') : null

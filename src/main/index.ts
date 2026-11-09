@@ -1,6 +1,7 @@
 // Точка входа main-процесса Electron: окно, IPC, слежение за файлом оверлея.
 
 import { app, BrowserWindow, shell } from 'electron'
+import { registerUpdaterIpc, startUpdater } from './updater'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { prepareShots, runShots, shotsEnabled } from './devShots'
@@ -74,11 +75,13 @@ function createWindow(background: string): BrowserWindow {
 
 app.whenReady().then(async () => {
   registerIpc()
+  registerUpdaterIpc()
   // Фон окна до загрузки интерфейса — в цвет сохранённой темы, чтобы ничего не мигало.
   const background = themeBase((await getSettings()).ui.base).bg
   const win = createWindow(background)
   if (shotsEnabled()) win.webContents.once('did-finish-load', () => void runShots(win))
   await startWatching()
+  void startUpdater()
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow(background)
   })

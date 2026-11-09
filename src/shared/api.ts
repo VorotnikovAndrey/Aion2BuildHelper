@@ -2,6 +2,7 @@
 // В браузерном режиме разработки (npm run dev:web) тот же контракт реализует lib/webApi.ts.
 
 import type { GamedataChange } from './gamedata/diff'
+import type { UpdateState } from './updates'
 import type { HistoryEntry } from './analysis/history'
 import type { Guide } from './guide/types'
 import type { NameMode, NameOverrides } from './names'
@@ -50,6 +51,8 @@ export interface Settings {
   historyPageSize?: number
   /** Уведомления Windows о прогрессе (взятые пороги, новые вещи…). По умолчанию включены. */
   notifications?: boolean
+  /** Скачивать обновления приложения сами (по умолчанию да). */
+  autoUpdate?: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -102,6 +105,15 @@ export interface AppApi {
     /** Скачать свежие страницы metabot.gg и сравнить со справочниками приложения. */
     check(cls: ClassKey): Promise<GamedataCheckResult>
     onProgress(cb: (p: { done: number; total: number; label: string }) => void): () => void
+  }
+  updates: {
+    get(): Promise<UpdateState>
+    check(): Promise<void>
+    download(): Promise<void>
+    /** Перезапустить и установить скачанное обновление. */
+    install(): Promise<void>
+    setAuto(auto: boolean): Promise<Settings>
+    onState(cb: (state: UpdateState) => void): () => void
   }
   app: {
     version(): Promise<string>

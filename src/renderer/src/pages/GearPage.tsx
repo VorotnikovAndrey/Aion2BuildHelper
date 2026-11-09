@@ -716,7 +716,7 @@ function StonePlan({ ctx }: { ctx: Ctx }) {
             <Tooltip
               block
               wide
-              content="Эти статы в PvE почти ничего не дают стражу (ОМ, уклонение, сопротивление криту) — их и стоит перековывать в первую очередь."
+              content="Эти статы гайд почти не ценит (у стража, например, ОМ, уклонение, сопротивление криту) — их и стоит перековывать в первую очередь."
             >
               <div className="w-full text-xs text-ink-3">
                 <span className="text-critical">Бесполезно в PvE:</span> {useless.map(([stat, n]) => `${namer.stat(stat).main} ×${n}`).join(', ')}

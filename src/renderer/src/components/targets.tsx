@@ -14,9 +14,9 @@ const fmt = (t: TargetStatus, v: number) => formatStatValue(t.target.stats[0], M
 export const targetTone = (t: TargetStatus): Tone => (t.next ? 'warn' : 'ok')
 
 export function targetText(t: TargetStatus): string {
-  if (!t.next) return t.target.kind === 'top' ? 'не ниже, чем у топ-стражей' : 'хватает'
+  if (!t.next) return t.target.kind === 'top' ? 'не ниже, чем у топ-игроков класса' : 'хватает'
   const gap = t.next.value - t.current
-  return t.target.kind === 'top' ? `ниже среднего у топ-стражей на ${fmt(t, gap)}` : `не хватает ${fmt(t, gap)} до «${t.next.label}»`
+  return t.target.kind === 'top' ? `ниже среднего у топ-игроков класса на ${fmt(t, gap)}` : `не хватает ${fmt(t, gap)} до «${t.next.label}»`
 }
 
 /** Строка порога: название, текущее значение, шкала с отметками целей. */

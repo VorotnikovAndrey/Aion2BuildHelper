@@ -18,6 +18,10 @@ describe('арт игры', () => {
     expect(helmet.src).toBe('./art/items/icon_equip_ar_l_idris_01_helmet.webp')
     expect(helmet.grade).toBe('unique')
     expect(itemArt(999999999)).toBeNull()
+    // Вещи вне своего арта — из базы предметов: официальное название и иконка с сервера картинок Questlog.
+    const mace = itemArt(110720003)!
+    expect(mace.ru).toBe('Смертоносная булава Рудры')
+    expect(mace.src).toBe('https://cdn.questlog.gg/aion-2/assets/Game/UI/Resource/Texture/Item/Weapon/Icon_WP_MA_0108_T06.webp')
   })
 
   it('грейд из списка важнее цифры в ID (руны — «особые»)', () => {

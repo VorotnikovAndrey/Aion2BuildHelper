@@ -16,7 +16,7 @@
 src/shared/            — чистая логика без Electron и React. Покрыта тестами.
   types.ts             — модель персонажа
   questlog/parse.ts    — разбор characters.json оверлея Questlog
-  gamedata/            — справочники: статы, умения+специализации, слоты, арканы, доски, род, опции шмота
+  gamedata/            — справочники: статы, умения+специализации, слоты, арканы, доски, род, опции шмота, топ-игроки, названия умений (skills-ru.json) и вещей (items.json)
   gamedata/generated/  — JSON, собранный скриптом npm run gamedata (руками не править)
   guide/               — формат гайда, проверка импорта, встроенные гайды (builtin/)
   analysis/            — разбор персонажа по гайду: skills, gear, arcana, daevanion, genus, pets, titles, targets, rotation, inputMacro, progress, top, build (итог+шаги), history
@@ -45,6 +45,8 @@ npm run gamedata   # обновить справочники (по умолча�
 npm run art        # скачать арт игры по списку src/shared/gamedata/art.json
 npm run icon       # перерисовать build/icon.png и icon.ico
 npm run shortcut   # ярлык на рабочем столе
+npm run dist       # установщик в dist/
+npm run release    # выпустить новую версию на GitHub (установленные копии обновятся сами)
 ```
 
 Node.js установлен в `C:\Program Files\nodejs`. Если `node` не находится в PATH, добавьте этот путь в начало `PATH` в текущей сессии.

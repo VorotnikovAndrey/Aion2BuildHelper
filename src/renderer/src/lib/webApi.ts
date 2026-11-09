@@ -121,6 +121,19 @@ export function createWebApi(): AppApi {
         }
       }
     },
+    updates: {
+      // В браузерном режиме обновлять нечего.
+      get: async () => ({ phase: 'unsupported', current: __APP_VERSION__ }),
+      check: async () => undefined,
+      download: async () => undefined,
+      install: async () => undefined,
+      setAuto: async (auto) => {
+        const next = { ...DEFAULT_SETTINGS, ...load<Partial<Settings>>(LS_SETTINGS, {}), autoUpdate: auto }
+        store(LS_SETTINGS, next)
+        return next
+      },
+      onState: () => () => undefined
+    },
     gamedata: {
       // В браузере чужой сайт не отдаст страницы (CORS) — проверка только в приложении.
       check: async () => {

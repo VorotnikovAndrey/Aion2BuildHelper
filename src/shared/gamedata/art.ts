@@ -6,6 +6,7 @@ import type { ClassKey } from '../types'
 import type { ArcanaType, ArcanaVariant } from './arcana'
 import { gradeOfItem, type ItemGrade } from './slots'
 import artJson from './art.json'
+import itemsJson from './items.json'
 
 interface ArtJson {
   items: Record<string, { ru: string; icon: string; grade?: ItemGrade }>
@@ -31,11 +32,20 @@ export interface ItemArt {
   grade: ItemGrade
 }
 
-/** Иконка и название вещи, если она есть в списке арта. */
+/**
+ * Снаряжение всех классов из базы предметов Questlog на русском: ID → [название, путь к иконке].
+ * Иконки этих вещей не лежат в приложении (их больше тысячи) — грузятся с публичного сервера картинок Questlog;
+ * без интернета вместо них значок слота.
+ */
+const ITEMS = (itemsJson as unknown as { items: Record<string, [string, string]> }).items
+export const ITEM_ICON_CDN = 'https://cdn.questlog.gg/aion-2/assets/Game/UI/Resource/Texture/Item/'
+
+/** Иконка и официальное название вещи: сначала свой арт (лежит в приложении), иначе — из базы предметов. */
 export function itemArt(itemId: number): ItemArt | null {
   const a = ART.items[String(itemId)]
-  if (!a) return null
-  return { ru: a.ru, src: artFile('items', a.icon), grade: a.grade ?? gradeOfItem(itemId) }
+  if (a) return { ru: a.ru, src: artFile('items', a.icon), grade: a.grade ?? gradeOfItem(itemId) }
+  const db = ITEMS[String(itemId)]
+  return db ? { ru: db[0], src: `${ITEM_ICON_CDN}${db[1]}.webp`, grade: gradeOfItem(itemId) } : null
 }
 
 /** Подложка иконки по грейду — как в инвентаре игры. */

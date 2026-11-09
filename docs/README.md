@@ -12,7 +12,7 @@
 | [design.md](design.md) | Дизайн-токены, компоненты, правила интерфейса |
 | [roadmap.md](roadmap.md) | Что сделано, что дальше, идеи |
 | [decisions/](decisions/) | Почему сделано именно так |
-| [research/](research/) | Разборы гайдов: [страж PvE, ноябрь 2026](research/templar-pve-2026-11.md) — 8 гайдов + данные топ-игроков |
+| [research/](research/) | Разборы гайдов: [страж PvE](research/templar-pve-2026-11.md) и [целитель PvE](research/cleric-pve-2026-11.md), ноябрь 2026 — по 8 гайдов + данные топ-игроков |
 
 ## Что важно помнить (быстрый контекст)
 

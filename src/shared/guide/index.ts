@@ -2,6 +2,7 @@
 
 import { classInfo } from '../gamedata/classes'
 import { toClassKey } from '../questlog/parse'
+import { clericPveConsensus } from './builtin/clericPveConsensus'
 import { templarPveConsensus } from './builtin/templarPveConsensus'
 import { templarPveMobalytics } from './builtin/templarPveMobalytics'
 import {
@@ -23,7 +24,7 @@ import {
 export * from './types'
 
 /** Первый подходящий по классу — гайд по умолчанию. Сводный идёт первым: приложение не следует одному гайду вслепую. */
-export const BUILTIN_GUIDES: Guide[] = [templarPveConsensus, templarPveMobalytics]
+export const BUILTIN_GUIDES: Guide[] = [templarPveConsensus, templarPveMobalytics, clericPveConsensus]
 
 type Obj = Record<string, unknown>
 const isObj = (v: unknown): v is Obj => typeof v === 'object' && v !== null && !Array.isArray(v)

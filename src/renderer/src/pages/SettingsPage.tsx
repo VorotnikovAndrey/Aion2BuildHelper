@@ -14,6 +14,7 @@ import { ago, cn, compact } from '@/lib/format'
 import { api, isWebMode, useApp, useCharacter } from '@/lib/store'
 import { AppearanceSection } from './settings/AppearanceSection'
 import { GamedataCheckCard } from './settings/GamedataCheckCard'
+import { UpdatesCard } from './settings/UpdatesCard'
 
 type Tab = 'general' | 'appearance'
 
@@ -140,6 +141,8 @@ export function SettingsPage() {
               {isWebMode && <span className="text-[11px] text-ink-3">В браузерном режиме уведомлений Windows нет — только всплывашки.</span>}
             </div>
           </Card>
+
+          <UpdatesCard />
 
           <GamedataCheckCard cls={char?.cls ?? null} />
 

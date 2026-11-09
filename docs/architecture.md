@@ -36,6 +36,7 @@
 - `questlog.ts` — путь к файлу (стандартный или выбранный), чтение, слежение (`fs.watch` на папку + страховочный опрос), запись истории при каждом обновлении.
 - `storage.ts` — `%APPDATA%\Aion2 Build Helper`: `settings.json`, `guides/*.json`, `history/<персонаж>.json`, `snapshots/<персонаж>.json`. Запись атомарная (через `.tmp`).
 - `ipc.ts` — обработчики `window.api` (контракт — `shared/api.ts`): источник, настройки, гайды (+ диалоги импорта/экспорта), история, служебное.
+- `updater.ts` — обновления приложения (electron-updater, выпуски GitHub): проверка, скачивание в фоне, установка при перезапуске; состояние — `shared/updates.ts`.
 - `gamedataCheck.ts` — проверка справочников после патча: свежие страницы metabot.gg → те же разборщики (`scripts/gamedata/parsers.mjs`) → сравнение (`shared/gamedata/diff.ts`).
 - `zoom.ts` — масштаб окна (Ctrl+колесо, Ctrl +/−/0) и применение оформления к окнам.
 - `devShots.ts` — режим автоскриншотов (`npm run shots`).

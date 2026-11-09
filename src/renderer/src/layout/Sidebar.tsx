@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { NavLink, useNavigate } from 'react-router'
 import {
+  ArrowDownCircle,
   BookOpen,
   ChevronDown,
   Gem,
@@ -28,7 +29,8 @@ import { toneOfScore } from '@/components/ui/Pill'
 import { ago, cn, compact } from '@/lib/format'
 import { useAnimate } from '@/lib/motion'
 import { useCharacterContext } from '@/lib/report'
-import { useApp, useCharacters } from '@/lib/store'
+import { api, useApp, useCharacters } from '@/lib/store'
+import { useUpdates } from '@/lib/updates'
 
 interface NavItem {
   to: string
@@ -202,6 +204,7 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-line px-3 py-3">
+        <UpdateBanner />
         <Tooltip
           block
           content="Приложение само следит за файлом оверлея Questlog. Здесь — когда файл обновился в последний раз. Нажмите, чтобы перечитать его прямо сейчас. Зелёная точка — файл найден, красная — нет."
@@ -323,5 +326,36 @@ export function Logo({ size = 34 }: { size?: number }) {
       />
       <path d="M32 30 V44" stroke="url(#lg-a)" strokeWidth="3" strokeLinecap="round" />
     </svg>
+  )
+}
+
+/** Новая версия скачивается или готова — коротко внизу меню, нажатие открывает «Настройки». */
+function UpdateBanner() {
+  const state = useUpdates((s) => s.state)
+  const navigate = useNavigate()
+  if (state.phase !== 'ready' && state.phase !== 'downloading') return null
+  const ready = state.phase === 'ready'
+  return (
+    <Tooltip
+      block
+      content={
+        ready
+          ? 'Нажмите «Перезапустить и обновить» в настройках — или новая версия поставится сама при закрытии приложения.'
+          : 'Новая версия скачивается в фоне.'
+      }
+    >
+      <button
+        onClick={() => (ready ? void api.updates.install() : navigate('/settings'))}
+        className={cn(
+          'mb-1 flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs transition-colors',
+          ready ? 'bg-accent-soft text-ink hover:bg-accent/20' : 'text-ink-3 hover:bg-surface'
+        )}
+      >
+        <ArrowDownCircle size={14} className={ready ? 'text-accent' : 'animate-pulse'} />
+        <span className="flex-1 truncate">
+          {ready ? `Обновить до ${state.version} — перезапуск` : `Скачиваю ${state.version ?? 'обновление'} · ${Math.round((state.progress ?? 0) * 100)}%`}
+        </span>
+      </button>
+    </Tooltip>
   )
 }
