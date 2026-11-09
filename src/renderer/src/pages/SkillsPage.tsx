@@ -75,7 +75,7 @@ export function SkillsPage() {
         <Section title="Поддерживающие" hint="Открывают окна Суда, контроль и мобильность.">
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
             {support.map((s) => (
-              <SkillCard key={s.skill} s={s} ctx={ctx} compact />
+              <SkillCard key={s.skill} s={s} ctx={ctx} />
             ))}
           </div>
         </Section>
@@ -176,7 +176,7 @@ function Breakdown({ s }: { s: SkillReport }) {
   )
 }
 
-function SkillCard({ s, ctx, compact }: { s: SkillReport; ctx: Ctx; compact?: boolean }) {
+function SkillCard({ s, ctx }: { s: SkillReport; ctx: Ctx }) {
   const { namer, char, report } = ctx
   const prefs = useCharacterPrefs(char.key)
   const setPrefs = useApp((st) => st.updateCharacterPrefs)
@@ -209,7 +209,7 @@ function SkillCard({ s, ctx, compact }: { s: SkillReport; ctx: Ctx; compact?: bo
     >
       <div className="flex items-start gap-3">
         <Tooltip content={`${namer.skill(s.skill).main}${s.def?.unlock ? ` — открывается на ур. ${s.def.unlock} персонажа` : ''}. ${verdict.why}`} wide>
-          <SkillIcon id={s.skill} size={compact ? 40 : 48} tone={verdict.tone} />
+          <SkillIcon id={s.skill} size={48} tone={verdict.tone} />
         </Tooltip>
         <div className="min-w-0 flex-1">
           <Name label={namer.skill(s.skill)} className="text-[15px] font-semibold" />
@@ -258,7 +258,7 @@ function SkillCard({ s, ctx, compact }: { s: SkillReport; ctx: Ctx; compact?: bo
               <span className="text-warning">не отмечено — нажмите на стоящие варианты</span>
             ) : null}
           </div>
-          <div className={cn('grid gap-1.5', compact ? 'grid-cols-5' : 'grid-cols-1')}>
+          <div className="grid grid-cols-1 gap-1.5">
             {specs.map((sp) => {
               const isOn = current.includes(sp.n)
               const wanted = s.specs?.wanted.includes(sp.n) ?? false
@@ -295,7 +295,7 @@ function SkillCard({ s, ctx, compact }: { s: SkillReport; ctx: Ctx; compact?: bo
                 </>
               )
               return (
-                <Tooltip key={sp.n} content={tip} wide block={!compact}>
+                <Tooltip key={sp.n} content={tip} wide block>
                   <button
                     onClick={() => toggle(sp.n)}
                     className={cn(
@@ -313,10 +313,9 @@ function SkillCard({ s, ctx, compact }: { s: SkillReport; ctx: Ctx; compact?: bo
                       <SpecIcon n={sp.n} size={20} dim={!isOn} />
                       {isOn && <Check size={11} strokeWidth={3} className="absolute -right-1 -bottom-1 rounded-full bg-good text-bg" />}
                     </span>
-                    {!compact && <span className="min-w-0 flex-1 truncate">{label.main}</span>}
-                    {compact && <span className="tnum text-[11px] font-semibold">{sp.n}</span>}
+                    <span className="min-w-0 flex-1 truncate">{label.main}</span>
                     {locked && <Lock size={11} className="shrink-0" />}
-                    {!compact && sp.level && <span className="tnum shrink-0 text-[10px] opacity-70">ур. {sp.level}</span>}
+                    {sp.level && <span className="tnum shrink-0 text-[10px] opacity-70">ур. {sp.level}</span>}
                   </button>
                 </Tooltip>
               )
