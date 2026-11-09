@@ -75,7 +75,7 @@ Hex-коды в компонентах не пишем. Шрифт — Inter Var
 
 ## Компоненты
 
-`components/ui`: `Card` (заголовок, `hint` «?», действия), `Button` (`primary` — одна на экран), `Pill` (+ `toneOfShare`, `toneOfScore`), `ProgressBar`, `ScoreRing`, `InfoTip`/`Tooltip`, `PageHeader`, `StatTile`, `Tabs`, `Segmented`, `Modal`, `EmptyState`, `Legend`.
+`components/ui`: `Card` (заголовок, `hint` «?», действия), `Button` (`primary` — одна на экран), `Pill` (+ `toneOfShare`, `toneOfScore`), `ProgressBar`, `ScoreRing`, `InfoTip`/`Tooltip`, `PageHeader`, `StatTile`, `Tabs`, `Segmented`, `Modal`, `EmptyState`, `Legend`, `Pager` (страницы длинного списка: «показано X–Y из N», номера, размер 10/25/50/100; срез — `shared/paging.ts`).
 
 `components/game.tsx`: `Name` (русское + английское мелко), `VerdictChip`, `WishChip`, `GradeText`, `ImpactPill`, `ClassIcon`, `WeightDots`. `components/GuideSwitcher.tsx` — выбор гайда в шапке страниц билда.
 

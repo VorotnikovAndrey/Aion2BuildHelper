@@ -45,6 +45,8 @@ export interface Settings {
   hiddenCharacters: string[]
   /** Оформление: тема и масштаб. */
   ui: UiPrefs
+  /** Сколько записей ленты изменений показывать на странице (10, 25, 50, 100). */
+  historyPageSize?: number
 }
 
 export const DEFAULT_SETTINGS: Settings = {
