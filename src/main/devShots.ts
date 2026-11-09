@@ -67,6 +67,8 @@ export async function runShots(win: BrowserWindow): Promise<void> {
     win.webContents.reload()
     await loaded
   }
+  // Заставка при запуске закрывается любой клавишей — на снимках её быть не должно.
+  await win.webContents.executeJavaScript(`window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))`)
   await sleep(2000)
   const title = () => win.webContents.executeJavaScript(`document.querySelector('main h1')?.textContent ?? ''`) as Promise<string>
   for (const [name, route] of ROUTES) {

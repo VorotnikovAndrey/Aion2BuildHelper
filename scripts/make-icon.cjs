@@ -1,21 +1,15 @@
-// Рисует значок приложения (тот же щит, что в боковом меню) в build/icon.png и build/icon.ico.
+// Рисует значок приложения (build/icon.svg — крылья вокруг кристалла эфира) в build/icon.png и build/icon.ico.
 // Запуск: npm run icon  (через Electron — он умеет отрисовать SVG без лишних библиотек).
 
 const { app, BrowserWindow } = require('electron')
-const { mkdirSync, writeFileSync } = require('node:fs')
+const { mkdirSync, readFileSync, writeFileSync } = require('node:fs')
 const { join } = require('node:path')
 
 const SIZE = 256
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="${SIZE}" viewBox="0 0 64 64">
-  <defs>
-    <linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3cf7a"/><stop offset="1" stop-color="#b9822a"/></linearGradient>
-    <linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d2433"/><stop offset="1" stop-color="#0f131c"/></linearGradient>
-  </defs>
-  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#b)" stroke="url(#a)" stroke-width="2"/>
-  <path d="M32 12 L48 18 V31 C48 41 41 48 32 52 C23 48 16 41 16 31 V18 Z" fill="none" stroke="url(#a)" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M32 20 C37 25 41 26 44 26 C41 29 37 30 33 30 M32 20 C27 25 23 26 20 26 C23 29 27 30 31 30" fill="none" stroke="#55c7ec" stroke-width="2.2" stroke-linecap="round"/>
-  <path d="M32 30 V44" stroke="url(#a)" stroke-width="3" stroke-linecap="round"/>
-</svg>`
+// Источник — build/icon.svg (та же геометрия разобрана на части в BrandMark.tsx для заставки).
+const svg = readFileSync(join(__dirname, '..', 'build', 'icon.svg'), 'utf8')
+  .replace(/<!--[\s\S]*?-->/g, '')
+  .replace('<svg ', `<svg width="${SIZE}" height="${SIZE}" `)
 
 /** ICO с PNG внутри — Windows (Vista+) понимает такой формат. */
 function pngToIco(png) {

@@ -37,6 +37,27 @@
   --color-critical-soft: color-mix(in srgb, var(--color-critical) 14%, transparent);
   --color-info: #58a6ff;
 
+  /* Значок приложения (build/icon.svg, BrandMark) — фирменные цвета, от темы не зависят */
+  --color-brand-bg-1: #26355a;
+  --color-brand-bg-2: #151d33;
+  --color-brand-bg-3: #0b0f1b;
+  --color-brand-gold-1: #fbe3a0;
+  --color-brand-gold-2: #e2b25a;
+  --color-brand-gold-3: #a8701f;
+  --color-brand-gold-4: #d9a64a;
+  --color-brand-gold-5: #7f5214;
+  --color-brand-rim-1: #f6d585;
+  --color-brand-rim-2: #8a5f1e;
+  --color-brand-rim-3: #f0c66c;
+  --color-brand-crystal-1: #e9fbff;
+  --color-brand-crystal-2: #7fdcff;
+  --color-brand-crystal-3: #1f6fc4;
+  --color-brand-crystal-shade: #0b3f86;
+  --color-brand-halo: #55c7ec;
+  --color-brand-glow: #8ee6ff;
+  --color-brand-line: #101729;
+  --color-brand-spark: #fff4cf;
+
   /* Грейды предметов — цвета названий из игры */
   --color-grade-mythic: #ff4f6d;
   --color-grade-epic: #ff7a1f;

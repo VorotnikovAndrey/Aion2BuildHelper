@@ -1,0 +1,58 @@
+<!--
+  Значок Aion2 Build Helper: золотые крылья даэва вокруг кристалла эфира на тёмно-синей плитке.
+  Источник для build/icon.png и icon.ico (npm run icon). Та же геометрия — в src/renderer/src/components/BrandMark.tsx
+  (там значок разобран на части для заставки) — меняйте вместе.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <radialGradient id="bg" cx="0.5" cy="0.42" r="0.75">
+      <stop offset="0" stop-color="#26355a"/>
+      <stop offset="0.6" stop-color="#151d33"/>
+      <stop offset="1" stop-color="#0b0f1b"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbe3a0"/>
+      <stop offset="0.5" stop-color="#e2b25a"/>
+      <stop offset="1" stop-color="#a8701f"/>
+    </linearGradient>
+    <linearGradient id="goldDark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9a64a"/>
+      <stop offset="1" stop-color="#7f5214"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6d585"/>
+      <stop offset="0.5" stop-color="#8a5f1e"/>
+      <stop offset="1" stop-color="#f0c66c"/>
+    </linearGradient>
+    <linearGradient id="crystal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9fbff"/>
+      <stop offset="0.35" stop-color="#7fdcff"/>
+      <stop offset="1" stop-color="#1f6fc4"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.55" stop-color="#55c7ec" stop-opacity="0"/>
+      <stop offset="0.78" stop-color="#55c7ec" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#55c7ec" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#8ee6ff" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#8ee6ff" stop-opacity="0"/>
+    </radialGradient>
+    <g id="wing" stroke="#101729" stroke-width="2.4" stroke-linejoin="round">
+      <path d="M106,118 C128,98 146,76 156,50 C164,38 172,32 178,30 C176,54 164,80 144,100 C132,110 120,117 110,122 Z" fill="url(#gold)"/>
+      <path d="M108,124 C132,112 154,100 180,90 C172,108 156,118 136,126 C126,129 118,130 110,130 Z" fill="url(#gold)"/>
+      <path d="M108,132 C130,130 154,128 178,132 C162,144 140,148 116,142 Z" fill="url(#goldDark)"/>
+      <path d="M106,140 C124,146 140,154 154,166 C134,168 120,160 104,150 Z" fill="url(#goldDark)"/>
+    </g>
+  </defs>
+  <rect x="6" y="6" width="188" height="188" rx="46" fill="url(#bg)"/>
+  <rect x="6" y="6" width="188" height="188" rx="46" fill="none" stroke="url(#rim)" stroke-width="5"/>
+  <circle cx="100" cy="100" r="70" fill="url(#halo)"/>
+  <circle cx="100" cy="98" r="40" fill="url(#glow)"/>
+  <use href="#wing"/>
+  <use href="#wing" transform="translate(200 0) scale(-1 1)"/>
+  <path d="M100,36 L120,98 L100,166 L80,98 Z" fill="url(#crystal)" stroke="#101729" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M100,38 L118.5,98 L100,98 Z" fill="#ffffff" fill-opacity="0.45"/>
+  <path d="M100,98 L118.5,98 L100,164 Z" fill="#0b3f86" fill-opacity="0.35"/>
+  <path d="M142,44 c1.5,7 3,8.5 10,10 c-7,1.5 -8.5,3 -10,10 c-1.5,-7 -3,-8.5 -10,-10 c7,-1.5 8.5,-3 10,-10 z" fill="#fff4cf"/>
+</svg>

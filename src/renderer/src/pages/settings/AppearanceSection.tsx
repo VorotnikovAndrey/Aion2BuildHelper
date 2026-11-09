@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { motion } from 'motion/react'
-import { Check, Minus, Plus, RotateCcw, Sparkles } from 'lucide-react'
+import { Check, Minus, Play, Plus, RotateCcw, Sparkles } from 'lucide-react'
 import {
   ACCENT_SWATCHES,
   MOTION_LEVELS,
@@ -16,6 +16,8 @@ import {
   type ThemeBase,
   type ThemePreset
 } from '@shared/theme'
+import { BrandMark } from '@/components/BrandMark'
+import { replaySplash } from '@/components/Splash'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Pill } from '@/components/ui/Pill'
@@ -183,6 +185,21 @@ export function AppearanceSection() {
               </button>
             )
           })}
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-line pt-4">
+          <BrandMark size={34} />
+          <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5">
+            <input type="checkbox" checked={ui.splash} onChange={(e) => void updateUi({ splash: e.target.checked })} className="accent-[var(--color-accent)]" />
+            <span>
+              <span className="block text-[13px] text-ink">Заставка при запуске</span>
+              <span className="block text-[11px] text-ink-3">
+                Значок раскрывает крылья, ~2,5 с; клик или любая клавиша — пропустить. При «Выкл.» анимаций заставки нет, при «Спокойных» — без полётов.
+              </span>
+            </span>
+          </label>
+          <Button size="sm" icon={<Play size={13} />} onClick={replaySplash}>
+            Показать сейчас
+          </Button>
         </div>
       </Card>
     </div>

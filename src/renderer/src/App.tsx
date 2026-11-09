@@ -4,6 +4,7 @@ import { Sidebar } from './layout/Sidebar'
 import { ZoomToast } from './components/ZoomToast'
 import { AetherBackdrop } from './components/fx'
 import { Celebrations } from './components/Celebrations'
+import { Splash } from './components/Splash'
 import { NoData } from './pages/NoData'
 import { OverviewPage } from './pages/OverviewPage'
 import { SkillsPage } from './pages/SkillsPage'
@@ -74,6 +75,7 @@ function Shell() {
       </div>
       <ZoomToast />
       <Celebrations />
+      <Splash />
     </div>
   )
 }

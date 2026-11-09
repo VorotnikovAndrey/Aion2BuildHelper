@@ -22,6 +22,7 @@ import {
   type LucideIcon
 } from 'lucide-react'
 import { classInfo } from '@shared/gamedata/classes'
+import { BrandMark } from '@/components/BrandMark'
 import { CountUp } from '@/components/fx'
 import { ClassIcon } from '@/components/game'
 import { Tooltip } from '@/components/ui/InfoTip'
@@ -301,32 +302,9 @@ function CharacterSwitcher() {
   )
 }
 
-/** Значок приложения: золотой щит с крылом — нарисован в коде, чтобы не тащить картинки. */
+/** Значок приложения — тот же, что у установщика и на заставке (BrandMark). */
 export function Logo({ size = 34 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden>
-      <defs>
-        <linearGradient id="lg-a" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#f3cf7a" />
-          <stop offset="1" stopColor="#b9822a" />
-        </linearGradient>
-        <linearGradient id="lg-b" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#1d2433" />
-          <stop offset="1" stopColor="#0f131c" />
-        </linearGradient>
-      </defs>
-      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#lg-b)" stroke="url(#lg-a)" strokeWidth="2" />
-      <path d="M32 12 L48 18 V31 C48 41 41 48 32 52 C23 48 16 41 16 31 V18 Z" fill="none" stroke="url(#lg-a)" strokeWidth="3" strokeLinejoin="round" />
-      <path
-        d="M32 20 C37 25 41 26 44 26 C41 29 37 30 33 30 M32 20 C27 25 23 26 20 26 C23 29 27 30 31 30"
-        fill="none"
-        stroke="#55c7ec"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      />
-      <path d="M32 30 V44" stroke="url(#lg-a)" strokeWidth="3" strokeLinecap="round" />
-    </svg>
-  )
+  return <BrandMark size={size} />
 }
 
 /** Новая версия скачивается или готова — коротко внизу меню, нажатие открывает «Настройки». */

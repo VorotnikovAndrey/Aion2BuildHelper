@@ -1,0 +1,357 @@
+/*
+ * Заставка при запуске (Splash.tsx) и анимация частей значка (BrandMark.tsx, классы a2m-*).
+ * Части значка анимируются только внутри .a2-splash — в боковом меню значок неподвижен.
+ * Базовые стили — конечное состояние: при «Спокойных» анимациях всё просто видно и плавно уходит.
+ *
+ * Хронология: 0–0,7 с плитка прилетает → 0,25 с падает кристалл → 0,5–1,1 с раскрываются крылья →
+ * 0,9 с кольцо эфира → 1,15 с блик по кристаллу и звезда → 1–1,6 с название → 1,8 с взмах → 2,3 с уход.
+ */
+
+.a2-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 50% 42%, var(--color-surface) 0%, var(--color-bg) 60%);
+  cursor: pointer;
+  animation: a2-splash-out 0.45s cubic-bezier(0.4, 0, 0.2, 1) 2.3s both;
+}
+
+/* Клик или клавиша — заставка сразу уходит. Своя анимация (а не новые тайминги у a2-splash-out):
+   иначе браузер может не прислать animationend и заставка останется висеть. */
+.a2-splash.is-skipping {
+  animation: a2-splash-skip 0.25s ease-out both;
+}
+
+.a2-splash__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: a2-stage-out 0.45s cubic-bezier(0.4, 0, 0.2, 1) 2.3s both;
+}
+
+.a2-splash__emblem {
+  position: relative;
+  width: 148px;
+  height: 148px;
+}
+
+/* Сияние эфира за значком — разгорается и дышит. */
+.a2-splash__aura {
+  position: absolute;
+  inset: -80px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-brand-halo) 32%, transparent), transparent);
+  animation:
+    a2-aura-in 0.8s ease-out 0.2s both,
+    a2-aura-breathe 1.6s ease-in-out 1s infinite alternate;
+}
+
+.a2-splash__mark {
+  position: relative;
+  display: block;
+  overflow: visible;
+  animation: a2-mark-in 0.8s cubic-bezier(0.3, 0.9, 0.3, 1) both;
+}
+
+/* Части значка: трансформации в координатах значка (200×200). */
+.a2-splash .a2m-tile,
+.a2-splash .a2m-crystal,
+.a2-splash .a2m-spark,
+.a2-splash .a2m-ring,
+.a2-splash .a2m-glint,
+.a2-splash .a2m-feather,
+.a2-splash .a2m-wing {
+  transform-box: view-box;
+}
+
+.a2-splash .a2m-tile {
+  transform-origin: 100px 100px;
+  animation: a2-tile-flash 0.6s ease-out 0.9s both;
+}
+
+.a2-splash .a2m-crystal {
+  transform-origin: 100px 166px;
+  animation: a2-crystal-drop 0.6s cubic-bezier(0.25, 1.4, 0.5, 1) 0.25s both;
+}
+
+/* Перо поворачивается вокруг основания крыла — у кристалла. */
+.a2-splash .a2m-feather {
+  transform-origin: 106px 124px;
+  animation: a2-feather-open 0.6s cubic-bezier(0.3, 1.5, 0.5, 1) var(--d) both;
+}
+
+/* Взмах крыльями, когда всё собралось. */
+.a2-splash .a2m-wing {
+  transform-origin: 104px 124px;
+  animation: a2-wing-flap 0.55s ease-in-out 1.75s both;
+}
+
+.a2-splash .a2m-halo,
+.a2-splash .a2m-glow {
+  animation: a2-fade-in 0.7s ease-out 0.35s both;
+}
+
+.a2-splash .a2m-ring {
+  transform-origin: 100px 100px;
+  animation: a2-ring 0.8s cubic-bezier(0.2, 0.7, 0.3, 1) 0.9s both;
+}
+
+.a2-splash .a2m-glint {
+  animation: a2-glint 0.65s ease-in-out 1.15s both;
+}
+
+.a2-splash .a2m-spark {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation:
+    a2-spark-pop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) 1.2s both,
+    a2-spark-twinkle 0.9s ease-in-out 1.7s infinite alternate;
+}
+
+.a2-splash__word {
+  margin-top: 28px;
+  display: flex;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+.a2-splash__word span {
+  display: inline-block;
+  animation: a2-letter 0.5s cubic-bezier(0.2, 0.8, 0.3, 1.2) var(--d) both;
+}
+
+.a2-splash__word .a2-gold {
+  color: var(--color-brand-gold-2);
+}
+
+.a2-splash__word .a2-space {
+  width: 0.28em;
+}
+
+.a2-splash__tagline {
+  margin-top: 6px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+  animation: a2-fade-up 0.5s ease-out 1.5s both;
+}
+
+@keyframes a2-splash-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes a2-splash-skip {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes a2-stage-out {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes a2-mark-in {
+  0% {
+    transform: translateY(26px) scale(0.55) rotate(-10deg);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(-4px) scale(1.06) rotate(2deg);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(1px) scale(0.98) rotate(-1deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes a2-aura-in {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes a2-aura-breathe {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0.6;
+    transform: scale(0.92);
+  }
+}
+
+@keyframes a2-tile-flash {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  35% {
+    transform: scale(0.97);
+    filter: brightness(1.35);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes a2-crystal-drop {
+  from {
+    transform: translateY(-46px) scale(0.6);
+    opacity: 0;
+    filter: blur(3px);
+  }
+  to {
+    transform: none;
+    opacity: 1;
+    filter: none;
+  }
+}
+
+@keyframes a2-feather-open {
+  from {
+    transform: rotate(-62deg) scale(0.35);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes a2-wing-flap {
+  0%,
+  100% {
+    transform: none;
+  }
+  45% {
+    transform: rotate(-7deg) scale(1.03);
+  }
+}
+
+@keyframes a2-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes a2-ring {
+  /* Начинаем с прозрачного: с fill-mode both первый кадр виден и до старта. */
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes a2-glint {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(70px);
+    opacity: 0;
+  }
+}
+
+@keyframes a2-spark-pop {
+  from {
+    transform: scale(0) rotate(-120deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes a2-spark-twinkle {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes a2-letter {
+  from {
+    transform: translateY(16px) scale(0.85);
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    transform: none;
+    opacity: 1;
+    filter: none;
+  }
+}
+
+@keyframes a2-fade-up {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* «Спокойные» анимации и системное «уменьшить движение»: без полётов — просто появилось и растворилось. */
+[data-motion='calm'] .a2-splash *,
+[data-motion='calm'] .a2-splash *::before {
+  animation: none !important;
+}
+[data-motion='calm'] .a2-splash {
+  animation: a2-splash-out 0.5s ease-out 1.2s both;
+}
+[data-motion='calm'] .a2-splash.is-skipping {
+  animation: a2-splash-skip 0.25s ease-out both;
+}

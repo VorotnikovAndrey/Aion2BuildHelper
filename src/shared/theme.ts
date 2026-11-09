@@ -84,9 +84,11 @@ export interface UiPrefs {
   /** Масштаб интерфейса, 1 = 100%. */
   zoom: number
   motion: MotionLevel
+  /** Заставка с анимацией значка при запуске. */
+  splash: boolean
 }
 
-export const DEFAULT_UI: UiPrefs = { themeId: 'gold', base: 'abyss', accent: '#d9a441', zoom: 1, motion: 'full' }
+export const DEFAULT_UI: UiPrefs = { themeId: 'gold', base: 'abyss', accent: '#d9a441', zoom: 1, motion: 'full', splash: true }
 
 export const ZOOM_STEPS = [0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2]
 export const ZOOM_MIN = ZOOM_STEPS[0]
@@ -115,7 +117,8 @@ export function normalizeUi(raw: unknown): UiPrefs {
     base,
     accent,
     zoom: clampZoom(typeof r.zoom === 'number' ? r.zoom : 1),
-    motion: MOTION_LEVELS.some((m) => m.id === r.motion) ? (r.motion as MotionLevel) : DEFAULT_UI.motion
+    motion: MOTION_LEVELS.some((m) => m.id === r.motion) ? (r.motion as MotionLevel) : DEFAULT_UI.motion,
+    splash: r.splash !== false
   }
 }
 

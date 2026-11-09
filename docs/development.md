@@ -16,7 +16,7 @@
 | `npm run build` | Сборка в `out/` |
 | `npm run gamedata` | Обновить справочники и данные топ-игроков (см. [data-sources.md](data-sources.md)); разбор страниц — `scripts/gamedata/parsers.mjs` |
 | `npm run art` | Скачать арт игры по списку `src/shared/gamedata/art.json` в `src/renderer/public/art` |
-| `npm run icon` | Перерисовать `build/icon.png` и `build/icon.ico` |
+| `npm run icon` | Собрать `build/icon.png` и `build/icon.ico` из `build/icon.svg` |
 | `npm run shortcut` | Ярлык на рабочем столе и в «Пуске» (запускает `Aion2BuildHelper.vbs`: сборка + запуск без консоли) |
 | `npm run dist` | Собрать установщик `dist\Aion2BuildHelper-Setup-<версия>.exe` (ничего не выкладывает) |
 | `npm run release` | Собрать и выпустить новую версию на GitHub — установленные копии обновятся сами (см. ниже) |

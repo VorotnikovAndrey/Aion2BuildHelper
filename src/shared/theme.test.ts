@@ -47,4 +47,10 @@ describe('анимации', () => {
     expect(normalizeUi({ motion: 'turbo' }).motion).toBe('full')
     expect(normalizeUi({ themeId: 'gold', base: 'abyss', accent: '#d9a441', zoom: 1 }).motion).toBe('full')
   })
+
+  it('заставка при запуске включена, пока её явно не выключили (старые настройки без поля — тоже)', () => {
+    expect(DEFAULT_UI.splash).toBe(true)
+    expect(normalizeUi({ themeId: 'gold' }).splash).toBe(true)
+    expect(normalizeUi({ splash: false }).splash).toBe(false)
+  })
 })
