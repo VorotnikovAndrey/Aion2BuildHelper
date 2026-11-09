@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { FolderOpen, PartyPopper, RefreshCw, RotateCcw, Settings } from 'lucide-react'
-import { classSkills } from '@shared/gamedata/skills'
-import { skillDef } from '@shared/gamedata/skills'
 import type { ProgressEvent } from '@shared/analysis/progress'
-import type { NameMode } from '@shared/names'
 import { CELEBRATE_EVENT, showNotification } from '@/components/Celebrations'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -13,10 +10,11 @@ import { Pill } from '@/components/ui/Pill'
 import { ago, cn, compact } from '@/lib/format'
 import { api, isWebMode, useApp, useCharacter } from '@/lib/store'
 import { AppearanceSection } from './settings/AppearanceSection'
+import { NamesSection } from './settings/NamesSection'
 import { GamedataCheckCard } from './settings/GamedataCheckCard'
 import { UpdatesCard } from './settings/UpdatesCard'
 
-type Tab = 'general' | 'appearance'
+type Tab = 'general' | 'names' | 'appearance'
 
 export function SettingsPage() {
   const source = useApp((s) => s.source)
@@ -32,7 +30,8 @@ export function SettingsPage() {
 
   const roster = source?.data?.characters ?? []
   const [params, setParams] = useSearchParams()
-  const tab: Tab = params.get('tab') === 'appearance' ? 'appearance' : 'general'
+  const raw = params.get('tab')
+  const tab: Tab = raw === 'appearance' || raw === 'names' ? raw : 'general'
 
   return (
     <>
@@ -42,13 +41,16 @@ export function SettingsPage() {
           value={tab}
           onChange={(t) => setParams(t === 'general' ? {} : { tab: t }, { replace: true })}
           items={[
-            { id: 'general', label: 'Данные и названия' },
+            { id: 'general', label: 'Данные' },
+            { id: 'names', label: 'Названия' },
             { id: 'appearance', label: 'Оформление' }
           ]}
         />
       </div>
       {tab === 'appearance' ? (
         <AppearanceSection />
+      ) : tab === 'names' ? (
+        <NamesSection />
       ) : (
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
           <Card
@@ -87,23 +89,6 @@ export function SettingsPage() {
                 </>
               )}
             </div>
-          </Card>
-
-          <Card title="Названия" hint="Английские названия — официальные из клиента игры. Русские — перевод приложения; любое можно заменить своим ниже.">
-            <Segmented<NameMode>
-              value={settings.nameMode}
-              onChange={(nameMode) => void update({ nameMode })}
-              items={[
-                { id: 'both', label: 'Русские + английские' },
-                { id: 'ru', label: 'Только русские' },
-                { id: 'en', label: 'Только английские' }
-              ]}
-            />
-            <p className="mt-3 text-xs leading-relaxed text-ink-3">
-              Пример: {settings.nameMode === 'en' ? 'Judgment' : 'Суд'}
-              {settings.nameMode === 'both' && <span className="ml-1 text-[11px]">(Judgment)</span>} — английский вариант удобен, когда сверяетесь с
-              англоязычным гайдом.
-            </p>
           </Card>
 
           <Card
@@ -145,16 +130,6 @@ export function SettingsPage() {
           <UpdatesCard />
 
           <GamedataCheckCard cls={char?.cls ?? null} />
-
-          {char?.cls && (
-            <Card
-              title="Свои названия умений"
-              className="xl:col-span-2"
-              hint="Если в вашем клиенте умение называется иначе — впишите своё название. Пусто — название приложения."
-            >
-              <SkillRenames cls={char.cls} />
-            </Card>
-          )}
 
           <Card title="Персонажи" hint="Скрытые персонажи не показываются в переключателе (например, твинки первого уровня).">
             <div className="-mx-2">
@@ -198,37 +173,5 @@ export function SettingsPage() {
         </div>
       )}
     </>
-  )
-}
-
-function SkillRenames({ cls }: { cls: NonNullable<ReturnType<typeof useCharacter>>['cls'] }) {
-  const settings = useApp((s) => s.settings)
-  const update = useApp((s) => s.updateSettings)
-  const skills = classSkills(cls!)
-  const set = (id: number, value: string) => {
-    const next = { ...settings.names.skills }
-    if (value.trim()) next[id] = value.trim()
-    else delete next[id]
-    void update({ names: { ...settings.names, skills: next } })
-  }
-  return (
-    <div className="grid grid-cols-1 gap-x-6 gap-y-1.5 md:grid-cols-2 2xl:grid-cols-3">
-      {skills.map((s) => {
-        const def = skillDef(s.id)!
-        return (
-          <label key={s.id} className="flex items-center gap-2">
-            <span className="w-40 shrink-0 truncate text-xs text-ink-3" title={def.en}>
-              {def.en}
-            </span>
-            <input
-              defaultValue={settings.names.skills?.[s.id] ?? ''}
-              placeholder={def.ru ?? def.en}
-              onBlur={(e) => set(s.id, e.target.value)}
-              className="h-8 min-w-0 flex-1 rounded-md border border-line bg-surface-2 px-2 text-[13px] outline-none placeholder:text-ink-3 focus:border-accent"
-            />
-          </label>
-        )
-      })}
-    </div>
   )
 }
