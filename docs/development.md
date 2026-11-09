@@ -7,7 +7,7 @@
 | Команда | Что делает |
 |---|---|
 | `npm run dev` | Приложение с горячей перезагрузкой (то же — `start.cmd`) |
-| `npm run dev:web` | Интерфейс в браузере на http://localhost:5199 без Electron. Данные — из `samples/private/characters.json`, если есть, иначе из файла оверлея (`A2BH_LIVE=1` — всегда из оверлея). Настройки и гайды — в localStorage браузера |
+| `npm run dev:web` | Интерфейс в браузере на http://localhost:5199 без Electron. Данные — из `samples/private/characters.json`, если есть, иначе из файла оверлея (`A2BH_LIVE=1` — всегда из оверлея, `A2BH_SAMPLE_FILE=<путь>` — из любого файла в том же формате, например демо-персонажей других классов). Настройки и гайды — в localStorage браузера |
 | `npm test` | Тесты логики (vitest) |
 | `npm run typecheck` | Проверка типов main + renderer |
 | `npm run shots` | Сборка и автоскриншоты всех экранов в `out/shots` (временная папка настроек, реальные данные оверлея). В другой теме и масштабе: `A2BH_SHOTS_UI='{"base":"asmodae","accent":"#e0525e","zoom":1.25}' node scripts/shots.mjs` |
@@ -56,5 +56,5 @@
 ## Новый класс
 
 1. `npm run gamedata -- --classes <класс>` — специализации, доски, иконки умений, данные топ-игроков (сейчас собраны все 8 классов).
-2. Русские названия умений — `src/shared/gamedata/skills-ru.json` (из базы Questlog на русском, все классы); поправки — `RU_OVERRIDES` в `skills.ts`; специализации — `SPEC_RU` (пока только страж).
-3. Гайд — в редакторе или JSON (см. [guides.md](guides.md)); встроенный — в `src/shared/guide/builtin/` и в `BUILTIN_GUIDES`.
+2. Русские названия умений — `src/shared/gamedata/skills-ru.json` (из базы Questlog на русском, все классы); поправки — `RU_OVERRIDES` в `skills.ts`; специализации — `specs-ru.json` (все классы, из русской базы), у стража — `SPEC_RU` в `skills.ts`.
+3. Гайд — в редакторе или JSON (см. [guides.md](guides.md)); встроенный — в `src/shared/guide/builtin/` и в `BUILTIN_GUIDES`. Тест `builtin/allClasses.test.ts` проверяет у каждого класса гайд (все ID — из справочников и своего класса), русские названия умений и специализаций, разбор персонажа и сравнение с топом.

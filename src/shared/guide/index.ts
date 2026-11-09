@@ -2,7 +2,13 @@
 
 import { classInfo } from '../gamedata/classes'
 import { toClassKey } from '../questlog/parse'
+import { assassinPveConsensus } from './builtin/assassinPveConsensus'
+import { chanterPveConsensus } from './builtin/chanterPveConsensus'
 import { clericPveConsensus } from './builtin/clericPveConsensus'
+import { gladiatorPveConsensus } from './builtin/gladiatorPveConsensus'
+import { rangerPveConsensus } from './builtin/rangerPveConsensus'
+import { sorcererPveConsensus } from './builtin/sorcererPveConsensus'
+import { spiritmasterPveConsensus } from './builtin/spiritmasterPveConsensus'
 import { templarPveConsensus } from './builtin/templarPveConsensus'
 import { templarPveMobalytics } from './builtin/templarPveMobalytics'
 import {
@@ -24,7 +30,17 @@ import {
 export * from './types'
 
 /** Первый подходящий по классу — гайд по умолчанию. Сводный идёт первым: приложение не следует одному гайду вслепую. */
-export const BUILTIN_GUIDES: Guide[] = [templarPveConsensus, templarPveMobalytics, clericPveConsensus]
+export const BUILTIN_GUIDES: Guide[] = [
+  templarPveConsensus,
+  templarPveMobalytics,
+  clericPveConsensus,
+  chanterPveConsensus,
+  assassinPveConsensus,
+  gladiatorPveConsensus,
+  rangerPveConsensus,
+  sorcererPveConsensus,
+  spiritmasterPveConsensus
+]
 
 type Obj = Record<string, unknown>
 const isObj = (v: unknown): v is Obj => typeof v === 'object' && v !== null && !Array.isArray(v)

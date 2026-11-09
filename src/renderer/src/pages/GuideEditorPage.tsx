@@ -238,7 +238,7 @@ function SkillsSection({ g, set }: SectionProps) {
                           <button
                             key={sp.n}
                             onClick={() => toggleSpec(s.id, sp.n, field)}
-                            title={`${namer.spec(s.id, sp.n).main}${sp.level ? ` (с ур. ${sp.level})` : ''}`}
+                            title={`${namer.spec(s.id, sp.n).main}${sp.level ? ` (с ур. ${sp.level})` : ''}${sp.ruByAssistant ? ' · перевод помощника' : ''}`}
                             className={cn(
                               'flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px]',
                               pos >= 0 ? 'border-accent/60 bg-accent-soft text-accent-2' : 'border-line bg-surface-3 text-ink-3 hover:text-ink-2'

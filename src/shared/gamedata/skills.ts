@@ -1,12 +1,14 @@
 // Умения: ID → название, класс, тип (активное / пассивное / стигма), уровень открытия.
 // Английские названия — официальные из клиента (через metabot.gg, см. docs/data-sources.md).
 // Русские — наш перевод; часть совпадает с тем, как их называют русскоязычные игроки.
-// Специализации (варианты 1–5 у активных умений и стигм) — тоже здесь.
+// Специализации (варианты 1–5 у активных умений и стигм) — тоже здесь: русские тексты всех классов — из русского клиента
+// (specs-ru.json), у стража — сверены по видео окна умений.
 
 import type { ClassKey } from '../types'
 import skillsJson from './generated/skills.json'
 import specsJson from './generated/specs.json'
 import skillsRuJson from './skills-ru.json'
+import specsRuJson from './specs-ru.json'
 
 export type SkillType = 'active' | 'passive' | 'stigma'
 
@@ -30,6 +32,8 @@ export interface SpecDef {
   level: number | null
   en: string
   ru?: string
+  /** Русский текст перевёл помощник (в русском клиенте не нашли). */
+  ruByAssistant?: boolean
 }
 
 /** Русские названия. Общие умения разных классов (Снятие шока, Попадание шоком…) переведены одинаково. */
@@ -76,7 +80,7 @@ export function findSkillByName(name: string, cls?: ClassKey | null): SkillDef |
 
 // ───────────────────────── Специализации ─────────────────────────
 
-/** Переводы специализаций стража (по ID умения, затем номер варианта). */
+/** Переводы специализаций стража (по ID умения, затем номер варианта) — главнее specs-ru.json. */
 const SPEC_RU: Record<number, Record<number, string>> = {
   // Формулировки — как в русском клиенте (сверено по видео окна умений); обрезанные в игре строки дописаны.
   12010000: {
@@ -258,9 +262,22 @@ const SPEC_RU: Record<number, Record<number, string>> = {
 
 const SPECS = specsJson as Record<string, Omit<SpecDef, 'ru'>[]>
 
+/**
+ * Остальные классы: тексты из русского клиента (база умений Questlog на русском).
+ * Пятого варианта стигм в базе нет — его перевёл помощник (stigma5), в справке это отмечено.
+ */
+const SPECS_RU = specsRuJson as { specs: Record<string, Record<string, string>>; stigma5: Record<string, string> }
+
+function specRu(skillId: number, n: number): Pick<SpecDef, 'ru' | 'ruByAssistant'> {
+  const ru = SPEC_RU[skillId]?.[n] ?? SPECS_RU.specs[String(skillId)]?.[String(n)]
+  if (ru) return { ru }
+  const guess = n === 5 ? SPECS_RU.stigma5[String(skillId)] : undefined
+  return guess ? { ru: guess, ruByAssistant: true } : {}
+}
+
 /** Специализации умения (пусто, если у умения их нет или они не загружены для этого класса). */
 export function skillSpecs(skillId: number): SpecDef[] {
-  return (SPECS[String(skillId)] ?? []).map((s) => ({ ...s, ru: SPEC_RU[skillId]?.[s.n] }))
+  return (SPECS[String(skillId)] ?? []).map((s) => ({ ...s, ...specRu(skillId, s.n) }))
 }
 
 /**

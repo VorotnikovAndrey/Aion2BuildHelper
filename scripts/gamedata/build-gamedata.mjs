@@ -17,7 +17,7 @@
 // Иконки умений и специализаций (родной арт игры, 256×256) кладутся в src/renderer/public/icons —
 // они нужны интерфейсу без интернета. Уже скачанные не перекачиваются.
 
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { homedir } from 'node:os'
@@ -89,9 +89,27 @@ async function buildStats() {
 async function buildSkills() {
   const skills = parseSkills(await page('/skills'))
   if (skills.length < 250) throw new Error(`Слишком мало умений (${skills.length}) — разметка страницы поменялась?`)
+  addSharedSkills(skills)
   await writeJson('skills.json', skills)
   console.log('✓ умения:', skills.length)
   return skills
+}
+
+/**
+ * Общие умения классов (Инстинкт выживания…) идут под одним номером: 11790000, 12790000… На metabot у некоторых классов
+ * такого умения нет в списке, хотя в игре оно есть (в русской базе Questlog — есть). Добавляем по образцу другого класса
+ * с тем же номером и тем же русским названием.
+ */
+function addSharedSkills(skills) {
+  const ru = JSON.parse(readFileSync(join(ROOT, 'src/shared/gamedata/skills-ru.json'), 'utf8')).names
+  const have = new Set(skills.map((s) => String(s.id)))
+  for (const id of Object.keys(ru).filter((id) => !have.has(id))) {
+    const twin = skills.find((s) => s.id % 1000000 === Number(id) % 1000000 && ru[String(s.id)] === ru[id])
+    const cls = CLASSES[Math.floor(Number(id) / 1000000) - 11]
+    if (!twin || !cls) continue
+    skills.push({ ...twin, id: Number(id), slug: `${twin.slug.replace(new RegExp(`-(${CLASSES.join('|')})$`), '')}-${cls}`, cls })
+    console.log(`  + ${id} ${twin.en} (${cls}) — по образцу ${twin.id}`)
+  }
 }
 
 // ───────────────────────── Специализации ─────────────────────────

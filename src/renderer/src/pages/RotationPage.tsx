@@ -55,7 +55,9 @@ export function RotationPage() {
     )
   }
 
-  const steps = rot ? rot.macros.filter((m) => m.active) : []
+  // Ячейка со своей клавишей — не шаг связки: её жмут отдельно, номер шага ей не нужен.
+  const steps = rot ? rot.macros.filter((m) => m.active && !m.macro.key) : []
+  const keyed = rot ? rot.macros.filter((m) => m.active && m.macro.key) : []
   const later = rot ? rot.macros.filter((m) => !m.active) : []
 
   return (
@@ -63,7 +65,7 @@ export function RotationPage() {
       {header}
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-5">
-          {steps.length > 0 && combat && (
+          {steps.length + keyed.length > 0 && combat && (
             <Card
               title="Связка"
               hint="В игре: окно «Умения» → «Связки». Связка работает, пока её клавиша зажата: идёт по шагам сверху вниз и по кругу, пропуская то, что на откате. Каждый шаг — ячейка панели: до 4 умений столбиком, игра применяет первое готовое, нижний ряд 0 — главный. Красный значок — умение не изучено, жёлтый — стигма не надета."
@@ -81,6 +83,9 @@ export function RotationPage() {
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 {steps.map((m, i) => (
                   <CellCard key={m.macro.id} m={m} step={i + 1} namer={namer} />
+                ))}
+                {keyed.map((m) => (
+                  <CellCard key={m.macro.id} m={m} namer={namer} />
                 ))}
                 {later.map((m) => (
                   <CellCard key={m.macro.id} m={m} namer={namer} />
@@ -213,7 +218,11 @@ function CellCard({ m, step, namer }: { m: MacroReport; step?: number; namer: Na
           ) : (
             <Pill tip={`Эта ячейка — для другого уровня умения: ${whenText}. Сейчас — ур. ${m.whenLevel ?? 0}.`}>{whenText}</Pill>
           ))}
-        {m.macro.key && <Key className="ml-auto">{m.macro.key}</Key>}
+        {m.macro.key && (
+          <Pill className="ml-auto" tip="Своя клавиша: эту ячейку жмут отдельно, она не входит в связку.">
+            не в связке · <Key className="h-4 min-w-4 text-[10px]">{m.macro.key}</Key>
+          </Pill>
+        )}
       </div>
       <div className={cn('mt-3 flex flex-col-reverse gap-1', !m.active && 'opacity-55')}>
         {m.skills.map((s, i) => (

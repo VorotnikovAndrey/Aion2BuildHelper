@@ -14,6 +14,8 @@ const { version } = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8
 const appData = process.env.APPDATA ?? join(homedir(), 'AppData', 'Roaming')
 
 function questlogFile(): string {
+  // A2BH_SAMPLE_FILE — любой другой файл в формате оверлея (например, демо-персонажи других классов).
+  if (process.env.A2BH_SAMPLE_FILE) return resolve(process.env.A2BH_SAMPLE_FILE)
   const sample = resolve(root, 'samples/private/characters.json')
   if (process.env.A2BH_SAMPLE !== '0' && existsSync(sample) && process.env.A2BH_LIVE !== '1') return sample
   return join(appData, 'Questlog', 'aion-2', 'characters.json')
