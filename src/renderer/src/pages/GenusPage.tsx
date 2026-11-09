@@ -3,6 +3,7 @@ import type { GenusReport, GenusSlotReport } from '@shared/analysis/genus'
 import { GENUS_GRADE_COLOR, GENUS_GRADES, GENUS_LEVEL_GOAL, GENUS_MAX } from '@shared/gamedata/genus'
 import { formatStatValue } from '@shared/gamedata/stats'
 import { gradeColorVar, StatusBadge } from '@/components/art'
+import { DataFreshness } from '@/components/DataFreshness'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
 import { Card } from '@/components/ui/Card'
 import { Tooltip } from '@/components/ui/InfoTip'
@@ -43,6 +44,8 @@ export function GenusPage() {
         subtitle="Пять родов питомцев, в каждом — ячейки со случайным статом. Уровень рода растёт с коллекцией питомцев этого рода, с ним открываются ячейки и растёт их грейд. У каждой ячейки — итог по гайду и, если стоит перебросить, на что."
         actions={<GuideSwitcher char={char} />}
       />
+
+      <DataFreshness char={char} section="genus" className="mb-5" />
 
       {g.genuses.length === 0 ? (
         <EmptyState title="Оверлей ещё не видел Знание о видах">Откройте окно Знания о видах в игре или смените зону — оверлей обновит данные.</EmptyState>

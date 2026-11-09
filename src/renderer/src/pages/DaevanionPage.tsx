@@ -4,6 +4,7 @@ import type { BoardReport, GoalReport } from '@shared/analysis/daevanion'
 import { BOARD_CURRENCY, neighbors, type DaevanionNode } from '@shared/gamedata/daevanion'
 import { skillIconSrc } from '@shared/gamedata/art'
 import { formatStatValue } from '@shared/gamedata/stats'
+import { DataFreshness } from '@/components/DataFreshness'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
 import { StaleBoardsNotice } from '@/components/StaleBoardsNotice'
 import { Card } from '@/components/ui/Card'
@@ -47,6 +48,7 @@ export function DaevanionPage() {
       />
 
       <StaleBoardsNotice list={ctx.report.boardsStale} namer={ctx.namer} className="mb-5" />
+      <DataFreshness char={char} section="daevanion" className="mb-5" />
 
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-6">
         {d.boards.map((b) => {
