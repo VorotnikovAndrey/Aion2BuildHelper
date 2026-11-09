@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { BookOpen, Check, Copy, Download, ExternalLink, Pencil, Plus, Trash2, Upload } from 'lucide-react'
-import { classInfo } from '@shared/gamedata/classes'
+import { BookOpen, Check, ChevronDown, Copy, Download, ExternalLink, Flag, Heart, Pencil, Plus, Trash2, Upload } from 'lucide-react'
+import { CLASSES, classInfo } from '@shared/gamedata/classes'
+import { applyStage, pickStage, sortedStages } from '@shared/guide/stages'
 import { titleDef } from '@shared/gamedata/titles'
-import { emptyGuide, MODE_LABEL, ROLE_LABEL, type Guide, type GuideSource } from '@shared/guide/types'
+import { emptyGuide, MODE_LABEL, ROLE_LABEL, type Guide, type GuideSource, type GuideStage } from '@shared/guide/types'
+import type { ClassKey } from '@shared/types'
 import { TitleEmblem } from '@/components/art'
 import { titleName } from '@/components/collections'
 import { ClassIcon } from '@/components/game'
@@ -15,14 +17,23 @@ import { Tooltip } from '@/components/ui/InfoTip'
 import { Pill } from '@/components/ui/Pill'
 import { cn } from '@/lib/format'
 import { useNamer } from '@/lib/report'
-import { api, useActiveGuide, useApp, useCharacter, useGuides } from '@/lib/store'
+import { api, useActiveGuide, useApp, useCharacter, useCharacterPrefs, useGuides } from '@/lib/store'
 
 export function GuidesPage() {
   const guides = useGuides()
   const char = useCharacter()
   const active = useActiveGuide(char)
-  const [selectedId, setSelectedId] = useState<string | null>(active?.id ?? guides[0]?.id ?? null)
-  const selected = guides.find((g) => g.id === selectedId) ?? guides[0]
+  const [cls, setCls] = useState<ClassKey>(char?.cls ?? guides[0]?.cls ?? 'templar')
+  const ofClass = useMemo(() => guides.filter((g) => g.cls === cls), [guides, cls])
+  const builtin = ofClass.filter((g) => g.builtin)
+  const custom = ofClass.filter((g) => !g.builtin)
+  const [selectedId, setSelectedId] = useState<string | null>(active?.id ?? null)
+  const selected = ofClass.find((g) => g.id === selectedId) ?? (active?.cls === cls ? active : undefined) ?? ofClass[0]
+  const counts = useMemo(() => new Map(CLASSES.map((c) => [c.key, guides.filter((g) => g.cls === c.key).length])), [guides])
+  const pickClass = (c: ClassKey) => {
+    setCls(c)
+    setSelectedId(null)
+  }
   const saveGuide = useApp((s) => s.saveGuide)
   const removeGuide = useApp((s) => s.removeGuide)
   const importGuide = useApp((s) => s.importGuide)
@@ -36,14 +47,17 @@ export function GuidesPage() {
     navigate(`/guides/${copy.id}/edit`)
   }
   const create = async () => {
-    const g = await saveGuide({ ...emptyGuide(char?.cls ?? 'templar', `guide-${Date.now()}`) })
+    const g = await saveGuide({ ...emptyGuide(cls, `guide-${Date.now()}`) })
     navigate(`/guides/${g.id}/edit`)
   }
   const doImport = async () => {
     setError(null)
     try {
       const g = await importGuide()
-      if (g) setSelectedId(g.id)
+      if (g) {
+        setCls(g.cls)
+        setSelectedId(g.id)
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     }
@@ -72,32 +86,59 @@ export function GuidesPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[340px_1fr]">
-        <div className="space-y-2">
-          {guides.map((g) => (
+      <div className="mb-5 flex flex-wrap gap-1.5">
+        {CLASSES.map((c) => {
+          const n = counts.get(c.key) ?? 0
+          const mine = char?.cls === c.key
+          return (
             <button
-              key={g.id}
-              onClick={() => setSelectedId(g.id)}
+              key={c.key}
+              onClick={() => pickClass(c.key)}
+              disabled={!n}
               className={cn(
-                'flex w-full items-start gap-3 rounded-xl border px-3.5 py-3 text-left transition-colors',
-                selected?.id === g.id ? 'border-accent/50 bg-accent-soft' : 'border-line bg-surface hover:border-line-strong'
+                'flex items-center gap-2 rounded-xl border px-3 py-2 text-[13px] transition-colors disabled:opacity-40',
+                cls === c.key ? 'border-accent bg-accent-soft text-ink' : 'border-line bg-surface text-ink-2 hover:border-line-strong hover:bg-surface-2'
               )}
             >
-              <ClassIcon cls={g.cls} size={16} className="mt-0.5 shrink-0 text-accent" />
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-[13px] font-semibold">{g.name}</span>
-                <span className="mt-0.5 block text-[11px] text-ink-3">
-                  {classInfo(g.cls)?.ru} · {MODE_LABEL[g.mode]} · {g.builtin ? 'встроенный' : 'свой'}
-                </span>
-              </span>
-              {active?.id === g.id && <Pill tone="good">активный</Pill>}
+              <ClassIcon cls={c.key} size={18} />
+              <span className="font-medium">{c.ru}</span>
+              {mine && <span className="text-[10.5px] text-ink-3">ваш</span>}
+              <span className="tnum rounded-full bg-surface-3 px-1.5 text-[10.5px] text-ink-2">{n}</span>
             </button>
-          ))}
+          )
+        })}
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[340px_1fr]">
+        <div className="space-y-5">
+          {builtin.length > 0 && (
+            <GuideGroup title="Билды Questlog" hint="Пять самых популярных билдов класса на questlog.gg (по лайкам). По умолчанию персонажа ведёт первый.">
+              {builtin.map((g, i) => (
+                <GuideRow key={g.id} guide={g} rank={i + 1} selected={selected?.id === g.id} active={active?.id === g.id} onClick={() => setSelectedId(g.id)} />
+              ))}
+            </GuideGroup>
+          )}
+          <GuideGroup title="Свои" hint="Ваши гайды: копии встроенных, собранные в редакторе или импортированные из файла.">
+            {custom.map((g) => (
+              <GuideRow key={g.id} guide={g} selected={selected?.id === g.id} active={active?.id === g.id} onClick={() => setSelectedId(g.id)} />
+            ))}
+            {custom.length === 0 && (
+              <button
+                onClick={() => void create()}
+                className="flex w-full items-center gap-2 rounded-xl border border-dashed border-line px-3.5 py-3 text-left text-[12.5px] text-ink-3 hover:border-line-strong hover:text-ink-2"
+              >
+                <Plus size={14} /> Своих гайдов для класса «{classInfo(cls)?.ru}» нет — собрать с нуля
+              </button>
+            )}
+          </GuideGroup>
         </div>
 
         {selected && (
           <GuideDetail
+            key={selected.id}
             guide={selected}
+            charKey={char?.key}
+            charGs={char?.gearScore ?? 0}
             isActive={active?.id === selected.id}
             canActivate={!!char && char.cls === selected.cls}
             onActivate={() => char && void setPrefs(char.key, { guideId: selected.id })}
@@ -132,8 +173,68 @@ export function GuidesPage() {
   )
 }
 
+/** Группа в списке гайдов: заголовок с подсказкой и строки. */
+function GuideGroup({ title, hint, children }: { title: string; hint: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <Tooltip content={hint}>
+        <div className="mb-2 px-1 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{title}</div>
+      </Tooltip>
+      <div className="space-y-2">{children}</div>
+    </div>
+  )
+}
+
+/** Строка гайда: место у Questlog, название, автор, лайки, стадии, регион. */
+function GuideRow({ guide, rank, selected, active, onClick }: { guide: Guide; rank?: number; selected: boolean; active: boolean; onClick: () => void }) {
+  const src = guide.source
+  const questlog = src?.kind === 'questlog'
+  const title = questlog ? (src?.title ?? guide.name) : guide.name
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        'flex w-full items-start gap-3 rounded-xl border px-3.5 py-3 text-left transition-colors',
+        selected ? 'border-accent/50 bg-accent-soft' : 'border-line bg-surface hover:border-line-strong'
+      )}
+    >
+      {rank ? (
+        <span className="tnum mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-3 text-[11px] font-bold text-ink-2">{rank}</span>
+      ) : (
+        <ClassIcon cls={guide.cls} size={16} className="mt-1 shrink-0 text-accent" />
+      )}
+      <span className="min-w-0 flex-1">
+        <span className="line-clamp-2 text-[13px] leading-snug font-semibold">{title}</span>
+        <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-ink-3">
+          {questlog ? (
+            <>
+              <span>{src?.author}</span>
+              <span className="tnum inline-flex items-center gap-0.5">
+                <Heart size={10} className="text-critical" /> {src?.likes ?? 0}
+              </span>
+              {guide.stages?.length ? (
+                <span className="inline-flex items-center gap-0.5">
+                  <Flag size={10} /> {guide.stages.length}
+                </span>
+              ) : null}
+              {src?.region === 'korea' && <span className="text-warning">Корея</span>}
+            </>
+          ) : (
+            <span>
+              {MODE_LABEL[guide.mode]} · свой{guide.stages?.length ? ` · стадий: ${guide.stages.length}` : ''}
+            </span>
+          )}
+        </span>
+      </span>
+      {active && <Pill tone="good">ведёт</Pill>}
+    </button>
+  )
+}
+
 function GuideDetail({
-  guide,
+  guide: base,
+  charKey,
+  charGs,
   isActive,
   canActivate,
   onActivate,
@@ -143,6 +244,8 @@ function GuideDetail({
   onDelete
 }: {
   guide: Guide
+  charKey?: string
+  charGs: number
   isActive: boolean
   canActivate: boolean
   onActivate: () => void
@@ -152,17 +255,39 @@ function GuideDetail({
   onDelete: () => void
 }) {
   const n = useNamer()
+  const prefs = useCharacterPrefs(charKey)
+  const setPrefs = useApp((s) => s.updateCharacterPrefs)
+  const target = isActive ? pickStage(base, prefs.stages?.[base.id], charGs) : null
+  const [previewId, setPreviewId] = useState<string | null>(null)
+  const stages = sortedStages(base)
+  const preview = stages.find((s) => s.id === previewId) ?? target ?? (stages.length ? stages[stages.length - 1] : null)
+  const guide = applyStage(base, preview)
   const by = (role: string) => guide.skills.filter((s) => s.role === role)
+  const questlog = base.source?.kind === 'questlog'
+  const [summary, authorText] = splitDescription(base.description)
+  const makeTarget = (st: GuideStage) => charKey && void setPrefs(charKey, { stages: { ...(prefs.stages ?? {}), [base.id]: st.id } })
   return (
     <div className="min-w-0 space-y-5">
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <h2 className="text-xl font-semibold">{guide.name}</h2>
-            <p className="mt-1 text-xs text-ink-3">
-              {classInfo(guide.cls)?.ru} · {MODE_LABEL[guide.mode]}
-              {guide.source?.author ? ` · ${guide.source.author}` : ''}
-              {guide.source?.date ? ` · ${guide.source.date}` : ''}
+            <h2 className="text-xl font-semibold">{questlog ? (base.source?.title ?? base.name) : base.name}</h2>
+            <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-3">
+              <span>
+                {classInfo(base.cls)?.ru} · {MODE_LABEL[base.mode]}
+                {base.source?.author ? ` · ${base.source.author}` : ''}
+                {base.source?.date ? ` · ${base.source.date}` : ''}
+              </span>
+              {questlog && (
+                <span className="tnum inline-flex items-center gap-1">
+                  <Heart size={11} className="text-critical" /> {base.source?.likes ?? 0}
+                </span>
+              )}
+              {base.source?.region && (
+                <Pill tone={REGION[base.source.region].tone} tip={REGION[base.source.region].tip}>
+                  {REGION[base.source.region].ru}
+                </Pill>
+              )}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -194,20 +319,70 @@ function GuideDetail({
             )}
           </div>
         </div>
-        {guide.description && <p className="mt-4 text-[13px] leading-relaxed text-ink-2">{guide.description}</p>}
-        {guide.source?.url && (
+        {summary && <p className="mt-4 text-[13px] leading-relaxed text-ink-2">{summary}</p>}
+        {authorText && <AuthorText text={authorText} />}
+        {base.source?.url && (
           <button
-            onClick={() => void api.app.openExternal(guide.source!.url!)}
+            onClick={() => void api.app.openExternal(base.source!.url!)}
             className="mt-3 inline-flex items-center gap-1.5 text-xs text-accent hover:underline"
           >
-            {guide.source.title ?? guide.source.url} <ExternalLink size={12} />
+            {questlog ? 'Открыть билд на Questlog' : (base.source.title ?? base.source.url)} <ExternalLink size={12} />
           </button>
         )}
-        {guide.sources && guide.sources.length > 0 && <SourceList sources={guide.sources} />}
+        {base.sources && base.sources.length > 1 && <SourceList sources={base.sources} />}
       </Card>
 
+      {stages.length > 0 && (
+        <Card
+          title={`Стадии прокачки · ${stages.length}`}
+          hint="Стадии билда по уровню снаряжения. Нажмите на стадию — ниже покажутся её умения, титулы и цели досок. Целевую стадию для персонажа выбирают здесь или рядом с выбором гайда на страницах билда."
+        >
+          <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+            {stages.map((st) => {
+              const isTarget = target?.id === st.id
+              const shown = preview?.id === st.id
+              const done = st.gearScore !== undefined && st.gearScore <= charGs
+              return (
+                <div
+                  key={st.id}
+                  className={cn(
+                    'flex items-start gap-2.5 rounded-xl border px-3 py-2.5 transition-colors',
+                    shown ? 'border-accent/50 bg-accent-soft' : 'border-line bg-surface-2/40 hover:border-line-strong'
+                  )}
+                >
+                  <button onClick={() => setPreviewId(st.id)} className="min-w-0 flex-1 text-left">
+                    <span className="flex items-center gap-1.5">
+                      {st.gearScore ? (
+                        <span className="tnum shrink-0 text-[11px] font-semibold text-accent-2">{st.gearScore.toLocaleString('ru-RU')} GS</span>
+                      ) : null}
+                      {isTarget && <Flag size={11} className="shrink-0 text-accent" />}
+                    </span>
+                    <span className="mt-0.5 line-clamp-2 block text-[12.5px] leading-snug">{st.name}</span>
+                    <span className="mt-0.5 block text-[10.5px] text-ink-3">
+                      {[...(st.tags ?? []), done ? 'пройдена по GS' : ''].filter(Boolean).join(' · ')}
+                    </span>
+                  </button>
+                  {isActive &&
+                    (isTarget ? (
+                      <Pill tone="accent" tip="С этой стадией сейчас сравнивается персонаж.">
+                        цель
+                      </Pill>
+                    ) : (
+                      <Tooltip content="Сравнивать персонажа с этой стадией.">
+                        <button onClick={() => makeTarget(st)} className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-accent hover:bg-surface-3">
+                          сделать целью
+                        </button>
+                      </Tooltip>
+                    ))}
+                </div>
+              )
+            })}
+          </div>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 gap-5 2xl:grid-cols-2">
-        <Card title="Умения">
+        <Card title={preview ? `Умения · ${preview.name}` : 'Умения'}>
           {(['core', 'support', 'stigma', 'passive'] as const).map((role) =>
             by(role).length ? (
               <div key={role} className="mb-3 last:mb-0">
@@ -357,6 +532,37 @@ function SourceList({ sources }: { sources: GuideSource[] }) {
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+/** Описание встроенного гайда: наша строка сверху, текст автора после «Описание автора:». */
+function splitDescription(text?: string): [string | undefined, string | undefined] {
+  if (!text) return [undefined, undefined]
+  const i = text.indexOf('Описание автора:')
+  if (i < 0) return [text, undefined]
+  // Пустые строки между абзацами автора — лишние в свёрнутом виде
+  const author = text
+    .slice(i + 'Описание автора:'.length)
+    .replace(/\n\s*\n+/g, '\n')
+    .trim()
+  return [text.slice(0, i).trim() || undefined, author || undefined]
+}
+
+/** Текст автора билда — как есть (обычно по-английски), свёрнут до нескольких строк. */
+function AuthorText({ text }: { text: string }) {
+  const [open, setOpen] = useState(false)
+  const long = text.length > 280
+  return (
+    <div className="mt-3 rounded-xl border border-line bg-surface-2/40 px-3.5 py-3">
+      <div className="mb-1 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Описание автора</div>
+      <p className={cn('text-[12.5px] leading-relaxed whitespace-pre-line text-ink-2', !open && long && 'line-clamp-4')}>{text}</p>
+      {long && (
+        <button onClick={() => setOpen((v) => !v)} className="mt-1.5 inline-flex items-center gap-1 text-xs text-accent hover:underline">
+          {open ? 'Свернуть' : 'Показать полностью'}
+          <ChevronDown size={12} className={cn('transition-transform', open && 'rotate-180')} />
+        </button>
+      )}
     </div>
   )
 }
