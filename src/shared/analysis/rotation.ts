@@ -1,5 +1,5 @@
-// Ротация: стопки макроса, ручные умения и открытие боя из гайда — рядом с тем, что есть у персонажа.
-// Здесь же личные советы: какая стопка подходит по уровню умения, чего не хватает на панели,
+// Ротация: связка (ячейки панели), ручные умения и открытие боя из гайда — рядом с тем, что есть у персонажа.
+// Здесь же личные советы: какая ячейка подходит по уровню умения, чего не хватает на панели,
 // как жать умение при ваших статах (например, заряд по скорости боя).
 
 import { skillDef } from '../gamedata/skills'
@@ -22,7 +22,7 @@ export interface RotationSkill {
 
 export interface MacroReport {
   macro: GuideMacro
-  /** Подходит ли стопка сейчас по уровню умения из `when`. */
+  /** Подходит ли ячейка сейчас по уровню умения из `when`. */
   active: boolean
   /** Текущий уровень умения из `when`. */
   whenLevel?: number
@@ -100,7 +100,7 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
   const advice: RotationAdvice[] = []
   const list = (ids: number[]) => ids.map(name).join(', ')
 
-  // Стопки по уровню умения: какая подходит сейчас и когда переходить на следующую.
+  // Ячейки по уровню умения: какая подходит сейчас и когда переходить на следующую.
   for (const m of macros) {
     const w = m.macro.when
     if (m.active || !w?.minLevel || (m.whenLevel ?? 0) >= w.minLevel) continue
@@ -124,14 +124,14 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
   const missing = [...needed].filter((id) => state(id).use === 'missing')
   const unequipped = [...needed].filter((id) => state(id).use === 'unequipped')
   if (missing.length) {
-    // Дыра в стопке бьёт по урону сильнее, чем отсутствие ручного умения.
+    // Дыра в связке бьёт по урону сильнее, чем отсутствие ручного умения.
     const inStack = missing.some((id) => macros.some((m) => m.active && m.macro.skills.includes(id)))
     advice.push({
       id: 'missing',
       tone: inStack ? 'bad' : 'warn',
       title: `Не изучено: ${list(missing)}`,
       text: inStack
-        ? 'Ротация гайда рассчитана на них: стопка пропустит неизученное, и окна урона станут короче.'
+        ? 'Ротация гайда рассчитана на них: связка пропустит неизученное, и окна урона станут короче.'
         : `По гайду ${missing.length === 1 ? 'это умение жмут' : 'эти умения жмут'} вручную. Ротация работает и без ${missing.length === 1 ? 'него' : 'них'}, но слабее; стигмы и их уровни — на странице «Умения».`,
       skills: missing,
       link: '/skills'
@@ -148,7 +148,7 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
     })
   }
 
-  // Специализации умений из стопок: порядок в стопке рассчитан на варианты гайда.
+  // Специализации умений из связки: порядок в ячейках рассчитан на варианты гайда.
   const inMacros = [...new Set(macros.filter((m) => m.active).flatMap((m) => m.macro.skills))]
   const specsOff = inMacros.filter((id) => state(id).specsOff)
   if (specsOff.length) {
@@ -156,7 +156,7 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
       id: 'specs',
       tone: 'warn',
       title: `Специализации не по гайду: ${list(specsOff)}`,
-      text: 'Порядок в стопках рассчитан на варианты гайда — с другими он работает хуже. Что поменять, видно на странице «Умения».',
+      text: 'Порядок в ячейках рассчитан на варианты гайда — с другими он работает хуже. Что поменять, видно на странице «Умения».',
       skills: specsOff,
       link: '/skills'
     })
@@ -164,8 +164,8 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
     advice.push({
       id: 'specs-unknown',
       tone: 'info',
-      title: 'Специализации умений из стопок неизвестны',
-      text: 'Оверлей не показывает выбранные варианты. Отметьте их на странице «Умения» — тогда помощник проверит и стопки.',
+      title: 'Специализации умений из связки неизвестны',
+      text: 'Оверлей не показывает выбранные варианты. Отметьте их на странице «Умения» — тогда помощник проверит и связку.',
       link: '/skills'
     })
   }
@@ -188,7 +188,7 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
       id: 'ready',
       tone: 'ok',
       title: 'Всё для ротации на месте',
-      text: 'Умения из стопок и ручные изучены, стигмы надеты. Дальше — уровни и специализации на странице «Умения».'
+      text: 'Умения из связки и ручные изучены, стигмы надеты. Дальше — уровни и специализации на странице «Умения».'
     })
   }
   return { macros, manual, opener, advice }

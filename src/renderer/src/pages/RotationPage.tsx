@@ -1,8 +1,9 @@
-import { Fragment, type ReactNode } from 'react'
+import { Fragment, useMemo, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
-import { ArrowRight, BookOpen, Check, ChevronRight, Info, Lightbulb, Repeat } from 'lucide-react'
+import { ArrowDown, ArrowRight, ArrowUp, BookOpen, Check, ChevronRight, Info, Lightbulb, MousePointerClick, Repeat } from 'lucide-react'
+import { analyzeInputMacro } from '@shared/analysis/inputMacro'
 import type { AdviceTone, MacroReport, ManualReport, RotationAdvice, RotationSkill, SkillUse } from '@shared/analysis/rotation'
-import type { Guide } from '@shared/guide/types'
+import type { Guide, GuideOneButton } from '@shared/guide/types'
 import type { Namer } from '@shared/names'
 import { formatStatValue } from '@shared/gamedata/stats'
 import { StatusBadge } from '@/components/art'
@@ -29,7 +30,7 @@ export function RotationPage() {
     <PageHeader
       icon={<Repeat size={22} />}
       title="Ротация"
-      subtitle="Как играть по гайду: стопки умений для макроса, что жать вручную и с чего начинать бой. Справа — советы под вашего персонажа."
+      subtitle="Как играть по гайду: связка (макрос игры) и ячейки панели, что жать вручную, с чего начинать бой и как зажимать всё одной кнопкой. Справа — советы под вашего персонажа."
       actions={<GuideSwitcher char={char} />}
     />
   )
@@ -47,23 +48,24 @@ export function RotationPage() {
             </Button>
           }
         >
-          Ротацию и макросы задаёт гайд. Выберите гайд, где они расписаны, — например, встроенный сводный.
+          Ротацию и связку задаёт гайд. Выберите гайд, где они расписаны, — например, встроенный сводный.
         </EmptyState>
       </>
     )
   }
 
-  const macros = rot ? [...rot.macros].sort((a, b) => Number(b.active) - Number(a.active)) : []
+  const steps = rot ? rot.macros.filter((m) => m.active) : []
+  const later = rot ? rot.macros.filter((m) => !m.active) : []
 
   return (
     <>
       {header}
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-5">
-          {macros.length > 0 && combat && (
+          {steps.length > 0 && combat && (
             <Card
-              title="Макрос"
-              hint="Стопка — несколько умений в одной ячейке: игра применяет первое готовое по списку (число на иконке — приоритет). Стопки кладут в один макрос: пока клавиша зажата, он перебирает их по кругу. Красный значок — умение не изучено, жёлтый — стигма не надета."
+              title="Связка"
+              hint="В игре: окно «Умения» → «Связки». Связка работает, пока её клавиша зажата: идёт по шагам сверху вниз и по кругу, пропуская то, что на откате. Каждый шаг — ячейка панели: до 4 умений столбиком, игра применяет первое готовое, нижний ряд 0 — главный. Красный значок — умение не изучено, жёлтый — стигма не надета."
               actions={
                 <>
                   {combat.macroKey && (
@@ -71,23 +73,28 @@ export function RotationPage() {
                       клавиша <Key>{combat.macroKey}</Key>
                     </span>
                   )}
-                  {combat.delayMs !== undefined && <Pill tip="Пауза между умениями внутри макроса.">задержка {combat.delayMs} мс</Pill>}
+                  {combat.delayMs !== undefined && <Pill tip="Пауза между шагами связки.">задержка {combat.delayMs} мс</Pill>}
                 </>
               }
             >
-              <div className="space-y-3">
-                {macros.map((m) => (
-                  <StackRow key={m.macro.id} m={m} namer={namer} />
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                {steps.map((m, i) => (
+                  <CellCard key={m.macro.id} m={m} step={i + 1} namer={namer} />
+                ))}
+                {later.map((m) => (
+                  <CellCard key={m.macro.id} m={m} namer={namer} />
                 ))}
               </div>
               {combat.delayNote && <p className="mt-3 text-xs leading-relaxed text-ink-3">{combat.delayNote}</p>}
             </Card>
           )}
 
+          {combat?.oneButton && <OneButtonCard ob={combat.oneButton} macroKey={combat.macroKey} manual={rot?.manual ?? []} namer={namer} />}
+
           {rot && rot.manual.length > 0 && (
             <Card
               title="Вручную"
-              hint="Умения на отдельных клавишах — их не кладут в макрос: важен момент. Если подсказка зависит от ваших статов, она выделена и уже выбрана под ваши цифры."
+              hint="Умения на отдельных клавишах — их не кладут в связку: важен момент. Если подсказка зависит от ваших статов, она выделена и уже выбрана под ваши цифры."
               delay={0.05}
             >
               <ul className="grid grid-cols-1 gap-x-6 lg:grid-cols-2">
@@ -170,7 +177,7 @@ function Key({ children, className }: { children: ReactNode; className?: string 
 const USE_TONE: Record<SkillUse, Tone | undefined> = { ready: undefined, missing: 'bad', unequipped: 'warn' }
 const USE_TEXT: Record<SkillUse, string> = {
   ready: '',
-  missing: 'Не изучено — макрос его пропустит.',
+  missing: 'Не изучено — связка его пропустит.',
   unequipped: 'Стигма не надета.'
 }
 
@@ -187,13 +194,15 @@ function skillTip(s: RotationSkill, namer: Namer, extra?: ReactNode) {
   )
 }
 
-function StackRow({ m, namer }: { m: MacroReport; namer: Namer }) {
+/** Шаг связки — ячейка панели столбиком, как в игре: ряд 0 снизу, он главный. */
+function CellCard({ m, step, namer }: { m: MacroReport; step?: number; namer: Namer }) {
   const w = m.macro.when
   const whenSkill = w ? namer.skill(w.skill).main : ''
   const whenText = w ? (w.minLevel !== undefined ? `${whenSkill} — с ур. ${w.minLevel}` : `${whenSkill} — до ур. ${w.maxLevel}`) : ''
   return (
-    <div className={cn('rounded-xl border p-3.5', m.active ? 'border-line-strong bg-surface-2/50' : 'border-dashed border-line')}>
+    <div className={cn('flex flex-col rounded-xl border p-3.5', m.active ? 'border-line-strong bg-surface-2/50' : 'border-dashed border-line')}>
       <div className="flex flex-wrap items-center gap-2">
+        {step !== undefined && <span className="rounded-md bg-accent-soft px-1.5 py-0.5 text-[11px] font-semibold text-accent-2">Шаг {step}</span>}
         <span className={cn('text-[13px] font-semibold', !m.active && 'text-ink-3')}>{m.macro.name}</span>
         {w &&
           (m.active ? (
@@ -201,16 +210,13 @@ function StackRow({ m, namer }: { m: MacroReport; namer: Namer }) {
               подходит сейчас
             </Pill>
           ) : (
-            <Pill tip={`Эта стопка — для другого уровня умения: ${whenText}. Сейчас — ур. ${m.whenLevel ?? 0}.`}>{whenText}</Pill>
+            <Pill tip={`Эта ячейка — для другого уровня умения: ${whenText}. Сейчас — ур. ${m.whenLevel ?? 0}.`}>{whenText}</Pill>
           ))}
         {m.macro.key && <Key className="ml-auto">{m.macro.key}</Key>}
       </div>
-      <div className={cn('mt-3 flex flex-wrap items-start gap-y-2', !m.active && 'opacity-55')}>
+      <div className={cn('mt-3 flex flex-col-reverse gap-1', !m.active && 'opacity-55')}>
         {m.skills.map((s, i) => (
-          <Fragment key={s.skill}>
-            {i > 0 && <ChevronRight size={16} className="mt-3.5 shrink-0 text-ink-3" />}
-            <SkillChip s={s} n={i + 1} namer={namer} />
-          </Fragment>
+          <CellRow key={s.skill} s={s} row={i} namer={namer} />
         ))}
       </div>
       {m.macro.note && <p className="mt-2.5 text-xs leading-relaxed text-ink-3">{m.macro.note}</p>}
@@ -218,22 +224,97 @@ function StackRow({ m, namer }: { m: MacroReport; namer: Namer }) {
   )
 }
 
-/** Умение в стопке: иконка с номером приоритета и название. */
-function SkillChip({ s, n, namer }: { s: RotationSkill; n: number; namer: Namer }) {
+/** Ряд ячейки: номер ряда, иконка, название. */
+function CellRow({ s, row, namer }: { s: RotationSkill; row: number; namer: Namer }) {
   const tone = USE_TONE[s.use] ?? (s.specsOff ? 'warn' : undefined)
   return (
-    <Tooltip content={skillTip(s, namer, <span className="mt-1 block text-ink-3">Приоритет {n}: применится, если умения выше в списке на перезарядке.</span>)}>
-      <div className="flex w-[88px] flex-col items-center gap-1.5 text-center">
-        <span className="relative">
-          <SkillIcon id={s.skill} size={44} tone={tone} dim={s.use === 'missing'} />
-          <span className="tnum absolute -top-1.5 -left-1.5 flex size-5 items-center justify-center rounded-full bg-ink text-[10.5px] font-bold text-bg shadow-[0_0_0_2px_var(--color-surface)]">
-            {n}
-          </span>
-          {tone && <StatusBadge tone={tone} size={15} className="absolute -right-1 -bottom-1" />}
+    <Tooltip
+      block
+      content={skillTip(
+        s,
+        namer,
+        <span className="mt-1 block text-ink-3">
+          {row === 0 ? 'Ряд 0 — главный: применится первым, если готов.' : `Ряд ${row}: применится, если всё ниже в ячейке на откате.`}
         </span>
-        <span className={cn('line-clamp-2 text-[11px] leading-tight', s.use === 'missing' ? 'text-ink-3' : 'text-ink-2')}>{namer.skill(s.skill).main}</span>
+      )}
+    >
+      <div className="flex w-full items-center gap-2.5 rounded-lg px-1 py-0.5 hover:bg-surface-2">
+        <span className={cn('tnum w-11 shrink-0 text-[10.5px]', row === 0 ? 'font-semibold text-accent' : 'text-ink-3')}>ряд {row}</span>
+        <span className="relative shrink-0">
+          <SkillIcon id={s.skill} size={34} tone={tone} dim={s.use === 'missing'} />
+          {tone && <StatusBadge tone={tone} size={13} className="absolute -right-1 -bottom-1" />}
+        </span>
+        <span className={cn('min-w-0 text-[12.5px] leading-tight', s.use === 'missing' ? 'text-ink-3' : 'text-ink-2')}>{namer.skill(s.skill).main}</span>
       </div>
     </Tooltip>
+  )
+}
+
+/** «Одна кнопка»: макрос ПО мыши по событиям и расчёт — длительность нажатий, частота, риски. */
+function OneButtonCard({ ob, macroKey, manual, namer }: { ob: GuideOneButton; macroKey?: string; manual: ManualReport[]; namer: Namer }) {
+  const r = useMemo(() => analyzeInputMacro(ob.events, ob.repeatMs, macroKey), [ob, macroKey])
+  const purpose = (key: string) => {
+    if (key === macroKey) return 'связка'
+    const m = manual.find((x) => x.entry.key === key)
+    return m ? namer.skill(m.entry.skill).main : ''
+  }
+  const fmt = (v: number) => `${Math.round(v * 10) / 10} мс`
+  return (
+    <Card
+      title="Одна кнопка"
+      hint="Для тех, кто зажимает одну боковую кнопку мыши на всю ротацию: ПО мыши (SteelSeries GG, Razer Synapse, G Hub) повторяет этот макрос, пока кнопка зажата. Ниже — расчёт: сколько длится каждое нажатие и как часто отпускается клавиша связки. Игра читает ввод раз в кадр (при 60 FPS — каждые 16,7 мс)."
+      delay={0.03}
+    >
+      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-2">
+        <MousePointerClick size={16} className="mr-1 shrink-0 text-accent" />
+        {ob.events.map((e, i) => (
+          <Fragment key={i}>
+            <span className="inline-flex items-center gap-1 rounded-lg border border-line bg-surface-2 py-0.5 pr-1.5 pl-0.5">
+              <Key>{e.key}</Key>
+              {e.down ? <ArrowDown size={13} className="text-ink-2" /> : <ArrowUp size={13} className="text-ink-2" />}
+            </span>
+            {e.waitMs > 0 && <span className="tnum text-[11px] text-ink-3">{e.waitMs} мс</span>}
+          </Fragment>
+        ))}
+        <span className="inline-flex items-center gap-1 text-[11px] text-ink-3">
+          <Repeat size={12} /> автоповтор {ob.repeatMs} мс
+        </span>
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+        <div className="rounded-xl border border-line bg-surface-2/50 px-3 py-2.5">
+          <div className="text-[11px] text-ink-3">Один прогон</div>
+          <div className="tnum mt-0.5 text-[15px] font-semibold">{fmt(r.cycleMs)}</div>
+          <div className="text-[11px] text-ink-3">{Math.round(1000 / Math.max(1, r.cycleMs))} прогонов в секунду</div>
+        </div>
+        {r.keys.map((k) => (
+          <div key={k.key} className="rounded-xl border border-line bg-surface-2/50 px-3 py-2.5">
+            <div className="flex items-center gap-1.5 text-[11px] text-ink-3">
+              <Key className="h-5 min-w-5 text-[10px]">{k.key}</Key>
+              <span className="truncate">{purpose(k.key)}</span>
+            </div>
+            <div className="tnum mt-1 text-[13px] font-semibold">{k.key === macroKey ? `зажата ${fmt(k.holdMs)}` : `нажатие ${fmt(k.holdMs)}`}</div>
+            <div className="tnum text-[11px] text-ink-3">
+              {k.key === macroKey ? `отпускается на ${fmt(k.gapMs)}` : `пауза ${fmt(k.gapMs)}, ${Math.round(k.pressesPerSec)} раз в секунду`}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {r.warnings.length > 0 && (
+        <ul className="mt-3 space-y-2">
+          {r.warnings.map((w) => (
+            <li key={w.key + w.kind} className="flex gap-2 text-xs leading-relaxed text-ink-2">
+              <span className="mt-0.5">
+                <AdviceIcon tone={w.kind === 'macro-release' ? 'info' : 'warn'} />
+              </span>
+              <span>{w.text}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {ob.note && <p className="mt-3 text-xs leading-relaxed text-ink-3">{ob.note}</p>}
+    </Card>
   )
 }
 
@@ -326,7 +407,7 @@ function AdviceCard({ advice, onOpen }: { advice: RotationAdvice[]; onOpen: (to:
   return (
     <Card
       title="Для вас"
-      hint="Советы по вашему персонажу: какая стопка подходит по уровню умений, чего не хватает для ротации, как жать умения при ваших статах. Красное — мешает ротации, жёлтое — стоит поправить, синее — к сведению. Нажмите, чтобы открыть раздел."
+      hint="Советы по вашему персонажу: какая ячейка подходит по уровню умений, чего не хватает для ротации, как жать умения при ваших статах. Красное — мешает ротации, жёлтое — стоит поправить, синее — к сведению. Нажмите, чтобы открыть раздел."
     >
       <ul className="-mx-2 space-y-0.5">
         {sorted.map((a) => {
@@ -380,7 +461,7 @@ function KeyMapCard({ guide, macros, manual, namer }: { guide: Guide; macros: Ma
   const combat = guide.combat!
   const rows: { key: string; skill?: number; text: string }[] = []
   const inMacro = macros.filter((m) => m.active && !m.macro.key)
-  if (combat.macroKey && inMacro.length) rows.push({ key: combat.macroKey, text: `Макрос: ${inMacro.map((m) => m.macro.name).join(' + ')}` })
+  if (combat.macroKey && inMacro.length) rows.push({ key: combat.macroKey, text: `Связка: ${inMacro.map((m) => m.macro.name).join(' → ')}` })
   for (const m of macros) if (m.active && m.macro.key) rows.push({ key: m.macro.key, skill: m.macro.skills[0], text: m.macro.name })
   for (const m of manual) if (m.entry.key) rows.push({ key: m.entry.key, skill: m.entry.skill, text: namer.skill(m.entry.skill).main })
   if (!rows.length) return null

@@ -4,7 +4,10 @@ import { makeTemplar } from '../testing/fixtures'
 import { analyzeGear } from './gear'
 import { statTargetStatus, stoneWeightFn } from './targets'
 
-const withStats = (stats: Record<number, number>) => ({ ...makeTemplar(), stats: Object.entries(stats).map(([stat, value]) => ({ stat: Number(stat), value })) })
+const withStats = (stats: Record<number, number>) => ({
+  ...makeTemplar(),
+  stats: Object.entries(stats).map(([stat, value]) => ({ stat: Number(stat), value }))
+})
 
 describe('пороги статов', () => {
   it('меткость = базовая + доп. + в PvE; ближайший порог — Трансцендентность 4', () => {

@@ -9,6 +9,7 @@ import {
   type Guide,
   type GuideCombat,
   type GuideMacro,
+  type GuideOneButton,
   type GuideManualSkill,
   type GuideMode,
   type GuideSource,
@@ -173,6 +174,19 @@ function normalizeStatHint(v: unknown): StatHint | undefined {
   return ranges.length ? { stat: v.stat, ranges } : undefined
 }
 
+function normalizeOneButton(v: unknown): GuideOneButton | undefined {
+  if (!isObj(v) || !Array.isArray(v.events)) return undefined
+  const events = v.events
+    .filter(isObj)
+    .flatMap((e) =>
+      typeof e.key === 'string' && e.key.trim() && typeof e.down === 'boolean'
+        ? [{ key: e.key, down: e.down, waitMs: typeof e.waitMs === 'number' && e.waitMs >= 0 ? e.waitMs : 0 }]
+        : []
+    )
+  if (!events.length) return undefined
+  return { events, repeatMs: typeof v.repeatMs === 'number' && v.repeatMs >= 0 ? v.repeatMs : 0, note: optStr(v.note) }
+}
+
 /** Раздел «Бой» (макросы, ручные умения, открытие) — необязательный; кривые записи отбрасываются. */
 function normalizeCombat(v: unknown): GuideCombat | undefined {
   if (!isObj(v)) return undefined
@@ -215,6 +229,7 @@ function normalizeCombat(v: unknown): GuideCombat | undefined {
     manual: manual.length ? manual : undefined,
     opener: opener.length ? opener : undefined,
     openerNote: optStr(v.openerNote),
+    oneButton: normalizeOneButton(v.oneButton),
     notes: optStr(v.notes)
   }
   return Object.values(combat).some((x) => x !== undefined) ? combat : undefined

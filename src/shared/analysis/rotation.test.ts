@@ -19,7 +19,7 @@ function rotation(char: Character) {
 }
 
 describe('ротация', () => {
-  it('стопка по уровню умения: до 16 и от 16', () => {
+  it('ячейка по уровню умения: до 16 и от 16', () => {
     const early = guide.combat!.macros!.find((m) => m.id === 'judgment-early')!
     const main = guide.combat!.macros!.find((m) => m.id === 'judgment')!
     expect(macroFits(early, 15)).toBe(true)
@@ -28,7 +28,7 @@ describe('ротация', () => {
     expect(macroFits(main, 12)).toBe(false)
   })
 
-  it('Суд ниже 16 — подходит ранняя стопка, совет когда переходить', () => {
+  it('Суд ниже 16 — подходит ранняя ячейка, совет когда переходить', () => {
     const char = makeTemplar()
     char.skills = char.skills.map((s) => (s.skill === JUDGMENT ? { ...s, level: 12 } : s))
     const r = rotation(char)
@@ -40,7 +40,7 @@ describe('ротация', () => {
     expect(tip.text).toContain('С ур. 16')
   })
 
-  it('Суд от 16 — основная стопка, без совета о переходе', () => {
+  it('Суд от 16 — основная ячейка, без совета о переходе', () => {
     const r = rotation(makeTemplar()) // Суд ур. 18
     expect(r.macros.find((m) => m.macro.id === 'judgment')?.active).toBe(true)
     expect(r.advice.some((a) => a.id.startsWith('macro-'))).toBe(false)
@@ -51,7 +51,7 @@ describe('ротация', () => {
     char.skills.push({ skill: TAUNT, level: 5, equipped: false, specs: [] })
     const r = rotation(char)
     const missing = r.advice.find((a) => a.id === 'missing')!
-    expect(missing.tone).toBe('bad') // Удара щитом нет — дыра в стопке
+    expect(missing.tone).toBe('bad') // Удара щитом нет — дыра в связке
     expect(missing.title).toContain('Удар щитом')
     expect(r.manual.find((m) => m.entry.skill === TAUNT)?.skill.use).toBe('unequipped')
     expect(r.advice.find((a) => a.id === 'unequipped')?.title).toBe('Стигма не надета: Провокация')
