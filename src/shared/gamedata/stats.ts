@@ -163,6 +163,30 @@ const RU: Record<string, string> = {
   frontattackcriticalresist: 'Сопр. крит. удару спереди'
 }
 
+/**
+ * Статы против монстров одного рода (выпадают в Знании о видах): «АТК против диких», «Блок против мутантов»…
+ * В клиенте Cogni / Fera / Natura / Varian — те же роды, что у питомцев. Наш перевод: в русском клиенте не сверено.
+ */
+const GENUS_FORMS: [key: string, gen: string, dat: string][] = [
+  ['intellect', 'разумных', 'разумным'],
+  ['feral', 'диких', 'диким'],
+  ['nature', 'природных', 'природным'],
+  ['trans', 'мутантов', 'мутантам']
+]
+const GENUS_STAT_RU: [suffix: string, ru: (gen: string, dat: string) => string][] = [
+  ['damage', (g) => `АТК против ${g}`],
+  ['defense', (g) => `ЗЩТ от ${g}`],
+  ['accuracy', (g) => `Меткость против ${g}`],
+  ['evasion', (g) => `Уклонение от ${g}`],
+  ['critical', (g) => `Крит. удар против ${g}`],
+  ['criticalresist', (g) => `Сопр. крит. удару ${g}`],
+  ['blockpierce', (g) => `Пробитие блока ${g}`],
+  ['block', (g) => `Блок против ${g}`],
+  ['amplifydamage', (_g, d) => `Увелич. урона по ${d}`],
+  ['decreasedamage', (g) => `Стойкость к урону ${g}`]
+]
+for (const [key, gen, dat] of GENUS_FORMS) for (const [suffix, ru] of GENUS_STAT_RU) RU[`${key}${suffix}`] ??= ru(gen, dat)
+
 export const STATS: StatDef[] = (statsJson as Omit<StatDef, 'ru'>[]).map((s) => ({ ...s, ru: RU[s.key] }))
 
 const byId = new Map(STATS.map((s) => [s.id, s]))

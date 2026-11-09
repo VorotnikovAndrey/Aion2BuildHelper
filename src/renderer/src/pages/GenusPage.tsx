@@ -1,6 +1,6 @@
 import { ArrowRight, Brain, Layers, Leaf, Dna, PawPrint, Sparkles, type LucideIcon } from 'lucide-react'
 import type { GenusReport, GenusSlotReport } from '@shared/analysis/genus'
-import { GENUS_GRADE_COLOR, GENUS_GRADES, GENUS_LEVEL_GOAL, GENUS_MAX } from '@shared/gamedata/genus'
+import { GENUS_GRADE_COLOR, GENUS_GRADES, GENUS_LEVEL_GOAL, GENUS_LOCK_SHARE, GENUS_MAX } from '@shared/gamedata/genus'
 import { formatStatValue } from '@shared/gamedata/stats'
 import { gradeColorVar, StatusBadge } from '@/components/art'
 import { DataFreshness } from '@/components/DataFreshness'
@@ -87,7 +87,10 @@ export function GenusPage() {
                   {lowLevel.length > 0 && <span className="text-warning"> Сейчас ниже: {lowLevel.map((x) => `${x.def.ru} (${x.level})`).join(', ')}.</span>}
                 </Step>
                 <Step n={2}>Перебрасывайте сначала красные ячейки (в них показано, что ловить), потом жёлтые — цель в подсказке ячейки.</Step>
-                <Step n={3}>Запирайте только верхние значения хорошего стата: золотую ячейку — сейчас, оранжевую — позже.</Step>
+                <Step n={3}>
+                  Запирайте только верхние значения хорошего стата: золотую ячейку — сейчас, оранжевую — позже. Полоска под ячейкой — где значение в диапазоне
+                  её грейда; зелёная — верх, можно запирать.
+                </Step>
               </ol>
               {g.wishlist.length > 0 && (
                 <div>
@@ -197,18 +200,21 @@ function GenusCard({ genus, ctx }: { genus: GenusReport; ctx: Ctx }) {
       </header>
       <div className="space-y-1.5">
         {genus.slots.map((s) => (
-          <SlotTile key={s.slot} s={s} ctx={ctx} />
+          <SlotTile key={s.slot} s={s} level={genus.level} ctx={ctx} />
         ))}
       </div>
     </section>
   )
 }
 
-function SlotTile({ s, ctx }: { s: GenusSlotReport; ctx: Ctx }) {
+function SlotTile({ s, level, ctx }: { s: GenusSlotReport; level: number; ctx: Ctx }) {
   const { namer } = ctx
   const b = bucket(s)
   const tone = b === 'ok' ? 'ok' : b === 'better' ? 'warn' : 'bad'
   const grade = GENUS_GRADE_COLOR[s.grade] ?? 'common'
+  const name = s.empty ? 'Пусто' : namer.stat(s.stat).main
+  const v = (x: number) => formatStatValue(s.stat, x)
+  const top = s.lockFrom !== null && s.value >= s.lockFrom
   return (
     <Tooltip
       block
@@ -216,16 +222,41 @@ function SlotTile({ s, ctx }: { s: GenusSlotReport; ctx: Ctx }) {
       content={
         <>
           <b className="text-ink">
-            Ячейка {s.slot + 1}: {namer.stat(s.stat).main} {formatStatValue(s.stat, s.value)}
+            Ячейка {s.slot + 1}: {s.empty ? 'пусто' : `${name} ${v(s.value)}`}
           </b>
-          <span className="mt-1 block">{verdictWhy(s.verdict, s.weight)}</span>
-          <span className="mt-1 block text-ink-3">
-            Грейд ячейки: {GENUS_GRADES[s.grade] ?? s.grade}.{GENUS_MAX[s.stat] ? ` Максимум этого стата — ${formatStatValue(s.stat, GENUS_MAX[s.stat])}.` : ''}
-          </span>
+          {s.empty ? (
+            <span className="mt-1 block">Ячейку ещё не анализировали — запустите анализ, чтобы в ней появился стат.</span>
+          ) : (
+            <span className="mt-1 block">{verdictWhy(s.verdict, s.weight)}</span>
+          )}
+          <span className="mt-1 block text-ink-3">Грейд ячейки: {GENUS_GRADES[s.grade] ?? s.grade}.</span>
+          {s.range && (
+            <span className="mt-1 block">
+              В этом грейде стат бывает от {v(s.range.min)} до {v(s.range.max)}.{' '}
+              {top ? (
+                <span className="text-good">У вас {v(s.value)} — верх диапазона, можно запирать.</span>
+              ) : (
+                <span className={tone === 'bad' ? 'text-ink-3' : 'text-warning'}>
+                  Хорошее значение — от {v(s.lockFrom!)}, у вас {v(s.value)}.
+                </span>
+              )}
+              {s.slotMax !== null && s.slotMax > s.range.max && <> В высшем грейде этой ячейки — до {v(s.slotMax)}.</>}
+              <span className="block text-ink-3">«Верх» — верхние {Math.round((1 - GENUS_LOCK_SHARE) * 100)}% диапазона грейда (оценка помощника).</span>
+            </span>
+          )}
+          {!s.range && !s.empty && GENUS_MAX[s.stat] ? (
+            <span className="mt-1 block text-ink-3">Максимум этого стата в Знании о видах — {v(GENUS_MAX[s.stat])}.</span>
+          ) : null}
           {s.target && (
             <span className="mt-1 block text-aether">
-              Перебросить на «{namer.stat(s.target.stat).main}» (важность {s.weight} → {s.target.weight}). Какие статы бывают именно в этой ячейке, в данных нет
-              — это лучший стат из встречающихся в Знании о видах.
+              Перебросить на «{namer.stat(s.target.stat).main}» (важность {s.weight} → {s.target.weight}).{' '}
+              {s.target.inSlot
+                ? `В этой ячейке он бывает до ${formatStatValue(s.target.stat, s.target.max ?? 0)}; шанс за анализ на ур. ${level} рода — ${fmtChance(s.target.chance ?? 0)}.${
+                    (s.target.chance ?? 0) < 1
+                      ? ` Это редкость: стат выпадает только в высших грейдах, а ничего лучше по гайду в этой ячейке не бывает. На ур. 10 рода — ${fmtChance(s.target.chanceAt10 ?? 0)}; до этого ресурсы на ячейку можно не тратить.`
+                      : ''
+                  }`
+                : 'Какие статы бывают именно в этой ячейке, в данных нет — это лучший стат из встречающихся в Знании о видах.'}
             </span>
           )}
         </>
@@ -247,23 +278,47 @@ function SlotTile({ s, ctx }: { s: GenusSlotReport; ctx: Ctx }) {
           <span
             className={cn(
               'min-w-0 flex-1 text-[13px] leading-snug',
-              tone === 'ok' ? 'text-ink' : tone === 'warn' ? 'text-ink-2' : 'text-critical line-through decoration-1',
-              verdictTone(s.verdict) === 'neutral' && 'text-ink-3'
+              s.empty ? 'text-ink-3 italic' : tone === 'ok' ? 'text-ink' : tone === 'warn' ? 'text-ink-2' : 'text-critical line-through decoration-1',
+              !s.empty && verdictTone(s.verdict) === 'neutral' && 'text-ink-3'
             )}
           >
-            {namer.stat(s.stat).main}
+            {name}
           </span>
           <span className={cn('tnum shrink-0 text-[13px] font-semibold', tone === 'ok' ? 'text-good' : tone === 'warn' ? 'text-warning' : 'text-critical')}>
-            {formatStatValue(s.stat, s.value)}
+            {s.empty ? '—' : v(s.value)}
           </span>
         </div>
+        {s.range && (
+          <div className="mt-1 flex items-center gap-2 pl-7">
+            <span className="h-1 flex-1 overflow-hidden rounded-full bg-surface-3">
+              <span
+                className={cn('block h-full rounded-full', tone === 'bad' ? 'bg-line-strong' : top ? 'bg-good' : 'bg-warning')}
+                style={{ width: `${Math.max(6, (s.quality ?? 0) * 100)}%` }}
+              />
+            </span>
+            <span className="tnum shrink-0 text-[10.5px] text-ink-3">
+              {v(s.range.min)}–{v(s.range.max)}
+            </span>
+          </div>
+        )}
         {s.target && b === 'reroll' && (
           <div className="mt-1 flex items-center gap-1.5 pl-7 text-[11.5px]">
             <ArrowRight size={12} className="shrink-0 text-ink-3" />
             <span className="rounded-full border border-aether/40 bg-aether-soft px-2 py-px font-medium text-aether">{namer.stat(s.target.stat).main}</span>
+            {s.target.chance !== null && (
+              <span className={cn('tnum', s.target.chance < 1 ? 'text-ink-3 italic' : 'text-ink-3')}>
+                {fmtChance(s.target.chance)}
+                {s.target.chance < 1 ? ' · редко' : ''}
+              </span>
+            )}
           </div>
         )}
       </div>
     </Tooltip>
   )
+}
+
+/** Шанс за анализ: «2%», «0,5%». */
+function fmtChance(p: number): string {
+  return `${p >= 10 ? Math.round(p) : Math.round(p * 10) / 10}%`.replace('.', ',')
 }

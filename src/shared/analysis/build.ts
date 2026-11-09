@@ -308,7 +308,7 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
       title: `Знание о видах: ${rerolls.length} ячеек под переброс`,
       detail: rerolls
         .slice(0, 4)
-        .map(({ g, s }) => `${g.def.ru} ${s.slot + 1}: ${n.stat(s.stat).main}`)
+        .map(({ g, s }) => `${g.def.ru} ${s.slot + 1}: ${s.empty ? 'пусто' : n.stat(s.stat).main}`)
         .join('; ')
     })
   }

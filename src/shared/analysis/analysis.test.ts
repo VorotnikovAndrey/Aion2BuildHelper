@@ -188,7 +188,7 @@ describe('цель по вещи: что на что перековать', () =
 })
 
 describe('Знание о видах: цель переброса', () => {
-  it('слабая ячейка получает лучший стат рода, хорошая — нет', () => {
+  it('слабая ячейка получает лучший достижимый стат своей ячейки, хорошая — нет', () => {
     const char = {
       ...makeTemplar(),
       genus: [
@@ -203,7 +203,10 @@ describe('Знание о видах: цель переброса', () => {
       ]
     }
     const [g] = analyzeGenus(char, templarPveConsensus).genuses
-    expect(g.slots[0].target?.stat).toBe(31)
+    // Макс. АТК в этой ячейке бывает только в уникальном грейде и выше: на ур. 7 рода — 0,1% за анализ.
+    // Поэтому советуем АТК в PvE (эпический грейд, ~5%), а не почти недостижимое.
+    expect(g.slots[0].target).toMatchObject({ stat: 56, inSlot: true })
+    expect(g.slots[0].target!.chance).toBeGreaterThan(1)
     expect(g.slots[1].target).toBeNull()
   })
 })
