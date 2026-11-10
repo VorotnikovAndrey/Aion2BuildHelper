@@ -1,0 +1,491 @@
+{
+  "_source": "PvP-гайды из статей в интернете (не Questlog), собраны помощником — decisions/0012",
+  "fetchedAt": "2026-11-10",
+  "guides": [
+    {
+      "schema": 1,
+      "id": "web-ranger-game8-dps-pvp",
+      "name": "DPS Ranger PvP Build — Game8",
+      "cls": "ranger",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "Game8", "author": "Game8 AION 2 Walkthrough Team" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A ranged damage setup for larger PvP fights built around Snipe, Tempest Shot and Deadshot. It slots four damage and AoE stigmas (Illusory Arrow, Arrow Storm, Griffon Arrow, Explosive Arrow), PvP Attack / PvP Damage Boost / PvP Critical Hit / PvP Accuracy manastones and the Magic Arcana set. Slow pursuers first, then hit groups with the AoE chain before they close the distance."
+        ]
+      },
+      "source": {
+        "title": "DPS Ranger PvP Build",
+        "url": "https://game8.co/games/Aion-2/archives/631924",
+        "author": "Game8 AION 2 Walkthrough Team",
+        "date": "2026-10-16",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "DPS Ranger PvP Build",
+          "url": "https://game8.co/games/Aion-2/archives/631924",
+          "author": "Game8 AION 2 Walkthrough Team",
+          "date": "2026-10-16",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        {
+          "skill": 14010000,
+          "role": "core",
+          "level": 20,
+          "specs": [3, 4],
+          "note": "Game8 also lists a third option (25% cooldown reset) that Deadshot does not have in the client; choose the third slot yourself."
+        },
+        { "skill": 14020000, "role": "core", "level": 20, "specs": [2, 4, 5] },
+        { "skill": 14340000, "role": "core", "level": 16, "specs": [2, 4] },
+        { "skill": 14080000, "role": "core", "level": 14, "specs": [1, 2] },
+        { "skill": 14090000, "role": "support", "level": 14, "specs": [1, 4] },
+        { "skill": 14110000, "role": "support", "level": 14, "specs": [1, 4] },
+        { "skill": 14130000, "role": "support", "level": 14, "specs": [3, 4] },
+        { "skill": 14050000, "role": "support", "level": 14, "specs": [2, 3] },
+        { "skill": 14070000, "role": "support", "note": "Part of the main chain; Game8 keeps it low with no specializations." },
+        { "skill": 14170000, "role": "situational", "note": "Starts the AoE chain; no specializations in the article." },
+        { "skill": 14330000, "role": "situational" },
+        { "skill": 14150000, "role": "stigma", "equip": true, "level": 20 },
+        { "skill": 14270000, "role": "stigma", "equip": true, "level": 20 },
+        { "skill": 14060000, "role": "stigma", "equip": true, "level": 20 },
+        { "skill": 14360000, "role": "stigma", "equip": true, "level": 20 },
+        { "skill": 14740000, "role": "passive", "level": 20 },
+        { "skill": 14710000, "role": "passive", "level": 15 },
+        { "skill": 14720000, "role": "passive", "level": 15 },
+        { "skill": 14730000, "role": "passive", "level": 15 },
+        { "skill": 14750000, "role": "passive", "level": 15 },
+        { "skill": 14760000, "role": "passive", "level": 15 },
+        { "skill": 14770000, "role": "passive", "level": 15 },
+        { "skill": 14780000, "role": "passive", "level": 15 },
+        { "skill": 14800000, "role": "passive", "level": 15 },
+        { "skill": 14790000, "role": "passive", "level": 14 }
+      ],
+      "stats": [
+        { "stat": 317, "weight": 5 },
+        { "stat": 282, "weight": 4 },
+        { "stat": 58, "weight": 4 },
+        { "stat": 65, "weight": 4 },
+        { "stat": 205, "weight": 3 },
+        { "stat": 132, "weight": 3 },
+        { "stat": 113, "weight": 3 },
+        { "stat": 425, "weight": 3 },
+        { "stat": 128, "weight": 2 },
+        { "stat": 318, "weight": 2 },
+        { "stat": 13, "weight": 3 },
+        { "stat": 9, "weight": 2 },
+        { "stat": 14, "weight": 2 },
+        { "stat": 17, "weight": 1 },
+        { "stat": 11, "weight": 1 }
+      ],
+      "gear": {
+        "skills": [
+          { "skill": 14010000, "weight": 5 },
+          { "skill": 14020000, "weight": 5 },
+          { "skill": 14740000, "weight": 4 },
+          { "skill": 14710000, "weight": 3 },
+          { "skill": 14720000, "weight": 3 },
+          { "skill": 14730000, "weight": 3 },
+          { "skill": 14750000, "weight": 3 },
+          { "skill": 14760000, "weight": 3 },
+          { "skill": 14770000, "weight": 3 },
+          { "skill": 14780000, "weight": 3 },
+          { "skill": 14800000, "weight": 3 }
+        ],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "manastones": [
+        { "stat": 58, "weight": 5 },
+        { "stat": 65, "weight": 5 },
+        { "stat": 132, "weight": 4 },
+        { "stat": 113, "weight": 4 }
+      ],
+      "arcana": {
+        "attack": [14010000, 14020000, 14340000],
+        "passive": [14740000],
+        "useless": [],
+        "preferredSet": "magic"
+      },
+      "daevanion": {
+        "goals": [
+          {
+            "id": "skills",
+            "name": "Skill nodes: Deadshot, Marking Shot, Gale Arrow",
+            "description": "Game8 marks these +1 nodes as priority on Nezekan, Zikel, Vaizel and Triniel.",
+            "skills": [14010000, 14090000, 14110000],
+            "boards": [31, 32, 33, 34]
+          },
+          {
+            "id": "stat-corners",
+            "name": "Key stat nodes on Nezekan–Triniel",
+            "description": "Cooldown Reduction and Combat Speed (Nezekan), Damage Boost and Tolerance (Zikel), Critical Damage Boost and Tolerance (Vaizel), Multi-hit Chance and Resist (Triniel).",
+            "nodes": [
+              310033, 310043, 310183, 310193, 320033, 320043, 320183, 320193, 330033, 330043, 330183, 330193, 340017, 340023, 340029, 340197, 340203,
+              340209
+            ]
+          },
+          {
+            "id": "azphel",
+            "name": "Azphel: PvP Damage Boost and Tolerance",
+            "description": "The PvP board's corner nodes. Game8 also marks Status Effect Chance and PvP Attack / Defense nodes there.",
+            "boards": [36],
+            "nodes": [360015, 360106, 360120, 360211, 360001, 360008, 360218, 360225]
+          }
+        ]
+      },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "titles": {
+        "attack": [23020043],
+        "defense": [22030003],
+        "utility": [12010061]
+      },
+      "combat": {
+        "macros": [
+          { "id": "step-1", "name": { "$skill": 14090000 }, "skills": [14090000] },
+          { "id": "step-2", "name": { "$skill": 14070000 }, "skills": [14070000] },
+          { "id": "step-3", "name": { "$skill": 14080000 }, "skills": [14080000] },
+          { "id": "step-4", "name": { "$skill": 14010000 }, "skills": [14010000] }
+        ],
+        "macroKey": "E",
+        "delayNote": "Game8: set the chain delay to about half your ping.",
+        "opener": [{ "skill": 14130000 }, { "skill": 14050000 }, { "skill": 14110000 }, { "skill": 14150000 }],
+        "openerNote": "Buff / debuff chain before any fight: it slows pursuers and buffs you.",
+        "manual": [
+          { "skill": 14170000, "when": "AoE chain as a group closes in: Explosion Trap first." },
+          { "skill": 14360000, "when": "AoE chain, after Explosion Trap." },
+          { "skill": 14060000, "when": "AoE chain, after Explosive Arrow." },
+          { "skill": 14270000, "when": "AoE chain finisher, after Griffon Arrow." }
+        ]
+      },
+      "rotation": [
+        "Before the fight: Snare Shot → Drill Dart → Gale Arrow → Illusory Arrow.",
+        "When a group approaches: Explosion Trap → Explosive Arrow → Griffon Arrow → Arrow Storm.",
+        "Main chain: Marking Shot → Suppressing Arrow → Burst Arrow → Deadshot; fire Deadshot whenever it is ready.",
+        "Most damage comes from Snipe, Tempest Shot and Deadshot — keep them at the highest levels."
+      ],
+      "tips": [
+        {
+          "kind": "skills",
+          "title": "Deadshot on its own key",
+          "text": "Game8 binds Deadshot to a dedicated key so it can go out alongside the Precision skills the moment it comes off cooldown."
+        },
+        {
+          "kind": "skills",
+          "title": "Chain delay",
+          "text": "Set the in-game chain delay to roughly half of your ping."
+        },
+        {
+          "kind": "build",
+          "title": "Hit them before they reach you",
+          "text": "This is a damage build for bigger fights: open on groups with the AoE chain while they are still closing in, and keep Snare Shot and Illusory Arrow for anyone chasing you."
+        },
+        {
+          "kind": "build",
+          "title": "Magic Arcana as a safety net",
+          "text": "The Magic set restores MP when you fall below 20% HP, which buys one more burst before you go down."
+        },
+        {
+          "kind": "build",
+          "title": "Pantheon god stats",
+          "text": "Game8 ranks Pantheon stats as Destruction, Illusion, Death, Space, Time; its summary box lists Destiny instead of Illusion and Space, so check the article."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-ranger-fextralife-control-survival",
+      "name": "PvP Control and Survival Build — Fextralife",
+      "cls": "ranger",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "Fextralife", "author": "Aion 2 Wiki (Fextralife)" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A control and survival setup that keeps melee divers off you with healing reduction, seals and traps placed under your feet. Stigmas are Vaizel's Authority, Bow of Blessing, Sealing Arrow and Ensnaring Trap. Defiance and Snare Shot are maxed first, and stats favour Accuracy and survivability over raw damage."
+        ]
+      },
+      "source": {
+        "title": "Ranger Builds — PvP Control and Survival Build",
+        "url": "https://aion2.wiki.fextralife.com/Ranger_Builds",
+        "author": "Aion 2 Wiki (Fextralife)",
+        "date": "2026-10-09",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "Ranger Builds — PvP Control and Survival Build",
+          "url": "https://aion2.wiki.fextralife.com/Ranger_Builds",
+          "author": "Aion 2 Wiki (Fextralife)",
+          "date": "2026-10-09",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 14130000, "role": "core", "level": 20, "specs": [3, 4, 5], "note": "Max first: mobile cast, Shackling Arrow chain, longer Slow and Root." },
+        { "skill": 14260000, "role": "core", "level": 20, "specs": [3, 4, 5], "note": "Max first: your answer to hard CC." },
+        { "skill": 14070000, "role": "core", "specs": [2, 4, 5] },
+        { "skill": 14090000, "role": "core", "specs": [2, 3, 4] },
+        { "skill": 14010000, "role": "core", "specs": [3, 4, 5], "note": "Mobile charging is the key pick." },
+        { "skill": 14080000, "role": "support", "specs": [1, 3, 5] },
+        { "skill": 14050000, "role": "support", "specs": [1, 4, 5] },
+        { "skill": 14110000, "role": "support", "specs": [3, 2, 5] },
+        { "skill": 14020000, "role": "support", "specs": [2, 4, 5] },
+        { "skill": 14340000, "role": "support", "specs": [2, 4, 5] },
+        { "skill": 14170000, "role": "situational", "note": "Alternative anti-dive trap." },
+        { "skill": 14310000, "role": "stigma", "equip": true },
+        { "skill": 14220000, "role": "stigma", "equip": true },
+        { "skill": 14160000, "role": "stigma", "equip": true, "level": 15, "note": "Level 5 adds a Root chance, level 15 a longer Seal." },
+        { "skill": 14180000, "role": "stigma", "equip": true, "level": 20, "note": "Level 10 strips buffs, 15 longer Airborne, 20 shorter cooldown." },
+        { "skill": 14380000, "role": "stigma", "equip": false, "note": "Swap in for Bow of Blessing in long attrition fights." },
+        { "skill": 14790000, "role": "passive" },
+        { "skill": 14770000, "role": "passive" }
+      ],
+      "stats": [
+        { "stat": 318, "weight": 5 },
+        { "stat": 193, "weight": 4 },
+        { "stat": 76, "weight": 4 },
+        { "stat": 159, "weight": 3 },
+        { "stat": 128, "weight": 2 },
+        { "stat": 317, "weight": 1 },
+        { "stat": 65, "weight": 1 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": { "attack": [], "passive": [], "useless": [] },
+      "daevanion": { "goals": [] },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "opener": [
+          { "skill": 14050000, "note": "From max range: Bleed and healing reduction." },
+          { "skill": 14130000, "note": "Then the Shackling Arrow chain to pin the target." },
+          { "skill": 14080000, "note": "Its bonus needs Slow or Root on the target." },
+          { "skill": 14090000, "note": "Grants Precision." },
+          { "skill": 14070000, "note": "Stun while Precision is up." },
+          { "skill": 14010000, "note": "Charge it while moving." }
+        ],
+        "manual": [
+          { "skill": 14160000, "when": "Interrupt casters or shut down an enemy burst in team fights." },
+          { "skill": 14180000, "when": "Drop under your feet when melee dives you." },
+          { "skill": 14170000, "when": "Same as Ensnaring Trap: a choke point against divers.", "optional": true },
+          { "skill": 14260000, "when": "Hold for hard CC: Airborne, Stun or Knockdown." }
+        ]
+      },
+      "rotation": [
+        "Open with Drill Dart from max range for Bleed and healing reduction.",
+        "Snare Shot + Shackling Arrow to pin the target, then Burst Arrow.",
+        "Marking Shot for Precision → Suppressing Arrow for the stun → Deadshot charged on the move.",
+        "Sealing Arrow interrupts casters; traps under your feet stop divers.",
+        "Keep Defiance for hard CC."
+      ],
+      "tips": [
+        {
+          "kind": "skills",
+          "title": "Burst Arrow needs Slow or Root",
+          "text": "Stun, Seal and Airborne don't enable Burst Arrow's bonus damage — land Snare Shot or a root first."
+        },
+        {
+          "kind": "skills",
+          "title": "Precision is only for the stun",
+          "text": "Suppressing Arrow does its damage without Precision; Marking Shot first only matters for the stun."
+        },
+        {
+          "kind": "skills",
+          "title": "Specializations before level 20",
+          "text": "Until the third specialization slot opens at skill level 20, run the first two picks of each skill."
+        },
+        {
+          "kind": "build",
+          "title": "Space control over damage",
+          "text": "The build wins by keeping melee away (healing reduction, seals, traps) and breaking out of hard CC with Defiance, not by out-damaging them."
+        },
+        {
+          "kind": "build",
+          "title": "Long fights",
+          "text": "In drawn-out fights swap Bow of Blessing for Supporting Fire for HP leech and extra shots."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-ranger-aion2guides-small-scale",
+      "name": "Ranger small-scale PvP (Korean builds, WIP) — aion2-guides.info",
+      "cls": "ranger",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "aion2-guides.info", "author": "aion2-guides.info (builds of Korean players 땅우양 and 히요리)" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A small-scale PvP setup assembled from two Korean Ranger players' videos; the page marks it as work in progress. The Ranger is treated as a fragile burst class that fights from about 20 m: Deadshot, Burst Arrow and Defiance go to 20, with Vaizel's Authority, Mother Nature's Breath, Ambush Kick and Stealth as stigmas. PvP Damage Boost goes on every manastone."
+        ]
+      },
+      "source": {
+        "title": "AION 2 Ranger Build & Guide — PvE, PvP, Leveling (WIP PvP section)",
+        "url": "https://aion2-guides.info/en/ranger/",
+        "author": "aion2-guides.info",
+        "date": "2026-10-31",
+        "region": "korea",
+        "kind": "guide",
+        "note": "PvP section marked work in progress; built from Korean builds (땅우양, 히요리), not a tested global build."
+      },
+      "sources": [
+        {
+          "title": "AION 2 Ranger Build & Guide — PvE, PvP, Leveling (WIP PvP section)",
+          "url": "https://aion2-guides.info/en/ranger/",
+          "author": "aion2-guides.info",
+          "date": "2026-10-31",
+          "region": "korea",
+          "kind": "guide",
+          "note": "PvP section marked work in progress; built from Korean builds (땅우양, 히요리), not a tested global build."
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 14010000, "role": "core", "level": 20, "specs": [4, 5], "note": "The page names the level 12 and 16 picks; the level 8 slot is your choice." },
+        { "skill": 14080000, "role": "core", "level": 20, "specs": [4, 5] },
+        { "skill": 14260000, "role": "core", "level": 20, "specs": [4, 5] },
+        { "skill": 14110000, "role": "core", "level": 16, "specs": [4, 5], "note": "Taken for the PvP Damage Boost option." },
+        { "skill": 14090000, "role": "support" },
+        { "skill": 14020000, "role": "support", "level": 16, "note": "Two specializations are enough in PvP." },
+        { "skill": 14340000, "role": "support", "level": 16, "note": "Two specializations are enough in PvP." },
+        { "skill": 14070000, "role": "situational", "note": "The first skill to drop in this build." },
+        { "skill": 14310000, "role": "stigma", "equip": true, "level": 20 },
+        { "skill": 14350000, "role": "stigma", "equip": true, "level": 20 },
+        { "skill": 14120000, "role": "stigma", "equip": true, "level": 20 },
+        { "skill": 14190000, "role": "stigma", "equip": true, "level": 15, "note": "Level 15 makes it usable in combat." },
+        { "skill": 14180000, "role": "stigma", "equip": false, "note": "High-level Arena against a Templar." },
+        { "skill": 14220000, "role": "stigma", "equip": false, "note": "Damage variant." },
+        { "skill": 14380000, "role": "stigma", "equip": false, "note": "Damage variant." },
+        { "skill": 14790000, "role": "passive" },
+        { "skill": 14760000, "role": "passive" },
+        { "skill": 14740000, "role": "passive" },
+        { "skill": 14710000, "role": "passive" }
+      ],
+      "stats": [
+        { "stat": 65, "weight": 5 },
+        { "stat": 318, "weight": 4 },
+        { "stat": 312, "weight": 4 },
+        { "stat": 193, "weight": 3 },
+        { "stat": 307, "weight": 3 },
+        { "stat": 6, "weight": 2 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "manastones": [
+        { "stat": 65, "weight": 5 },
+        { "stat": 104, "weight": 3 },
+        { "stat": 193, "weight": 3 },
+        { "stat": 307, "weight": 3 }
+      ],
+      "arcana": {
+        "attack": [14010000, 14080000, 14260000, 14110000],
+        "passive": [],
+        "useless": []
+      },
+      "daevanion": {
+        "goals": [
+          {
+            "id": "main-skills",
+            "name": "Main skill nodes",
+            "description": "The PvP route takes +4 on Defiance, Burst Arrow, Marking Shot, Gale Arrow and Deadshot.",
+            "skills": [14260000, 14080000, 14090000, 14110000, 14010000]
+          },
+          {
+            "id": "other-skills",
+            "name": "Secondary skill nodes",
+            "description": "Picked up on the way: Hunter's Resolve, Focused Eye, Revitalization Contract, Drill Dart.",
+            "skills": [14750000, 14740000, 14790000, 14050000]
+          },
+          {
+            "id": "azphel",
+            "name": "Azphel: PvP Damage Boost and Tolerance",
+            "description": "The PvP route on Azphel takes only PvP Damage Boost and PvP Damage Tolerance.",
+            "boards": [36],
+            "nodes": [360015, 360106, 360120, 360211, 360001, 360008, 360218, 360225]
+          }
+        ]
+      },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "manual": [
+          { "skill": 14310000, "when": "Buff before you engage, then Marking Shot." },
+          { "skill": 14120000, "when": "Point-blank, or on a target trying to run away." },
+          { "skill": 14190000, "when": "Not as an opener: hide while a Gladiator is invulnerable, then come back." },
+          { "skill": 14260000, "when": "Break out of crowd control." }
+        ]
+      },
+      "rotation": [
+        "Buff with Vaizel's Authority, then Marking Shot.",
+        "Gale Arrow, then a fully charged Deadshot; finish with Burst Arrow.",
+        "Kill Gladiators and ranged classes first; burst a Sorcerer while it is crowd-controlled."
+      ],
+      "tips": [
+        {
+          "kind": "build",
+          "title": "Don't get caught",
+          "text": "The Ranger is fragile: fight from around 20 m and avoid being caught. 1v1 is fine; 1v3 is about the limit with current Accuracy."
+        },
+        {
+          "kind": "skills",
+          "title": "Stealth against Gladiators",
+          "text": "Don't open from Stealth. Use it to wait out a Gladiator's 3-second invulnerability, then re-engage."
+        },
+        {
+          "kind": "skills",
+          "title": "Ambush Kick",
+          "text": "Use it at point-blank range or on someone trying to escape; in party PvP it can buy your healer one more cast."
+        },
+        {
+          "kind": "build",
+          "title": "Cure potions",
+          "text": "Gladiators and Chanters debuff you — carry cure potions to clear them."
+        },
+        {
+          "kind": "build",
+          "title": "Accuracy or Evasion",
+          "text": "The two Korean builds split: one stacks Accuracy, the other Evasion (said to cap at 50%). HP, Defense and Will (against Templar knockdowns) matter because you take as much damage as you deal."
+        },
+        {
+          "kind": "build",
+          "title": "Stigmas that didn't make it",
+          "text": "Sealing Arrow and Illusory Arrow were tested and judged not worth a slot. A damage variant runs Vaizel's Authority, Bow of Blessing, Supporting Fire and Griffon Arrow with Deadshot and Gale Arrow at 20."
+        },
+        {
+          "kind": "build",
+          "title": "Work in progress",
+          "text": "The article says this PvP build is assembled from Korean videos rather than a tested global build — check it against the original."
+        }
+      ]
+    }
+  ]
+}

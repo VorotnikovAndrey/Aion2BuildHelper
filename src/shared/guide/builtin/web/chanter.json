@@ -1,0 +1,521 @@
+{
+  "_source": "PvP-гайды из статей в интернете (не Questlog), собраны помощником — decisions/0012",
+  "fetchedAt": "2026-11-10",
+  "guides": [
+    {
+      "schema": 1,
+      "id": "web-chanter-game8-support-dps",
+      "name": "Support DPS, group PvP — Game8",
+      "cls": "chanter",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "Game8", "author": "Game8 AION 2 Walkthrough Team" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A group-PvP support DPS Chanter built around Dark Crush. Impactful Crush, Tremor Crush and Wave Blow land the stuns and knockdowns that open Dark Crush, Marchutan's Wrath opens it again, and both mantras stay on. Gear leans on Attack, Critical Hit and Combat Speed, with PvP options on every manastone."
+        ]
+      },
+      "source": {
+        "title": "Support DPS Chanter PvP Build",
+        "url": "https://game8.co/games/Aion-2/archives/631452",
+        "author": "Game8 AION 2 Walkthrough Team",
+        "date": "2026-10-16",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "Support DPS Chanter PvP Build",
+          "url": "https://game8.co/games/Aion-2/archives/631452",
+          "author": "Game8 AION 2 Walkthrough Team",
+          "date": "2026-10-16",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 18100000, "role": "core", "level": 20, "specs": [5, 3, 4] },
+        { "skill": 18060000, "role": "core", "level": 20, "specs": [2, 5, 4] },
+        { "skill": 18040000, "role": "core", "level": 14, "specs": [3, 5] },
+        { "skill": 18010000, "role": "support", "level": 14, "specs": [3, 4] },
+        { "skill": 18290000, "role": "support", "level": 14, "specs": [1, 3] },
+        { "skill": 18080000, "role": "support", "level": 14, "specs": [1, 4] },
+        { "skill": 18300000, "role": "support", "level": 14, "specs": [3, 4] },
+        { "skill": 18150000, "role": "support", "level": 14, "specs": [3, 4] },
+        { "skill": 18090000, "role": "support", "level": 9, "specs": [3] },
+        { "skill": 18210000, "role": "support", "level": 5 },
+        { "skill": 18120000, "role": "support", "level": 5 },
+        { "skill": 18200000, "role": "support", "level": 5 },
+        { "skill": 18190000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 18160000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 18330000, "role": "stigma", "level": 20, "equip": true, "note": "Opens Dark Crush again" },
+        { "skill": 18130000, "role": "stigma", "level": 20, "equip": true, "note": "Gap closer; flexible slot" },
+        { "skill": 18230000, "role": "stigma", "equip": false, "note": "Alternative to Fracturing Blow, depending on content" },
+        { "skill": 18250000, "role": "stigma", "equip": false, "note": "Alternative to Fracturing Blow, depending on content" },
+        { "skill": 18800000, "role": "passive", "level": 20 },
+        { "skill": 18710000, "role": "passive", "level": 15 },
+        { "skill": 18720000, "role": "passive", "level": 15 },
+        { "skill": 18730000, "role": "passive", "level": 15 },
+        { "skill": 18740000, "role": "passive", "level": 15 },
+        { "skill": 18750000, "role": "passive", "level": 15 },
+        { "skill": 18760000, "role": "passive", "level": 15 },
+        { "skill": 18770000, "role": "passive", "level": 15 },
+        { "skill": 18780000, "role": "passive", "level": 15 },
+        { "skill": 18790000, "role": "passive", "level": 14 }
+      ],
+      "stats": [
+        { "stat": 317, "weight": 5 },
+        { "stat": 128, "weight": 4 },
+        { "stat": 282, "weight": 3 },
+        { "stat": 425, "weight": 3 },
+        { "stat": 28, "weight": 3 },
+        { "stat": 44, "weight": 2 },
+        { "stat": 1, "weight": 2 },
+        { "stat": 318, "weight": 2 },
+        { "stat": 205, "weight": 1 },
+        { "stat": 5, "weight": 1 },
+        { "stat": 65, "weight": 4 },
+        { "stat": 58, "weight": 3 },
+        { "stat": 132, "weight": 3 },
+        { "stat": 113, "weight": 3 },
+        { "stat": 76, "weight": 2 },
+        { "stat": 158, "weight": 2 },
+        { "stat": 13, "weight": 3 },
+        { "stat": 9, "weight": 2 },
+        { "stat": 14, "weight": 2 },
+        { "stat": 17, "weight": 1 },
+        { "stat": 11, "weight": 1 }
+      ],
+      "gear": {
+        "skills": [
+          { "skill": 18100000, "weight": 5 },
+          { "skill": 18750000, "weight": 4 },
+          { "skill": 18290000, "weight": 4 },
+          { "skill": 18800000, "weight": 3 },
+          { "skill": 18710000, "weight": 3 },
+          { "skill": 18720000, "weight": 3 },
+          { "skill": 18730000, "weight": 3 },
+          { "skill": 18740000, "weight": 3 },
+          { "skill": 18760000, "weight": 3 },
+          { "skill": 18770000, "weight": 3 },
+          { "skill": 18780000, "weight": 3 }
+        ],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "manastones": [
+        { "stat": 65, "weight": 5 },
+        { "stat": 58, "weight": 4 },
+        { "stat": 132, "weight": 4 },
+        { "stat": 113, "weight": 3 },
+        { "stat": 569, "weight": 3 },
+        { "stat": 317, "weight": 1 },
+        { "stat": 128, "weight": 1 }
+      ],
+      "arcana": {
+        "attack": [18100000, 18060000],
+        "passive": [18800000],
+        "useless": [],
+        "preferredSet": "magic",
+        "notes": "Cards: Chalice, Parchment, Compass and Bell of Magic plus Mirror of Vigor (Magic Armor set); deity stats Destruction and Time."
+      },
+      "daevanion": {
+        "goals": [
+          {
+            "id": "skills",
+            "name": { "$join": [{ "$skill": 18100000 }, { "$skill": 18040000 }], "sep": " + " },
+            "description": "+1 nodes of Dark Crush and Incandescent Blow on Nezekan, Zikel, Vaizel and Triniel.",
+            "skills": [18100000, 18040000],
+            "boards": [81, 82, 83, 84]
+          },
+          {
+            "id": "board-stats",
+            "name": "Unique stat nodes",
+            "description": "Nezekan: Combat Speed, Cooldown Reduction. Zikel: Damage Boost, Damage Tolerance. Vaizel: Critical Damage Boost, Critical Damage Tolerance. Triniel: Multi-hit Chance, Multi-hit Resist.",
+            "boards": [81, 82, 83, 84],
+            "nodes": [
+              810033, 810193, 810043, 810183, 820043, 820183, 820033, 820193, 830033, 830193, 830043, 830183, 840023, 840197, 840209, 840017, 840029, 840203
+            ]
+          },
+          {
+            "id": "azphel",
+            "name": "Azphel: PvP nodes",
+            "description": "PvP Damage Boost, PvP Damage Tolerance, Status Effect Chance, then PvP Attack / Defense.",
+            "boards": [86],
+            "nodes": [860015, 860106, 860120, 860211, 860001, 860008, 860218, 860225, 860004, 860040, 860061, 860068, 860158, 860165, 860186, 860222]
+          }
+        ]
+      },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "titles": {
+        "attack": [23020043],
+        "defense": [22030003],
+        "utility": [13050009]
+      },
+      "combat": {
+        "macroKey": "R",
+        "delayNote": "About half of your ping (article advice).",
+        "macros": [
+          { "id": "dark-crush", "name": { "$skill": 18100000 }, "skills": [18100000] },
+          { "id": "tremor-crush", "name": { "$skill": 18210000 }, "skills": [18210000] },
+          { "id": "gust-rampage", "name": { "$skill": 18300000 }, "skills": [18300000] }
+        ],
+        "manual": [
+          { "skill": 18190000, "when": "Turn on before engaging" },
+          { "skill": 18160000, "when": "Turn on before engaging" },
+          { "skill": 18060000, "when": "Stun that opens Dark Crush; cast right before the macro when ready" },
+          { "skill": 18290000, "when": "Cast together with the macro when ready" },
+          { "skill": 18330000, "when": "Opens Dark Crush again; cast together with the macro when ready" },
+          { "skill": 18080000, "when": "Knockdown that opens Dark Crush" },
+          { "skill": 18090000, "when": "Close the gap" },
+          { "skill": 18130000, "when": "Close the gap" },
+          { "skill": 18120000, "when": "Often in a party: heals and removes Stun / Knockdown" }
+        ],
+        "opener": [
+          { "skill": 18100000, "note": "R macro" },
+          { "skill": 18090000 },
+          { "skill": 18150000 },
+          { "skill": 18130000 },
+          { "skill": 18100000, "note": "R macro again" },
+          { "skill": 18040000 },
+          { "skill": 18010000 }
+        ],
+        "openerNote": "Skill sequence from the article; the R macro is Dark Crush > Tremor Crush > Gust Rampage."
+      },
+      "rotation": [
+        "Turn on Undefeated Mantra and Sprint Mantra before the fight.",
+        "Land a stun or knockdown (Impactful Crush, Tremor Crush, Wave Blow) to open Dark Crush.",
+        "Spend the window on the Dark Crush macro; Marchutan's Wrath opens it again.",
+        "Close distance with Rushing Smash or Fracturing Blow.",
+        "Between bursts, cast Recuperation to heal the party and clear Stun / Knockdown."
+      ],
+      "tips": [
+        {
+          "kind": "build",
+          "title": "Role",
+          "text": "Group PvP damage dealer that also controls: the same Dark Crush core as the PvE build, with more weight on stuns and knockdowns."
+        },
+        {
+          "kind": "build",
+          "title": "Flexible stigma slot",
+          "text": "Fracturing Blow is the gap closer; swap it for Ensnaring Mark or Power of the Storm when the content calls for it."
+        },
+        {
+          "kind": "skills",
+          "title": "Macro delay",
+          "text": "Set the macro delay to roughly half your current ping."
+        },
+        {
+          "kind": "skills",
+          "title": "Recuperation as a cleanse",
+          "text": "In a party, use Recuperation often: it keeps allies alive and removes Stun and Knockdown from them."
+        },
+        {
+          "kind": "build",
+          "title": "Deity stats",
+          "text": "The article's deity stat summary (Destruction, Destiny, Death, Time, Wisdom) and its ordered list (Destruction, Illusion, Death, Space, Time) disagree; the weights here follow the ordered list."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-chanter-aion2guides-notxeon-arena",
+      "name": "Solo / arena PvP (notXeon) — aion2-guides.info",
+      "cls": "chanter",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "aion2-guides.info", "author": "notXeon" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A 1v1 / arena Chanter based on notXeon's arena duels. Every crowd-control skill takes its stun chance and duration picks. The plan: bait the enemy's Defiance with Impactful Crush, kite while it is on cooldown, then chain stun, knockdown and Dark Crush. Fracturing Blow turns into Sprint Mantra in the arena; the group stigmas are for team fights only."
+        ]
+      },
+      "source": {
+        "title": "AION 2 Chanter Build & Guide — PvE, PvP, Leveling",
+        "url": "https://aion2-guides.info/en/chanter/",
+        "author": "notXeon",
+        "date": "2026-11-08",
+        "region": "global",
+        "kind": "guide",
+        "note": "PvP section follows notXeon's video \"The ONLY Chanter PvP Skill Guide\" (2026-10-06)."
+      },
+      "sources": [
+        {
+          "title": "AION 2 Chanter Build & Guide — PvE, PvP, Leveling",
+          "url": "https://aion2-guides.info/en/chanter/",
+          "author": "notXeon",
+          "date": "2026-11-08",
+          "region": "global",
+          "kind": "guide",
+          "note": "PvP section follows notXeon's video \"The ONLY Chanter PvP Skill Guide\" (2026-10-06)."
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 18060000, "role": "core", "level": 16, "specs": [2, 5], "note": "Opener from about 20 m; skip the AoE and mobile picks" },
+        { "skill": 18080000, "role": "core", "level": 16, "specs": [3, 5], "note": "Only on a stunned target" },
+        { "skill": 18100000, "role": "core", "level": 16, "specs": [3, 5] },
+        { "skill": 18290000, "role": "core", "level": 16, "specs": [3, 5] },
+        { "skill": 18090000, "role": "support", "level": 20, "specs": [1, 5, 4] },
+        {
+          "skill": 18210000,
+          "role": "support",
+          "level": 16,
+          "specs": [5, 2],
+          "earlySpecs": [1],
+          "note": "At 16 the stamina pick gives way to +25% Stun Chance"
+        },
+        {
+          "skill": 18200000,
+          "role": "support",
+          "level": 12,
+          "specs": [3, 1],
+          "note": "The page is inconsistent about which pick comes at 8 and which at 12; check in-game"
+        },
+        { "skill": 18040000, "role": "support", "level": 16, "specs": [3, 5], "earlySpecs": [1] },
+        { "skill": 18010000, "role": "support", "specs": [3, 4, 5] },
+        { "skill": 18120000, "role": "support", "level": 12, "specs": [1, 4] },
+        { "skill": 18190000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 18330000, "role": "stigma", "level": 10, "equip": true, "note": "Level 10 adds a 50% stun chance" },
+        { "skill": 18130000, "role": "stigma", "level": 1, "equip": true, "note": "Gap closer; in the arena swap it for Sprint Mantra" },
+        { "skill": 18420000, "role": "stigma", "level": 15, "equip": true, "note": "Pays off at 15 (x1.5 Wind's Promise)" },
+        { "skill": 18160000, "role": "stigma", "equip": false, "note": "Arena / ground swap for Fracturing Blow" },
+        { "skill": 18170000, "role": "stigma", "equip": false, "note": "Group fights only" },
+        { "skill": 18240000, "role": "stigma", "equip": false, "note": "Group fights only" },
+        { "skill": 18250000, "role": "stigma", "equip": false, "note": "Group fights only" },
+        { "skill": 18750000, "role": "passive" },
+        { "skill": 18740000, "role": "passive" },
+        { "skill": 18800000, "role": "passive" },
+        { "skill": 18760000, "role": "passive" },
+        { "skill": 18730000, "role": "passive" }
+      ],
+      "stats": [
+        {
+          "stat": 317,
+          "weight": 5,
+          "note": "The PvP section gives no stat order: weights follow the page's manastone advice (Attack, Critical Hit, Accuracy), plus Azphel's PvP stats and the section's focus on landing stuns."
+        },
+        { "stat": 128, "weight": 4 },
+        { "stat": 104, "weight": 3 },
+        { "stat": 318, "weight": 3 },
+        { "stat": 65, "weight": 4 },
+        { "stat": 76, "weight": 3 },
+        { "stat": 158, "weight": 3 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": {
+        "attack": [18100000, 18010000, 18290000, 18040000, 18120000],
+        "passive": [18750000, 18760000, 18800000],
+        "useless": [],
+        "notes": "The PvP section keeps the page's PvE arcana: Chalice, Parchment and Compass on Primal Vigor, Bell and Mirror on Magic Armor."
+      },
+      "daevanion": {
+        "goals": [
+          {
+            "id": "cc-skills",
+            "name": { "$join": [{ "$skill": 18060000 }, { "$skill": 18080000 }, { "$skill": 18200000 }], "sep": " + " },
+            "description": "PvP route: +4 to Impactful Crush, Wave Blow and Defiance (one node on each of the four boards).",
+            "skills": [18060000, 18080000, 18200000],
+            "boards": [81, 82, 83, 84]
+          },
+          {
+            "id": "route-skills",
+            "name": { "$skill": 18040000 },
+            "description": "Also on the route: +4 Incandescent Blow (and +2 to Blessing of Life, Attack Preparation, Recuperation, Survival Willpower, Wind's Promise).",
+            "skills": [18040000],
+            "boards": [81, 82, 83, 84]
+          },
+          {
+            "id": "azphel",
+            "name": "Azphel: PvP Damage Boost and Tolerance",
+            "description": "Azphel only for PvP Damage Boost and PvP Damage Tolerance (110 of 232 points in the page's route).",
+            "boards": [86],
+            "nodes": [860015, 860106, 860120, 860211, 860001, 860008, 860218, 860225]
+          }
+        ],
+        "notes": "The page says its route is calculated, not taken from the video: check it against the in-game board."
+      },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "notes": "notXeon plays duels by hand, without a macro. Keys are his arena hotbar; stacked cells use the first ready skill.",
+        "macros": [
+          { "id": "q", "name": { "$join": [{ "$skill": 18080000 }, { "$skill": 18210000 }], "sep": " / " }, "skills": [18080000, 18210000], "key": "Q" },
+          { "id": "e", "name": { "$join": [{ "$skill": 18100000 }, { "$skill": 18290000 }], "sep": " / " }, "skills": [18100000, 18290000], "key": "E" },
+          { "id": "t", "name": { "$skill": 18040000 }, "skills": [18040000], "key": "T" },
+          { "id": "lmb", "name": { "$skill": 18010000 }, "skills": [18010000], "key": "LMB" }
+        ],
+        "manual": [
+          { "skill": 18090000, "key": "1", "when": "Close the gap or chase" },
+          { "skill": 18060000, "key": "2", "when": "Opener from range: forces the enemy's Defiance" },
+          { "skill": 18420000, "key": "3", "when": "Buff for the fight" },
+          { "skill": 18160000, "key": "7", "when": "Arena / on the ground only", "optional": true },
+          { "skill": 18190000, "key": "8", "when": "Keep on" },
+          { "skill": 18330000, "when": "Second stun once the enemy's Defiance is down" },
+          { "skill": 18200000, "when": "Break the enemy's control" }
+        ],
+        "opener": [
+          { "skill": 18060000, "note": "From about 20 m: forces the enemy's Defiance" },
+          { "skill": 18330000, "note": "After their Defiance is used: stun again (or Impactful Crush)" },
+          { "skill": 18080000, "note": "Knockdown on the stunned target" },
+          { "skill": 18100000 },
+          { "skill": 18290000 }
+        ],
+        "openerNote": "Between the first stun and the second, kite until the enemy's Defiance is on cooldown (about a minute)."
+      },
+      "rotation": [
+        "Open with Impactful Crush from range to force the enemy's Defiance.",
+        "Watch their buff bar: once Defiance is used it is down for about a minute, so kite until your control is ready.",
+        "Stun again (Impactful Crush or Marchutan's Wrath), knock the stunned target down with Wave Blow, then Dark Crush and Spinning Strike.",
+        "If they run, chase with Rushing Smash; Tremor Crush dodges and can stun after the dodge."
+      ],
+      "tips": [
+        {
+          "kind": "build",
+          "title": "Bait Defiance first",
+          "text": "Defiance is the main counter to a Chanter's control. Make the enemy spend it on your first stun, then commit your full chain while it is on cooldown."
+        },
+        {
+          "kind": "build",
+          "title": "Stigma swaps",
+          "text": "Solo set: Undefeated Mantra, Marchutan's Wrath, Fracturing Blow, Guardian Blessing. In the arena (on the ground) Sprint Mantra replaces Fracturing Blow. Healing Touch, Impeding Authority and Power of the Storm are for group fights, not duels."
+        },
+        {
+          "kind": "skills",
+          "title": "Specializations",
+          "text": "Take stun and knockdown chance and duration wherever a skill offers them; the skills not listed for PvP keep their PvE picks."
+        },
+        {
+          "kind": "skills",
+          "title": "Defiance picks",
+          "text": "The page contradicts itself on Defiance: one place puts the 10% HP restore at 8 and the Crushing Strike chain at 12, another lists the chain at 8. Check the options in-game."
+        },
+        {
+          "kind": "build",
+          "title": "Sprint Mantra",
+          "text": "The page also says notXeon runs Sprint Mantra for dungeons and farming and drops it in PvP, which conflicts with the arena swap. It matters most on the ground; in the Abyss most fighting is in the air."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-chanter-fextralife-group-support",
+      "name": "Group PvP defensive support — Fextralife",
+      "cls": "chanter",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "Fextralife (AION 2 Wiki)", "author": "Fextralife wiki editors" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A defensive group-PvP Chanter that protects allies instead of chasing kills. It stacks Max HP, PvP Damage Tolerance and Status Effect Resist, stuns divers with Impactful Crush, seals melee clumps with Spinning Strike, and saves Impeding Authority, Barrier Spell and Defiance for the moments that decide a fight."
+        ]
+      },
+      "source": {
+        "title": "Chanter Builds — Group PvP Defensive Support Build",
+        "url": "https://aion2.wiki.fextralife.com/Chanter_Builds",
+        "author": "Fextralife wiki editors",
+        "date": "2026-10-09",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "Chanter Builds — Group PvP Defensive Support Build",
+          "url": "https://aion2.wiki.fextralife.com/Chanter_Builds",
+          "author": "Fextralife wiki editors",
+          "date": "2026-10-09",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 18060000, "role": "core", "specs": [1, 2, 5], "note": "Invest early for stun chance and duration" },
+        { "skill": 18100000, "role": "core", "specs": [3, 5, 1], "note": "Keep the Critical Hit and cooldown-removal picks" },
+        { "skill": 18120000, "role": "core", "specs": [1, 2, 5] },
+        { "skill": 18200000, "role": "core", "specs": [3, 4, 5] },
+        { "skill": 18290000, "role": "support", "specs": [1, 4, 5] },
+        { "skill": 18010000, "role": "support", "specs": [3, 4, 5] },
+        { "skill": 18190000, "role": "stigma", "equip": true },
+        { "skill": 18160000, "role": "stigma", "equip": true },
+        { "skill": 18240000, "role": "stigma", "level": 20, "equip": true, "note": "Level 20: restores HP when the shield breaks or ends" },
+        { "skill": 18440000, "role": "stigma", "equip": true },
+        { "skill": 18710000, "role": "passive" },
+        { "skill": 18730000, "role": "passive" },
+        { "skill": 18750000, "role": "passive" }
+      ],
+      "stats": [
+        { "stat": 193, "weight": 5 },
+        { "stat": 196, "weight": 5 },
+        { "stat": 76, "weight": 4 },
+        { "stat": 159, "weight": 3 },
+        { "stat": 317, "weight": 2 },
+        { "stat": 218, "weight": 2 },
+        { "stat": 282, "weight": 1 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": { "attack": [], "passive": [], "useless": [] },
+      "daevanion": { "goals": [] },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "manual": [
+          { "skill": 18060000, "when": "AoE stun on enemies diving your backline" },
+          { "skill": 18100000, "when": "Right after the stun, to force their defensive cooldowns" },
+          { "skill": 18290000, "when": "Into packed melee: Seal, ignores Block / Evasion" },
+          { "skill": 18240000, "when": "Early, as the enemy engages" },
+          { "skill": 18440000, "when": "On an ally under lethal focus" },
+          { "skill": 18200000, "when": "Save it to break hard control, then reposition" },
+          { "skill": 18120000, "when": "After repositioning: heal and cleanse" }
+        ]
+      },
+      "rotation": [
+        "Stay within range of your allies.",
+        "Stun divers with Impactful Crush, then Dark Crush to make them burn defensive cooldowns.",
+        "Drop Spinning Strike into packed melee to Seal and ignore Block / Evasion.",
+        "Cast Impeding Authority early, as the enemy engages.",
+        "Save Barrier Spell for an ally under lethal focus.",
+        "Keep Defiance for hard control, then reposition and cast Recuperation."
+      ],
+      "tips": [
+        {
+          "kind": "skills",
+          "title": "Dark Crush window",
+          "text": "Dark Crush's cooldown removal only works within about 2 seconds after Spinning Strike or Impactful Crush."
+        },
+        {
+          "kind": "skills",
+          "title": "Specialization slots",
+          "text": "Slots open at skill levels 8, 12 and 20: at 16 use the top two picks, the third one comes at 20."
+        },
+        {
+          "kind": "build",
+          "title": "Barrier Spell limits",
+          "text": "Barrier Spell does not stack with other invulnerability effects, and execute mechanics go through it."
+        }
+      ]
+    }
+  ]
+}

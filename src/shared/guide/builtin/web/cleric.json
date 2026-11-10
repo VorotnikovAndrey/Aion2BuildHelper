@@ -1,0 +1,460 @@
+{
+  "_source": "PvP-гайды из статей в интернете (не Questlog), собраны помощником — decisions/0012",
+  "fetchedAt": "2026-11-10",
+  "guides": [
+    {
+      "schema": 1,
+      "id": "web-cleric-th3ruthless-1v1",
+      "name": "Cleric 1v1 PvP — Th3Ruthless",
+      "cls": "cleric",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "clericguideaion2global.netlify.app", "author": "Th3Ruthless" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "The duel chapter of Th3Ruthless's Cleric guide: Earth Punishment makes Condemnation crit and reset, Noble Aura adds steady damage, Light of Protection adds tolerance and Salvation is the emergency button. Build pressure with Mark, Chain and Earth Punishment, keep attacking through the opponent's defensives and heal only in safe windows. Against heavy healers or shields, Voice of Doom replaces Noble Aura."
+        ]
+      },
+      "source": {
+        "title": "AION 2 Cleric Guide — Chapter 1. 1v1 PvP",
+        "url": "https://clericguideaion2global.netlify.app/",
+        "author": "Th3Ruthless",
+        "date": "2026-09-24",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "AION 2 Cleric Guide — Chapter 1. 1v1 PvP",
+          "url": "https://clericguideaion2global.netlify.app/",
+          "author": "Th3Ruthless",
+          "date": "2026-09-24",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 17350000, "role": "core", "level": 20, "specs": [4, 5, 2], "note": "Main duel damage; at Lv. 16 run 4/5" },
+        { "skill": 17150000, "role": "core", "level": 20, "specs": [3, 5, 4], "note": "At Lv. 16 run 3/5" },
+        { "skill": 17100000, "role": "core", "level": 20, "specs": [1, 3, 5], "note": "At Lv. 16 run 1/3" },
+        { "skill": 17120000, "role": "core", "level": 20, "specs": [1, 3, 5] },
+        { "skill": 17240000, "role": "core", "level": 20, "specs": [4, 5, 2], "note": "At Lv. 16 run 4/5" },
+        { "skill": 17010000, "role": "support", "level": 20, "specs": [2, 4, 5] },
+        { "skill": 17060000, "role": "support", "level": 20, "specs": [3, 4, 5] },
+        { "skill": 17040000, "role": "support", "level": 20, "specs": [2, 4, 5] },
+        { "skill": 17080000, "role": "support", "level": 20, "specs": [2, 3, 5] },
+        { "skill": 17070000, "role": "support", "level": 20, "specs": [3, 4, 5] },
+        { "skill": 17090000, "role": "support", "level": 20, "specs": [3, 4, 5] },
+        { "skill": 17370000, "role": "situational", "level": 20, "specs": [3, 4, 5] },
+        { "skill": 17400000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 17440000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 17410000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 17270000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 17300000, "role": "stigma", "level": 20, "equip": false, "note": "Swap for Noble Aura vs heavy healing or shields" },
+        { "skill": 17790000, "role": "passive", "level": 20 },
+        { "skill": 17710000, "role": "passive", "level": 20 },
+        { "skill": 17780000, "role": "passive", "level": 20 },
+        { "skill": 17730000, "role": "passive", "level": 20 },
+        { "skill": 17750000, "role": "passive", "level": 10 },
+        { "skill": 17740000, "role": "passive", "level": 10 },
+        { "skill": 17720000, "role": "passive", "level": 1 },
+        { "skill": 17760000, "role": "passive", "level": 1 },
+        { "skill": 17770000, "role": "passive", "level": 1 },
+        { "skill": 17800000, "role": "passive", "level": 1 }
+      ],
+      "stats": [
+        { "stat": 318, "weight": 5, "note": "Enough to land key hits" },
+        { "stat": 104, "weight": 5 },
+        { "stat": 193, "weight": 5 },
+        { "stat": 65, "weight": 4 },
+        { "stat": 282, "weight": 4 },
+        { "stat": 76, "weight": 4 },
+        { "stat": 133, "weight": 4 },
+        { "stat": 215, "weight": 3 },
+        { "stat": 159, "weight": 3 },
+        { "stat": 317, "weight": 2 },
+        { "stat": 32, "weight": 2 },
+        { "stat": 44, "weight": 2 },
+        { "stat": 443, "weight": 2 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": { "attack": [], "passive": [], "useless": [] },
+      "daevanion": { "goals": [] },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "opener": [
+          { "skill": 17410000, "note": "Already active before the duel" },
+          { "skill": 17440000, "note": "Ready as the fight opens" },
+          { "skill": 17090000, "note": "Keep it running; start with room to move" },
+          { "skill": 17080000 },
+          { "skill": 17070000 },
+          { "skill": 17400000, "note": "Check it is on the target before Condemnation" },
+          { "skill": 17350000, "note": "Chain follow-ups and crit resets while Earth Punishment lasts" },
+          { "skill": 17150000, "note": "Place it where the fight will stay" },
+          { "skill": 17060000, "note": "Only when it cannot be absorbed by an active defensive" }
+        ],
+        "openerNote": "Duel sequence from the article; Earth's Retribution and Judgment Thunder fill the gaps between Condemnation casts.",
+        "manual": [
+          { "skill": 17010000, "when": "Fill gaps between Condemnation casts" },
+          { "skill": 17040000, "when": "Fill gaps between Condemnation casts" },
+          { "skill": 17100000, "when": "Heal early, during safe movement — not for minor damage" },
+          { "skill": 17120000, "when": "Heal and cleanse in safe windows" },
+          { "skill": 17240000, "when": "Only against control that would decide the fight" },
+          { "skill": 17270000, "when": "Lethal focus window; from Lv. 20 castable during Impact-type control" },
+          { "skill": 17300000, "when": "If slotted: time its heal suppression with your burst", "optional": true }
+        ]
+      },
+      "rotation": [
+        "Before the duel: Light of Protection up, Noble Aura ready, Light of Regeneration running, room to move.",
+        "Open pressure with Debilitating Mark, Chain of Torment and Earth Punishment, then keep attacking through the window.",
+        "Chain Condemnation while Earth Punishment is on the target; weave Earth's Retribution and Judgment Thunder into the gaps.",
+        "Commit Divine Aura and Bolt only when the opponent cannot soak them with a defensive.",
+        "Heal early in safe moments; hold Defiance for real control and Salvation for a lethal focus window."
+      ],
+      "tips": [
+        {
+          "id": "levels",
+          "kind": "skills",
+          "title": "Leveling priority",
+          "text": "Take Condemnation, Divine Aura, Healing Light, Radiant Recovery and Defiance to 20 first; Earth's Retribution and Bolt follow as resources allow. At skill level 16 the article runs Condemnation 4/5, Divine Aura 3/5, Healing Light 1/3 and Defiance 4/5."
+        },
+        {
+          "id": "melee",
+          "kind": "skills",
+          "title": "Against melee",
+          "text": "Condemnation 3/4/5 trades some single-target damage for a root chance, and Judgment Thunder 2/3/5 trades its root for a Combat Speed debuff. Root and stun procs are chance-based, so do not plan Bolt around them."
+        },
+        {
+          "id": "mistakes",
+          "kind": "skills",
+          "title": "Common mistakes",
+          "text": "Casting Bolt into a defensive cooldown, walking out of Divine Aura, healing minor damage instead of attacking, and using defensives too late."
+        },
+        {
+          "id": "doom",
+          "kind": "build",
+          "title": "Voice of Doom swap",
+          "text": "Replace Noble Aura with Voice of Doom against heavy healing or shields: from Lv. 10 it strips shields, at 20 it cuts healing and potions by 60%. Use it only when you can follow up with damage."
+        },
+        {
+          "id": "stats",
+          "kind": "build",
+          "title": "Stats",
+          "text": "Get enough Accuracy to land key hits, then PvP Damage Boost, Combat Speed and Cooldown Reduction; on defense HP, PvP Damage Tolerance, Critical Hit Resist and Status Effect Resist. Do not stack Critical Hit: Condemnation already crits under Earth Punishment."
+        },
+        {
+          "id": "passives",
+          "kind": "build",
+          "title": "Passives",
+          "text": "After the key actives: Survival Willpower, Warm Benediction, Earth's Grace, Empyrean Lord's Grace, Immortal Veil, Healing Enhancement. The first four aim for 20 with bonuses; Heal Block can wait."
+        },
+        {
+          "id": "salvation",
+          "kind": "build",
+          "title": "Salvation",
+          "text": "Keep Salvation as the default emergency tool while you learn how much burst you can survive. It does not trigger by itself."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-cleric-game8-support",
+      "name": "Support Cleric PvP — Game8",
+      "cls": "cleric",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "game8.co", "author": "AION 2 Walkthrough Team" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "An endgame support build: Healing Light, Light of Regeneration and Radiant Recovery keep the team up, while Chain of Torment and Condemnation (made to crit by Earth Punishment) add damage between heals. Yustiel's Power and Root are fixed stigmas, Light of Protection is a flex slot for Absolution or Benevolence. Damage skills sit on one macro key, heals are pressed by hand."
+        ]
+      },
+      "source": {
+        "title": "Support Cleric PvP Build",
+        "url": "https://game8.co/games/Aion-2/archives/631965",
+        "author": "AION 2 Walkthrough Team",
+        "date": "2026-10-16",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "Support Cleric PvP Build",
+          "url": "https://game8.co/games/Aion-2/archives/631965",
+          "author": "AION 2 Walkthrough Team",
+          "date": "2026-10-16",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 17100000, "role": "core", "level": 20, "specs": [1, 2, 5] },
+        { "skill": 17090000, "role": "core", "level": 20, "specs": [1, 3, 4], "note": "Keep it up at all times" },
+        { "skill": 17120000, "role": "core", "level": 14, "specs": [2, 3] },
+        { "skill": 17070000, "role": "core", "specs": [2, 4], "note": "Max via Daevanion +1 nodes" },
+        { "skill": 17350000, "role": "core", "specs": [1, 4], "note": "Max via Daevanion +1 nodes" },
+        { "skill": 17040000, "role": "support", "note": "Max via Daevanion +1 nodes" },
+        { "skill": 17010000, "role": "support", "level": 9, "specs": [1] },
+        { "skill": 17080000, "role": "support", "level": 14, "specs": [1, 2] },
+        { "skill": 17150000, "role": "support", "level": 5 },
+        { "skill": 17060000, "role": "support", "level": 5 },
+        { "skill": 17370000, "role": "situational", "level": 16, "specs": [4, 5], "note": "Not in the rotation" },
+        { "skill": 17400000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 17420000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 17190000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 17410000, "role": "stigma", "level": 20, "equip": true, "note": "Flex slot" },
+        { "skill": 17290000, "role": "stigma", "equip": false, "note": "Can take the Light of Protection slot" },
+        { "skill": 17160000, "role": "stigma", "equip": false, "note": "Can take the Light of Protection slot" },
+        { "skill": 17710000, "role": "passive", "level": 15 },
+        { "skill": 17720000, "role": "passive", "level": 15 },
+        { "skill": 17730000, "role": "passive", "level": 15 },
+        { "skill": 17740000, "role": "passive", "level": 20 },
+        { "skill": 17750000, "role": "passive", "level": 15 },
+        { "skill": 17760000, "role": "passive", "level": 15 },
+        { "skill": 17770000, "role": "passive", "level": 15 },
+        { "skill": 17780000, "role": "passive", "level": 15 },
+        { "skill": 17790000, "role": "passive", "level": 14 },
+        { "skill": 17800000, "role": "passive", "level": 15 }
+      ],
+      "stats": [
+        { "stat": 193, "weight": 5 },
+        { "stat": 282, "weight": 4 },
+        { "stat": 199, "weight": 4 },
+        { "stat": 307, "weight": 4 },
+        { "stat": 11, "weight": 3 },
+        { "stat": 7, "weight": 3 },
+        { "stat": 10, "weight": 2 },
+        { "stat": 16, "weight": 2 },
+        { "stat": 9, "weight": 1 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "manastones": [
+        { "stat": 58, "weight": 4 },
+        { "stat": 113, "weight": 4 },
+        { "stat": 569, "weight": 4 },
+        { "stat": 193, "weight": 4 },
+        { "stat": 307, "weight": 3 }
+      ],
+      "arcana": { "attack": [17090000, 17100000, 17370000], "passive": [17740000], "useless": [], "preferredSet": "magic" },
+      "titles": { "attack": [23020043], "defense": [22030003], "utility": [13050009] },
+      "daevanion": {
+        "goals": [
+          {
+            "id": "skills",
+            "name": "+1 nodes: Chain of Torment, Condemnation, Judgment Thunder",
+            "description": "Take these before orange stat nodes",
+            "skills": [17070000, 17350000, 17040000],
+            "boards": [71, 72, 73, 74]
+          },
+          {
+            "id": "stats",
+            "name": "Top stat nodes of the PvE boards",
+            "description": "Nezekan: Combat Speed, Cooldown Reduction; Zikel: Damage Boost; Vaizel: Critical Damage Boost; Triniel: Multi-hit Chance",
+            "nodes": [710033, 710193, 710043, 710183, 720043, 720183, 730033, 730193, 740023, 740197, 740209]
+          },
+          {
+            "id": "azphel",
+            "name": "Azphel: PvP Damage Boost, then PvP Damage Tolerance",
+            "boards": [76],
+            "nodes": [760015, 760106, 760120, 760211, 760001, 760008, 760218, 760225]
+          }
+        ]
+      },
+      "genus": {},
+      "combat": {
+        "macroKey": "E",
+        "macros": [
+          { "id": "step-1", "name": { "$skill": 17070000 }, "skills": [17070000] },
+          { "id": "step-2", "name": { "$skill": 17400000 }, "skills": [17400000] },
+          { "id": "step-3", "name": { "$skill": 17350000 }, "skills": [17350000] }
+        ],
+        "delayNote": "Set the macro display delay to about half your ping.",
+        "opener": [{ "skill": 17060000 }, { "skill": 17150000 }, { "skill": 17080000 }, { "skill": 17040000 }],
+        "openerNote": "Then hold the E macro.",
+        "manual": [
+          { "skill": 17090000, "when": "Keep it active at all times (also +5% Move Speed)" },
+          { "skill": 17160000, "when": "If slotted: together with Light of Regeneration for steady team healing", "optional": true },
+          { "skill": 17120000, "when": "After a big hit, or to remove a dangerous status" },
+          { "skill": 17290000, "when": "If slotted: extra cleanse or panic heal together with Radiant Recovery", "optional": true },
+          { "skill": 17100000, "when": "On cooldown for buffs and healing; backup heal for the lowest-HP ally" }
+        ]
+      },
+      "rotation": [
+        "Open with Bolt, Divine Aura, Debilitating Mark and Judgment Thunder, then hold the E macro: Chain of Torment, Earth Punishment, Condemnation.",
+        "Earth Punishment makes Condemnation crit, and the crit resets its cooldown.",
+        "Only damage skills go on the macro; heals are cast by hand to manage their cooldowns.",
+        "Keep Light of Regeneration up; Radiant Recovery after burst or a key status, Healing Light on cooldown and as backup for the lowest ally."
+      ],
+      "tips": [
+        {
+          "id": "macro",
+          "kind": "skills",
+          "title": "Macro setup",
+          "text": "Group the macro'd damage skills on one key and set the macro display delay to roughly half your ping; every other skill is pressed manually."
+        },
+        {
+          "id": "flex",
+          "kind": "build",
+          "title": "Flex stigma",
+          "text": "Light of Protection is the flexible slot: swap it for Absolution or Benevolence. It is redundant if a Chanter with Undefeated Mantra is in the party."
+        },
+        {
+          "id": "fixed",
+          "kind": "build",
+          "title": "Fixed stigmas",
+          "text": "Yustiel's Power is treated as essential for party survival; Root locks targets down and helps you keep distance."
+        },
+        {
+          "id": "boards",
+          "kind": "build",
+          "title": "Daevanion",
+          "text": "Fill the +1 nodes of Chain of Torment, Condemnation and Judgment Thunder before orange stat nodes. Per board: Nezekan — Combat Speed, Cooldown Reduction; Zikel — Damage Boost; Vaizel — Critical Damage Boost; Triniel — Multi-hit Chance; Azphel — PvP Damage Boost, then PvP Damage Tolerance and Status Effect Chance."
+        },
+        {
+          "id": "arcana",
+          "kind": "build",
+          "title": "Arcana and god stats",
+          "text": "Magic Armor set (Chalice, Parchment, Compass and Bell of Magic plus a Mirror of Vigor) with Light of Regeneration, Healing Light and Healing Enhancement as sub-skills. God stat order: Time, Justice, Life, Destiny, Illusion."
+        },
+        {
+          "id": "stones",
+          "kind": "build",
+          "title": "Manastones",
+          "text": "The author's gear uses PvP Attack, PvP Accuracy, PvP Block and HP stones, with Defense on the helmet and pauldrons. Main stats are HP, MP/Defense and Combat Speed."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-cleric-fextralife-group",
+      "name": "Group PvP Support — Fextralife Wiki",
+      "cls": "cleric",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "aion2.wiki.fextralife.com", "author": "Aion 2 Wiki (Fextralife)" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A group build for Abyss skirmishes and frontline team fights: stay free of control, cleanse quickly and keep panic buttons for the team. It runs Light of Protection, Absolution, Yustiel's Power and Salvation, and swaps several PvE specializations for root, stun, slow and cleanse options. Survival stats come before damage."
+        ]
+      },
+      "source": {
+        "title": "Cleric Builds — Group PvP Support Build",
+        "url": "https://aion2.wiki.fextralife.com/Cleric_Builds",
+        "author": "Aion 2 Wiki (Fextralife)",
+        "date": "2026-10-09",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "Cleric Builds — Group PvP Support Build",
+          "url": "https://aion2.wiki.fextralife.com/Cleric_Builds",
+          "author": "Aion 2 Wiki (Fextralife)",
+          "date": "2026-10-09",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 17120000, "role": "core", "specs": [1, 3, 5], "note": "Double cleanse and team recovery" },
+        { "skill": 17100000, "role": "core", "specs": [1, 3, 5] },
+        { "skill": 17240000, "role": "core", "note": "Breaks hard control" },
+        { "skill": 17090000, "role": "support", "specs": [4, 3, 5] },
+        { "skill": 17080000, "role": "support" },
+        { "skill": 17070000, "role": "support" },
+        { "skill": 17350000, "role": "support", "specs": [3, 4, 5] },
+        { "skill": 17060000, "role": "support", "specs": [3, 1, 5] },
+        { "skill": 17150000, "role": "support", "specs": [1, 4, 5] },
+        { "skill": 17010000, "role": "support", "specs": [2, 4, 5] },
+        { "skill": 17410000, "role": "stigma", "equip": true },
+        { "skill": 17290000, "role": "stigma", "equip": true },
+        { "skill": 17420000, "role": "stigma", "equip": true },
+        { "skill": 17270000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 17160000, "role": "stigma", "equip": false, "note": "Replaces Light of Protection with a Chanter in the party" },
+        { "skill": 17790000, "role": "passive" },
+        { "skill": 17770000, "role": "passive" },
+        { "skill": 17750000, "role": "passive" }
+      ],
+      "stats": [
+        { "stat": 193, "weight": 5 },
+        { "stat": 159, "weight": 4 },
+        { "stat": 76, "weight": 3 },
+        { "stat": 317, "weight": 2 },
+        { "stat": 218, "weight": 2 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": { "attack": [], "passive": [], "useless": [] },
+      "daevanion": { "goals": [] },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "manual": [
+          { "skill": 17240000, "when": "Hold it to break hard control: Airborne, Stun, Knockdown, Fear" },
+          { "skill": 17080000, "when": "On the enemy caller to strip their damage boost" },
+          { "skill": 17070000, "when": "Right after Debilitating Mark to focus the caller" },
+          { "skill": 17270000, "when": "Panic button: from Lv. 15 it also covers the lowest-HP ally, from Lv. 20 castable under Impact-type control" }
+        ]
+      },
+      "rotation": [
+        "Keep Defiance for hard control instead of using it on a timer.",
+        "Peel for the team: Debilitating Mark on the enemy caller, then Chain of Torment to focus them.",
+        "Radiant Recovery for the double cleanse and team healing; Healing Light adds a chance to remove a debuff."
+      ],
+      "tips": [
+        {
+          "id": "spec-timing",
+          "kind": "skills",
+          "title": "Specialization timing",
+          "text": "Slots open at skill levels 8, 12 and 20; until level 20, equip the first two listed options."
+        },
+        {
+          "id": "pvp-swaps",
+          "kind": "skills",
+          "title": "PvP swaps",
+          "text": "Compared with PvE, Condemnation takes the root chance, Bolt the full-charge stun, Divine Aura the slow, Healing Light the debuff removal and Light of Regeneration the Move Speed boost instead of damage or healing bonuses. Earth's Retribution and Radiant Recovery stay as in PvE."
+        },
+        {
+          "id": "chanter",
+          "kind": "build",
+          "title": "With a Chanter",
+          "text": "Light of Protection does not stack with a Chanter's Undefeated Mantra, so take Benevolence in that slot."
+        },
+        {
+          "id": "salvation",
+          "kind": "build",
+          "title": "Salvation levels",
+          "text": "At Lv. 15 the immunity bubble also covers the lowest-HP party member; at Lv. 20 you can cast it while stunned or knocked down."
+        }
+      ]
+    }
+  ]
+}

@@ -15,7 +15,7 @@ const traverse = traverseMod.default ?? traverseMod
 export const ROOT = resolve(fileURLToPath(import.meta.url), '../../..')
 export const LOCALES_DIR = join(ROOT, 'src/shared/i18n/locales')
 const SOURCES = ['src/renderer/src', 'src/main', 'src/shared']
-const GUIDES = join(ROOT, 'src/shared/guide/builtin/questlog')
+const GUIDES = ['questlog', 'web'].map((d) => join(ROOT, 'src/shared/guide/builtin', d))
 
 const walk = (p) => (statSync(p).isDirectory() ? readdirSync(p).flatMap((f) => walk(join(p, f))) : [p])
 
@@ -62,7 +62,8 @@ export function collectKeys() {
       Object.values(v).forEach((x) => visit(x, where))
     }
   }
-  if (existsSync(GUIDES)) for (const f of readdirSync(GUIDES)) visit(JSON.parse(readFileSync(join(GUIDES, f), 'utf8')), `guide/builtin/questlog/${f}`)
+  for (const dir of GUIDES.filter(existsSync))
+    for (const f of readdirSync(dir)) visit(JSON.parse(readFileSync(join(dir, f), 'utf8')), `${relative(ROOT, dir)}/${f}`)
   return { keys, errors }
 }
 

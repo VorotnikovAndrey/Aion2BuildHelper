@@ -1,0 +1,363 @@
+{
+  "_source": "PvP-гайды из статей в интернете (не Questlog), собраны помощником — decisions/0012",
+  "fetchedAt": "2026-11-10",
+  "guides": [
+    {
+      "schema": 1,
+      "id": "web-gladiator-gamerblurb-pvp",
+      "name": "Gladiator PvP: control and burst — GamerBlurb",
+      "cls": "gladiator",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "GamerBlurb", "author": "GamerBlurb Team" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A control-first PvP setup: open with Blade Toss from range, close in with Leaping Slam, knock down with Mocking Blade and punish the opening with Overhead Slam and Aerial Snare. The stigmas lean defensive (Armor of Balance, Tenaciousness) so you outlast the enemy's control, and gear favours Accuracy and Status Effect Chance over small damage gains."
+        ]
+      },
+      "source": {
+        "title": "AION 2 Gladiator Build Guide: PvE and PvP",
+        "url": "https://gamerblurb.com/guides/aion-2-gladiator-build-guide-pve-and-pvp",
+        "author": "GamerBlurb Team",
+        "date": "2026-10-06",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "AION 2 Gladiator Build Guide: PvE and PvP",
+          "url": "https://gamerblurb.com/guides/aion-2-gladiator-build-guide-pve-and-pvp",
+          "author": "GamerBlurb Team",
+          "date": "2026-10-06",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 11170000, "role": "core", "specs": [5, 4, 3], "note": "PvP priority #1: punish the knockdown" },
+        { "skill": 11290000, "role": "core", "specs": [5, 4, 3], "note": "PvP priority #2: the knockdown that opens the combo" },
+        { "skill": 11300000, "role": "core", "specs": [5, 4, 2], "note": "PvP priority #3: airborne follow-up" },
+        { "skill": 11190000, "role": "support", "specs": [5, 2, 1], "note": "PvP priority #4: gap closer; option 2 can trigger Ankle Slice" },
+        { "skill": 11260000, "role": "support", "specs": [5, 4, 3], "note": "PvP priority #5: save it for control that would end your engage" },
+        { "skill": 11360000, "role": "support", "specs": [5, 4, 2], "note": "Re-engage after the target escapes, or disengage" },
+        { "skill": 11080000, "role": "stigma", "equip": true, "specs": [1, 2, 3], "note": "Ranged opener: Defense and Incoming Heal reduction" },
+        { "skill": 11400000, "role": "stigma", "equip": true },
+        { "skill": 11130000, "role": "stigma", "equip": true, "note": "Activate before the enemy's control lands" },
+        { "skill": 11380000, "role": "stigma", "equip": true, "note": "Emergency survival window" },
+        { "skill": 11390000, "role": "stigma", "equip": false, "note": "Aggressive swap for Tenaciousness: more pressure, no emergency button" },
+        { "skill": 11110000, "role": "stigma", "equip": false, "note": "Swap in against opponents whose attacks you can reliably block" }
+      ],
+      "stats": [
+        { "stat": 318, "weight": 5 },
+        { "stat": 113, "weight": 5 },
+        { "stat": 158, "weight": 4 },
+        { "stat": 65, "weight": 4 },
+        { "stat": 128, "weight": 3 },
+        { "stat": 282, "weight": 3 },
+        { "stat": 193, "weight": 2 },
+        { "stat": 76, "weight": 2 },
+        { "stat": 159, "weight": 2 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": { "attack": [], "passive": [], "useless": [] },
+      "daevanion": {
+        "goals": [
+          {
+            "id": "core-skills",
+            "name": "+1 to core skills",
+            "description": "Nodes for Overhead Slam, Rending Blow and Ruinous Blow first, then Attack, Combat Speed, Damage Boost, Multi-Hit and the defensive stats you need.",
+            "skills": [11170000, 11010000, 11100000]
+          }
+        ]
+      },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "opener": [
+          { "skill": 11080000, "note": "From range: Defense and healing reduction" },
+          { "skill": 11190000, "note": "Close the distance when you commit" },
+          { "skill": 11290000, "note": "Knockdown" },
+          { "skill": 11170000, "note": "While the target is down" },
+          { "skill": 11300000, "note": "When its follow-up is available" }
+        ],
+        "openerNote": "1v1 engage from the article. Ankle Slice can add another knockdown through Leaping Slam's specialization.",
+        "manual": [
+          { "skill": 11130000, "when": "Before the enemy's control chain, not after you are disabled" },
+          { "skill": 11380000, "when": "Emergency: when you are about to die or dive into a group" },
+          { "skill": 11260000, "when": "When enemy control would end your engage" },
+          { "skill": 11360000, "when": "Reconnect after the target makes distance, or disengage" }
+        ]
+      },
+      "rotation": [
+        "Open with Blade Toss from range instead of spending a gap closer.",
+        "Commit with Leaping Slam, then Mocking Blade for the knockdown.",
+        "Use Overhead Slam while the target is down, then Aerial Snare when it is ready.",
+        "Keep Rush Strike for chasing or escaping."
+      ],
+      "tips": [
+        {
+          "kind": "skills",
+          "title": "Keep a gap closer in reserve",
+          "text": "Do not burn Leaping Slam and Rush Strike on the first engage: mobile classes such as Rangers and Sorcerers will slip away and leave you stranded."
+        },
+        {
+          "kind": "skills",
+          "title": "Defensives before control",
+          "text": "Armor of Balance goes up before the enemy's control lands. Tenaciousness is the emergency button, and Defiance is for the crowd control that would otherwise end your engage."
+        },
+        {
+          "kind": "build",
+          "title": "Stigma swaps",
+          "text": "Rage Burst instead of Tenaciousness adds pressure but removes the strongest survival tool. Focused Block is worth it against opponents whose hits you can block; Armor of Balance is safer when control is the bigger threat."
+        },
+        {
+          "kind": "build",
+          "title": "Accuracy first",
+          "text": "A missed hit does nothing, so Accuracy comes before small damage gains. Keep enough HP and PvP Damage Tolerance to stay on the front line without constantly backing off."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-gladiator-aoeah-pvp",
+      "name": "Gladiator PvP: knockdown chain — AOEAH",
+      "cls": "gladiator",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "AOEAH", "author": "AOEAH" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A small-group PvP build built around chaining knockdowns: Mocking Blade, Rush Strike and Aerial Snare are maxed, Overhead Slam gets moderate investment. Passives and Arcana favour survival and control, and stats put PvP damage reduction and status resistance ahead of offence. Kiting is named as the class's main weakness."
+        ]
+      },
+      "source": {
+        "title": "Best Aion 2 Gladiator Builds & Skills 2026 (PvP & PvE)",
+        "url": "https://www.aoeah.com/news/4855--best-aion-2-gladiator-builds--skills-2026-pvp--pve",
+        "author": "AOEAH",
+        "date": "2026-09-29",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "Best Aion 2 Gladiator Builds & Skills 2026 (PvP & PvE)",
+          "url": "https://www.aoeah.com/news/4855--best-aion-2-gladiator-builds--skills-2026-pvp--pve",
+          "author": "AOEAH",
+          "date": "2026-09-29",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 11290000, "role": "core", "level": 20, "specs": [5, 4, 3], "note": "Most important PvP skill: knockdown that ignores Block and Evasion" },
+        { "skill": 11360000, "role": "core", "level": 20, "specs": [4, 5], "note": "Gap closer right after a dodge" },
+        { "skill": 11300000, "role": "core", "level": 20, "specs": [5, 2], "note": "Launches a knocked-down target" },
+        { "skill": 11260000, "role": "support", "level": 20, "specs": [5, 4, 3], "note": "Breaks control; 45 s cooldown" },
+        { "skill": 11200000, "role": "support", "level": 8, "specs": [3, 1], "note": "16 m range and a knockdown chance" },
+        { "skill": 11170000, "role": "support", "level": 16, "specs": [5, 3], "note": "Moderate investment: stop at the level-16 option" },
+        { "skill": 11190000, "role": "support", "note": "Gap closer in the 1v1 opener" },
+        { "skill": 11400000, "role": "stigma", "equip": true },
+        { "skill": 11380000, "role": "stigma", "equip": true, "note": "3 s invulnerability when hit by control" },
+        { "skill": 11110000, "role": "stigma", "equip": true },
+        { "skill": 11080000, "role": "stigma", "equip": true, "note": "Recommended for most fights: Defense and healing reduction" },
+        { "skill": 11730000, "role": "passive" },
+        { "skill": 11790000, "role": "passive", "note": "Shorter knockdown, stun and freeze" },
+        { "skill": 11750000, "role": "passive" },
+        { "skill": 11760000, "role": "passive" }
+      ],
+      "stats": [
+        { "stat": 76, "weight": 5 },
+        { "stat": 159, "weight": 4 },
+        { "stat": 128, "weight": 3 },
+        { "stat": 282, "weight": 2 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": {
+        "attack": [11360000, 11290000, 11260000],
+        "passive": [11790000, 11730000, 11760000, 11780000],
+        "useless": []
+      },
+      "daevanion": { "goals": [] },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "opener": [
+          { "skill": 11080000, "note": "Defense reduction" },
+          { "skill": 11190000, "note": "Close the gap" },
+          { "skill": 11290000, "note": "Knockdown" },
+          { "skill": 11170000, "note": "Burst" },
+          { "skill": 11300000, "note": "Airborne control" },
+          { "skill": 11110000, "note": "Second knockdown, as the article puts it" }
+        ],
+        "openerNote": "1v1 sequence from the article.",
+        "manual": [
+          { "skill": 11260000, "when": "When HP is low or you are chained by control: break free and back off" },
+          { "skill": 11380000, "when": "When the enemy lands control on you" }
+        ],
+        "notes": "The article advises pressing control and survival skills by hand rather than through a combo macro."
+      },
+      "rotation": [
+        "Soften the target with Blade Toss, then close in with Leaping Slam.",
+        "Mocking Blade for the knockdown, Overhead Slam for burst, Aerial Snare to keep the target in the air.",
+        "Use Rush Strike after a dodge to stick to kiting targets.",
+        "Retreat with Defiance when HP gets low."
+      ],
+      "tips": [
+        {
+          "kind": "build",
+          "title": "Small fights, not zergs",
+          "text": "In small team fights, engage, absorb the first wave with parry and invulnerability, then chain control on the enemy backline or healers. In large mass PvP, ranged AoE kills a melee Gladiator quickly."
+        },
+        {
+          "kind": "build",
+          "title": "Watch for kiting",
+          "text": "Kiting is the class's main weakness: keep Rush Strike and Leaping Slam for ranged targets that try to keep distance."
+        },
+        {
+          "kind": "skills",
+          "title": "Skip in PvP",
+          "text": "Sword Aura Rampage and Crushing Wave are not recommended for PvP; spend the points on the knockdown chain instead."
+        },
+        {
+          "kind": "skills",
+          "title": "Control and defensives by hand",
+          "text": "Press crowd control and survival skills manually so they land at the right moment instead of whenever a macro reaches them."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-gladiator-metabot-pvp",
+      "name": "Gladiator PvP (editorial) — MetaBot",
+      "cls": "gladiator",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "MetaBot", "author": "MetaBot (editorial)" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A compact editorial PvP build for the current patch: both gap closers and the knockdown, launch and slam chain trained to Lv. 10 with skill points, Aerial Snare lower because of its long cooldown. Survival Willpower replaces a damage passive, since PvP is decided by who gets controlled less. The stigmas bring an attack buff, Combat Speed, full immunity and an AoE knockdown for group fights."
+        ]
+      },
+      "source": {
+        "title": "AION 2 Gladiator Build Planner — Recommended builds: PvP",
+        "url": "https://metabot.gg/en/aion-2/classes/gladiator/build",
+        "author": "MetaBot (editorial)",
+        "date": "2026-11-10",
+        "region": "global",
+        "kind": "guide",
+        "note": "Editorial PvP build on the class build page, written after the 2026-11-04 patch; page checked on 2026-11-10."
+      },
+      "sources": [
+        {
+          "title": "AION 2 Gladiator Build Planner — Recommended builds: PvP",
+          "url": "https://metabot.gg/en/aion-2/classes/gladiator/build",
+          "author": "MetaBot (editorial)",
+          "date": "2026-11-10",
+          "region": "global",
+          "kind": "guide",
+          "note": "Editorial PvP build on the class build page, written after the 2026-11-04 patch; page checked on 2026-11-10."
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 11290000, "role": "core", "note": "Lv. 10 from skill points: knockdown" },
+        { "skill": 11300000, "role": "core", "note": "Only Lv. 7 from skill points: long cooldown" },
+        { "skill": 11170000, "role": "core", "note": "Lv. 10 from skill points: slam the landing" },
+        { "skill": 11360000, "role": "core", "note": "Lv. 10 from skill points: gap closer after a dodge" },
+        { "skill": 11190000, "role": "support", "note": "Lv. 10 from skill points: second gap closer against kiting" },
+        { "skill": 11100000, "role": "support", "note": "Lv. 10 from skill points" },
+        { "skill": 11010000, "role": "support", "note": "Lv. 10 from skill points" },
+        { "skill": 11020000, "role": "support", "note": "Lv. 10 from skill points" },
+        { "skill": 11250000, "role": "stigma", "equip": true, "note": "Slot 1, Lv. 8: Attack and Accuracy buff" },
+        { "skill": 11400000, "role": "stigma", "equip": true, "note": "Slot 2, Lv. 7: Combat Speed" },
+        { "skill": 11380000, "role": "stigma", "equip": true, "note": "Slot 3, Lv. 5: full immunity" },
+        { "skill": 11240000, "role": "stigma", "equip": true, "note": "Slot 4, Lv. 4: AoE knockdown for group fights" },
+        { "skill": 11710000, "role": "passive", "note": "Lv. 10 from skill points" },
+        { "skill": 11740000, "role": "passive", "note": "Lv. 10 from skill points" },
+        { "skill": 11790000, "role": "passive", "note": "Lv. 5: replaces a damage passive, less time under control" }
+      ],
+      "stats": [
+        {
+          "stat": 159,
+          "weight": 5,
+          "note": "MetaBot's PvP build gives no stat order. Weights are the assistant's estimate from its reasoning: being controlled less decides PvP, and the stigmas add Attack and Combat Speed."
+        },
+        { "stat": 282, "weight": 4 },
+        { "stat": 317, "weight": 3 }
+      ],
+      "gear": { "skills": [] },
+      "arcana": { "attack": [], "passive": [], "useless": [] },
+      "daevanion": { "goals": [] },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "opener": [
+          { "skill": 11360000, "note": "Rush in right after a dodge" },
+          { "skill": 11290000, "note": "Knockdown" },
+          { "skill": 11300000, "note": "Launch" },
+          { "skill": 11170000, "note": "Slam the landing" },
+          { "skill": 11100000 },
+          { "skill": 11240000, "note": "AoE knockdown" },
+          { "skill": 11010000 }
+        ],
+        "openerNote": "Rotation order from the build card: finish the burst before the target can act.",
+        "manual": [
+          { "skill": 11250000, "when": "Right before the burst: Attack and Accuracy for 10 s" },
+          { "skill": 11400000, "when": "With the burst: more hits in the window" },
+          { "skill": 11380000, "when": "When the enemy commits control or burst on you" },
+          { "skill": 11190000, "when": "To catch a target that kites out of range" }
+        ]
+      },
+      "rotation": [
+        "Dodge the first attack, then Rush Strike in.",
+        "Mocking Blade knockdown, Aerial Snare launch, Overhead Slam on the landing.",
+        "Burst with Ruinous Blow, Wrath Wave and Rending Blow before the target recovers."
+      ],
+      "tips": [
+        {
+          "kind": "build",
+          "title": "Control decides PvP",
+          "text": "The build gives up a damage passive for Survival Willpower: whoever spends less time controlled usually wins the fight."
+        },
+        {
+          "kind": "skills",
+          "title": "Two gap closers",
+          "text": "Leaping Slam and Rush Strike are both trained to 10 so you can keep up with kiting targets."
+        },
+        {
+          "kind": "skills",
+          "title": "Aerial Snare can stay lower",
+          "text": "Its long cooldown means extra levels pay off less often, so it stops at 7 while the rest of the chain is at 10."
+        },
+        {
+          "kind": "build",
+          "title": "Stigma roles",
+          "text": "Zikel's Blessing for the attack buff, Lunge Stance for Combat Speed, Tenaciousness for full immunity, and Wrath Wave as an AoE knockdown for group fights."
+        }
+      ]
+    }
+  ]
+}

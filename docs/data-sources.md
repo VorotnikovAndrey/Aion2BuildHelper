@@ -109,6 +109,10 @@ npm run gamedata -- --classes all --refresh    # всё заново
 
 `generated/titles.json` — все титулы с публичной таблицы metabot.gg: ID, грейд, категория (атака / защита / другое), бонус при ношении и «эффект при наличии». Названия статов там — официальные английские из клиента, скрипт переводит их в наши ID статов (совпадают все). Русские названия титулов — `gamedata/titles.ts` (`TITLE_RU`, из окна «Титулы» и страницы билда), остальные пока по-английски.
 
+## 2в. PvP-гайды из интернета (не Questlog)
+
+С 0.20 — до 3 PvP-гайдов на класс из статей на сайтах (Game8, вики Fextralife, GamerBlurb, ExpCarry, AION 2 META, aion2-guides.info, MetaBot, Inven и др.; список и что из какой статьи — [research/pvp-web-guides-2026-11.md](research/pvp-web-guides-2026-11.md)). Исключение из правила «только Questlog» по просьбе владельца ([decisions/0012](decisions/0012-pvp-web-guides.md)). Файлы `src/shared/guide/builtin/web/<класс>.json` собраны помощником по статьям (скрипта нет): ID умений, специализаций, статов, титулов, узлов — из справочников `generated/`, веса статов — оценка по порядку приоритетов статьи. Проверка — `builtin/allClasses.test.ts` (те же правила, что у билдов Questlog, плюс: не questlog.gg, есть ссылка, главные умения и статы).
+
 ## 2б. Встроенные гайды — билды Questlog, `npm run guides`
 
 С 0.16 встроенные гайды — 5 самых популярных (по лайкам) «Билдов персонажей» каждого класса на questlog.gg, с 0.19 — ещё до 5 PvP-билдов (decisions/0011) ([decisions/0008](decisions/0008-questlog-guides-with-stages.md), список — [research/questlog-builds-2026-11.md](research/questlog-builds-2026-11.md)).

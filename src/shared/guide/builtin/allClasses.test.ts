@@ -64,7 +64,7 @@ describe.each(CLASSES.map((c) => [c.ru, c.key] as const))('%s', (_ru, cls) => {
   })
 
   it('встроенные гайды — 5 популярных билдов Questlog для PvE и до 5 для PvP, по убыванию лайков, со стадиями', () => {
-    const all = byClass(cls)
+    const all = byClass(cls).filter((g) => g.source?.kind === 'questlog')
     const pve = all.filter((g) => g.mode === 'pve')
     const pvp = all.filter((g) => g.mode === 'pvp')
     expect(pve.length).toBe(5)
@@ -90,6 +90,26 @@ describe.each(CLASSES.map((c) => [c.ru, c.key] as const))('%s', (_ru, cls) => {
         for (const st of tip.stages ?? []) expect(ids.has(st), `${g.name}: совет к стадии ${st}`).toBe(true)
       }
     }
+  })
+
+  it('PvP-гайды из интернета: до 3, не Questlog, со ссылкой на статью, с умениями и статами', () => {
+    const web = byClass(cls).filter((g) => g.source?.kind !== 'questlog')
+    expect(web.length).toBeLessThanOrEqual(3)
+    // После билдов Questlog: гайд по умолчанию — PvE-билд Questlog.
+    expect(byClass(cls)[0].source?.kind).toBe('questlog')
+    for (const g of web) {
+      expect(g.mode, g.name).toBe('pvp')
+      expect(g.source?.kind, g.name).toBe('guide')
+      expect(g.source?.url, g.name).toMatch(/^https?:\/\//)
+      expect(g.source?.url, g.name).not.toMatch(/questlog\.gg/)
+      expect(g.skills.filter((s) => s.role === 'core').length, g.name).toBeGreaterThan(0)
+      expect(g.stats.length, g.name).toBeGreaterThan(2)
+      expect(
+        g.stats.every((s) => statDef(s.stat)),
+        g.name
+      ).toBe(true)
+    }
+    expect(new Set(web.map((g) => g.id)).size).toBe(web.length)
   })
 
   it('PvP-гайды берут ориентир меткости в PvP, а не в PvE', () => {
@@ -121,11 +141,14 @@ describe.each(CLASSES.map((c) => [c.ru, c.key] as const))('%s', (_ru, cls) => {
 
   it('разбор персонажа работает на каждой стадии каждого гайда, сравнение с топом — тоже', () => {
     const char = makeChar(cls)
-    for (const g of byClass(cls))
+    for (const g of byClass(cls)) {
+      // Гайд без стадий (из статьи) — разбор по самому гайду.
+      if (!g.stages?.length) expect(analyzeBuild(char, g, namer).scores.overall, g.name).toBeGreaterThanOrEqual(0)
       for (const st of g.stages ?? []) {
         const report = analyzeBuild(char, applyStage(g, st), namer)
         expect(report.scores.overall, `${g.name} / ${st.name}`).toBeGreaterThanOrEqual(0)
       }
+    }
     const report = analyzeBuild(char, byClass(cls)[0], namer)
     expect(compareWithTop(char, report, topData(cls)!).skills.length).toBeGreaterThan(10)
   })

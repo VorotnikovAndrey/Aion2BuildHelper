@@ -4,7 +4,7 @@ import { BookOpen, Check, ChevronDown, Copy, Download, ExternalLink, Flag, Heart
 import { CLASSES, classInfo } from '@shared/gamedata/classes'
 import { applyStage, pickStage, sortedStages } from '@shared/guide/stages'
 import { titleDef } from '@shared/gamedata/titles'
-import { emptyGuide, MODE_LABEL, ROLE_LABEL, type Guide, type GuideSource, type GuideStage } from '@shared/guide/types'
+import { emptyGuide, isWebGuide, MODE_LABEL, ROLE_LABEL, sourceSite, type Guide, type GuideSource, type GuideStage } from '@shared/guide/types'
 import type { ClassKey } from '@shared/types'
 import { TitleEmblem } from '@/components/art'
 import { titleName } from '@/components/collections'
@@ -29,8 +29,9 @@ export function GuidesPage() {
   const [cls, setCls] = useState<ClassKey>(char?.cls ?? guides[0]?.cls ?? 'templar')
   const ofClass = useMemo(() => guides.filter((g) => g.cls === cls), [guides, cls])
   const builtin = ofClass.filter((g) => g.builtin)
-  const builtinPve = builtin.filter((g) => g.mode !== 'pvp')
-  const builtinPvp = builtin.filter((g) => g.mode === 'pvp')
+  const builtinPve = builtin.filter((g) => g.mode !== 'pvp' && !isWebGuide(g))
+  const builtinPvp = builtin.filter((g) => g.mode === 'pvp' && !isWebGuide(g))
+  const builtinWeb = builtin.filter((g) => isWebGuide(g))
   const custom = ofClass.filter((g) => !g.builtin)
   const [selectedId, setSelectedId] = useState<string | null>(active?.id ?? null)
   const selected = ofClass.find((g) => g.id === selectedId) ?? (active?.cls === cls ? active : undefined) ?? ofClass[0]
@@ -137,6 +138,18 @@ export function GuidesPage() {
             >
               {builtinPvp.map((g, i) => (
                 <GuideRow key={g.id} guide={g} rank={i + 1} selected={selected?.id === g.id} active={active?.id === g.id} onClick={() => setSelectedId(g.id)} />
+              ))}
+            </GuideGroup>
+          )}
+          {builtinWeb.length > 0 && (
+            <GuideGroup
+              title={t('PvP из интернета · не Questlog')}
+              hint={t(
+                'PvP-гайды из статей на сайтах (не Questlog): до трёх на класс, помощник перевёл их в формат приложения по тексту статьи. Веса статов — его оценка по порядку приоритетов из статьи. Сверяйтесь с оригиналом — ссылка в карточке гайда.'
+              )}
+            >
+              {builtinWeb.map((g) => (
+                <GuideRow key={g.id} guide={g} selected={selected?.id === g.id} active={active?.id === g.id} onClick={() => setSelectedId(g.id)} />
               ))}
             </GuideGroup>
           )}
@@ -248,6 +261,11 @@ function GuideRow({ guide, rank, selected, active, onClick }: { guide: Guide; ra
               ) : null}
               {src?.region === 'korea' && <span className="text-warning">{t('Корея')}</span>}
             </>
+          ) : isWebGuide(guide) ? (
+            <>
+              <span>{sourceSite(src) ?? src?.author}</span>
+              <span className="text-warning">{t('не Questlog')}</span>
+            </>
           ) : (
             <span>
               {t('{MODE_LABEL} · свой', { MODE_LABEL: MODE_LABEL[guide.mode] })}
@@ -314,6 +332,19 @@ function GuideDetail({
                   <Heart size={11} className="text-critical" /> {base.source?.likes ?? 0}
                 </span>
               )}
+              {isWebGuide(base) && (
+                <Pill
+                  tone="warning"
+                  tip={t(
+                    'Гайд из статьи на сайте {site}, а не билд Questlog. Помощник перевёл его по тексту статьи — что-то могло потеряться, сверяйтесь с оригиналом.',
+                    {
+                      site: sourceSite(base.source) ?? '—'
+                    }
+                  )}
+                >
+                  {t('не Questlog · {site}', { site: sourceSite(base.source) ?? '—' })}
+                </Pill>
+              )}
               {base.source?.region && (
                 <Pill tone={REGION[base.source.region].tone} tip={REGION[base.source.region].tip}>
                   {REGION[base.source.region].ru}
@@ -357,7 +388,12 @@ function GuideDetail({
             onClick={() => void api.app.openExternal(base.source!.url!)}
             className="mt-3 inline-flex items-center gap-1.5 text-xs text-accent hover:underline"
           >
-            {questlog ? t('Открыть билд на Questlog') : (base.source.title ?? base.source.url)} <ExternalLink size={12} />
+            {questlog
+              ? t('Открыть билд на Questlog')
+              : isWebGuide(base)
+                ? t('Открыть статью на {site}', { site: sourceSite(base.source) ?? '—' })
+                : (base.source.title ?? base.source.url)}{' '}
+            <ExternalLink size={12} />
           </button>
         )}
         {base.sources && base.sources.length > 1 && <SourceList sources={base.sources} />}

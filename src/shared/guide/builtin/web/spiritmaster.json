@@ -1,0 +1,424 @@
+{
+  "_source": "PvP-гайды из статей в интернете (не Questlog), собраны помощником — decisions/0012",
+  "fetchedAt": "2026-11-10",
+  "guides": [
+    {
+      "schema": 1,
+      "id": "web-spiritmaster-inven-sujiro-pvp",
+      "name": "Spiritmaster PvP guide: outlast and control — Inven, Sujiro",
+      "cls": "spiritmaster",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "Inven", "author": "스지로 (Sujiro)" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A Korean player's PvP guide built on outlasting the opponent rather than bursting them: keep debuffs and sustained damage rolling while high Status Effect Resist and Chance let you shrug off enemy control and land your own. Spirit's Benediction, Ancient Spirit, Kaisinel's Power and Siphon form the stigma core, with Command: Proxy and Seize Magic as swaps. Gear leans on Weapon Damage Boost and Accuracy, plus as much HP and Defense as you can fit."
+        ]
+      },
+      "source": {
+        "title": "정령성 pvp 가이드",
+        "url": "https://www.inven.co.kr/board/aion2/6454/9148",
+        "author": "스지로",
+        "date": "2026-08-08",
+        "region": "korea",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "정령성 pvp 가이드",
+          "url": "https://www.inven.co.kr/board/aion2/6454/9148",
+          "author": "스지로",
+          "date": "2026-08-08",
+          "region": "korea",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 16040000, "role": "core", "level": 20, "note": "Must be level 20." },
+        { "skill": 16300000, "role": "core", "level": 20, "note": "Must be level 20." },
+        { "skill": 16010000, "role": "support", "level": 16, "note": "16+ recommended, 12 at least." },
+        { "skill": 16140000, "role": "support", "level": 16, "note": "16+ recommended, 12 at least." },
+        { "skill": 16330000, "role": "support", "level": 16, "note": "16+ recommended, 12 at least." },
+        { "skill": 16110000, "role": "support", "level": 16, "note": "Spirit skills: 16+ recommended, 12 at least." },
+        { "skill": 16100000, "role": "support", "level": 16, "note": "Spirit skills: 16+ recommended, 12 at least." },
+        { "skill": 16130000, "role": "support", "level": 16, "note": "Spirit skills: 16+ recommended, 12 at least." },
+        { "skill": 16120000, "role": "support", "level": 16, "note": "Spirit skills: 16+ recommended, 12 at least." },
+        { "skill": 16200000, "role": "support", "note": "Fast reaction with it (and your stigmas) survives even a stealth opener." },
+        { "skill": 16070000, "role": "support", "note": "Your Fear tool: the guide prefers it over the Cry of Terror stigma." },
+        { "skill": 16190000, "role": "stigma", "equip": true, "note": "Core: PvP Damage Boost/Tolerance and x1.5 Spirit Strike." },
+        { "skill": 16250000, "role": "stigma", "equip": true, "note": "Core: a big share of your damage." },
+        { "skill": 16360000, "role": "stigma", "equip": true, "note": "Core: Status Effect Resist/Chance and Accuracy. Required if you run Magic Block." },
+        { "skill": 16060000, "role": "stigma", "equip": true, "level": 25, "note": "The author's favourite: heal plus shield; the shield grows a lot at level 25." },
+        { "skill": 16170000, "role": "stigma", "equip": false, "note": "Also rated core: lets you survive burst and boosts Spirit Protection x1.5. Swap in when you get focused." },
+        { "skill": 16230000, "role": "stigma", "equip": false, "level": 25, "note": "At 25 strips up to 5 buffs and Seals when it removes 3+." },
+        { "skill": 16150000, "role": "stigma", "equip": false, "note": "DoT and debuffs, but potions and cleanses remove it." },
+        { "skill": 16220000, "role": "stigma", "equip": false, "note": "DoT and debuffs, but potions and cleanses remove it." },
+        { "skill": 16260000, "role": "stigma", "equip": false, "note": "Seal, Root and Stamina drain; only together with Kaisinel's Power." },
+        { "skill": 16710000, "role": "passive", "note": "Priority 1: Damage Boost and Perfect." },
+        { "skill": 16790000, "role": "passive", "note": "Priority 2: Status Effect Resist." },
+        { "skill": 16760000, "role": "passive", "note": "Priority 3: Double and Mental-type Chance." },
+        { "skill": 16720000, "role": "passive", "note": "Priority 4: Defense, the class's only defensive passive." }
+      ],
+      "stats": [
+        { "stat": 159, "weight": 5 },
+        { "stat": 158, "weight": 5 },
+        { "stat": 32, "weight": 5 },
+        { "stat": 318, "weight": 4 },
+        { "stat": 442, "weight": 4 },
+        { "stat": 193, "weight": 4 },
+        { "stat": 4, "weight": 4 },
+        { "stat": 307, "weight": 4 },
+        { "stat": 76, "weight": 4 },
+        { "stat": 6, "weight": 3 },
+        { "stat": 443, "weight": 3 },
+        { "stat": 447, "weight": 3 },
+        { "stat": 65, "weight": 3 },
+        { "stat": 7, "weight": 3 },
+        { "stat": 282, "weight": 3 }
+      ],
+      "gear": {
+        "skills": [
+          { "skill": 16710000, "weight": 5 },
+          { "skill": 16790000, "weight": 4 },
+          { "skill": 16760000, "weight": 3 },
+          { "skill": 16720000, "weight": 2 }
+        ],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": {
+        "attack": [],
+        "passive": [16710000, 16790000, 16760000, 16720000],
+        "useless": []
+      },
+      "daevanion": { "goals": [] },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "manual": [
+          { "skill": 16200000, "when": "React at once to a stealth opener or a chain of CC, together with your defensive stigma." },
+          { "skill": 16170000, "when": "When several enemies focus you: it soaks burst and raises Spirit Protection.", "optional": true },
+          { "skill": 16230000, "when": "On a target with strong buffs: removing 3+ buffs also Seals it.", "optional": true }
+        ]
+      },
+      "rotation": [
+        "Fight to outlast: keep debuffs and sustained damage going instead of all-in burst.",
+        "Ignore enemy CC through Status Effect Resist, and make your own CC land through Status Effect Chance.",
+        "Keep Defiance and your defensive stigmas for the enemy's opener."
+      ],
+      "tips": [
+        {
+          "id": "build-direction",
+          "kind": "build",
+          "title": "Two stat directions",
+          "text": "Either Weapon Damage Boost + Perfect + Accuracy (expensive, highest ceiling) or a Double-based setup (cheap and efficient). The author runs Weapon Damage Boost + Accuracy and uses soul imprints for lots of HP and Defense."
+        },
+        {
+          "id": "build-survival",
+          "kind": "build",
+          "title": "Why HP and Defense",
+          "text": "Siphon's shield and healing potions scale with max HP. Spirit Protection is the class's only defensive passive, so stack Defense; with Command: Proxy active the author went past 75k Defense and survived 1-vs-many fights. Justice helps get Perfect and Defense together."
+        },
+        {
+          "id": "build-pvp-damage",
+          "kind": "build",
+          "title": "PvP Damage Boost is a luxury",
+          "text": "PvP Damage Boost is strong but costly (limit break, Abyss manastones), and it falls off fast if your Attack can't beat the target's Defense."
+        },
+        {
+          "id": "build-gear",
+          "kind": "build",
+          "title": "Gear path",
+          "text": "Weapon: a crafted or lava weapon is fine; PvP weapons add less damage than expected. Guard: a Legion guard first, it carries a lot of Damage Boost. Armor: start with the cheaper PvP set for its set bonus and PvP Damage Tolerance, then move to Legion armor (it needs many medals). Accessories matter least; the cheaper set gives Damage Boost."
+        },
+        {
+          "id": "build-imprints",
+          "kind": "build",
+          "title": "Soul imprint options",
+          "text": "Weapon/guard: Combat Speed, Weapon Damage Boost, Might, Precision, Status Effect Chance, Multi-Hit, Accuracy, Attack. Armor: Damage Boost or Tolerance, Constitution, Double Resist, Status Effect Resist, Willpower and passive skill lines (Spirit Strike first). Necklace/earrings: Accuracy, Intelligence, passives; rings: active skills. Slots are few, so lock in the must-haves first."
+        },
+        {
+          "id": "skills-stigmas",
+          "kind": "skills",
+          "title": "Stigma picks",
+          "text": "Spirit's Benediction and Ancient Spirit are fixed. Kaisinel's Power covers Status Effect Resist/Chance and Accuracy (its Block/Evasion option is weak) and is needed for Magic Block. Siphon heals and shields. Command: Proxy is the anti-burst swap; Seize Magic strips buffs; Corrode and Cursed Cloud add DoTs but get cleansed."
+        },
+        {
+          "id": "skills-avoid",
+          "kind": "skills",
+          "title": "Stigmas the author skips",
+          "text": "Jointstrike: Destructive Attack is risky burst unless you have Evasion/Block/weapon options for it; Assault Terror is only for chasing; Flame Blessing is not worth it; Cry of Terror loses to the active Soul's Cry."
+        },
+        {
+          "id": "skills-levels",
+          "kind": "skills",
+          "title": "Skill levels",
+          "text": "Combustion and Elemental Fusion at 20; Cold Shock, Jointstrike: Curse, Dimensional Control and the spirit skills at 16 or higher, never below 12. Get passives through Arcana and soul imprints."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-spiritmaster-vortex-geunpal-combo",
+      "name": "PvP skill setup and burst combo — Geunpal (Vortex Gaming)",
+      "cls": "spiritmaster",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "Vortex Gaming", "author": "근팔 (Geunpal)" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "Written summary of a Korean video on how top Spiritmasters set up skills, with a separate PvP specialization list. Combustion and Elemental Fusion go to 20, Soul's Cry and Jointstrike: Curse get cooldown and control options, and Dimensional Control joins at 16 for its Root. The stigma core is Spirit's Benediction, Ancient Spirit and Corrode, and a short burst combo is shown deleting a high-power Chanter."
+        ]
+      },
+      "source": {
+        "title": "[Aion 2] Spiritmaster Skill Build and Perfect Combo Guide",
+        "url": "https://vortexgaming.io/en/postdetail/670653",
+        "author": "근팔",
+        "region": "korea",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "[Aion 2] Spiritmaster Skill Build and Perfect Combo Guide",
+          "url": "https://vortexgaming.io/en/postdetail/670653",
+          "author": "근팔",
+          "region": "korea",
+          "kind": "guide"
+        },
+        {
+          "title": "[아이온2] 정령성 랭커들이 쓰고 있는 초강력 콤보 및 스킬 세팅법",
+          "url": "https://www.youtube.com/watch?v=OH7vHBRn1tA",
+          "author": "근팔",
+          "region": "korea",
+          "kind": "guide",
+          "note": "Original video"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 16040000, "role": "core", "level": 20, "specs": [3, 4, 5], "note": "Main damage skill." },
+        { "skill": 16300000, "role": "core", "level": 20, "specs": [1, 3, 5], "note": "Two slots: 1+3 (or 2+3); at 20: 1+3+5." },
+        { "skill": 16010000, "role": "core", "level": 20, "note": "The video's PvP list gives no separate options for it." },
+        { "skill": 16070000, "role": "support", "specs": [1, 4, 5], "note": "Part of the burst combo." },
+        { "skill": 16140000, "role": "support", "specs": [3, 4] },
+        { "skill": 16110000, "role": "support", "specs": [2, 3, 5], "note": "The strongest spirit in the video." },
+        { "skill": 16330000, "role": "situational", "level": 16, "specs": [5], "note": "Worth it in PvP only from 16, for the Root; skip below that." },
+        { "skill": 16200000, "role": "support", "specs": [1, 3], "note": "Option 1 or 3, by preference." },
+        { "skill": 16190000, "role": "stigma", "equip": true, "level": 20, "note": "Top priority." },
+        { "skill": 16250000, "role": "stigma", "equip": true, "level": 15 },
+        { "skill": 16150000, "role": "stigma", "equip": true, "level": 1, "note": "Level 1 is enough." },
+        { "skill": 16240000, "role": "stigma", "equip": true, "note": "Fourth slot in the video's final set." },
+        { "skill": 16060000, "role": "stigma", "equip": false, "note": "Alternative fourth stigma." },
+        { "skill": 16260000, "role": "stigma", "equip": false, "note": "Alternative fourth stigma." },
+        { "skill": 16710000, "role": "passive", "note": "Heroic-grade: take first." },
+        { "skill": 16760000, "role": "passive", "note": "Heroic-grade: take first." },
+        { "skill": 16720000, "role": "passive", "note": "Heroic-grade: take first." },
+        { "skill": 16740000, "role": "passive", "note": "Heroic-grade: take first." },
+        { "skill": 16790000, "role": "passive", "note": "Lower priority." },
+        { "skill": 16750000, "role": "passive", "note": "Lower priority." }
+      ],
+      "stats": [
+        { "stat": 65, "weight": 5, "note": "Helper's estimate: the video gives no stat priorities; burst-oriented PvP defaults." },
+        { "stat": 32, "weight": 4 },
+        { "stat": 113, "weight": 4 },
+        { "stat": 158, "weight": 3 },
+        { "stat": 193, "weight": 3 },
+        { "stat": 76, "weight": 3 }
+      ],
+      "gear": { "skills": [] },
+      "arcana": { "attack": [], "passive": [], "useless": [] },
+      "daevanion": { "goals": [] },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "opener": [
+          { "skill": 16190000, "note": "Key 2 in the video." },
+          { "skill": 16250000, "note": "Key R." },
+          { "skill": 16150000, "note": "Key T." },
+          { "skill": 16070000, "note": "Key 4, pressed twice." },
+          { "skill": 16300000, "note": "Key 1: the finisher." }
+        ],
+        "openerNote": "The video's \"T441\" burst combo, shown taking down a high-power Chanter in one go."
+      },
+      "rotation": [
+        "Buff first: Spirit's Benediction, then Ancient Spirit.",
+        "Apply Corrode before you burst.",
+        "Fear with Soul's Cry, then finish with Elemental Fusion."
+      ],
+      "tips": [
+        {
+          "id": "skills-pvp-specs",
+          "kind": "skills",
+          "title": "PvP specializations",
+          "text": "Combustion 3/4/5, Water Spirit 2/3/5, Jointstrike: Curse 3/4, Soul's Cry 1/4/5. Elemental Fusion: 1+3 or 2+3 while you have two slots, 1/3/5 at level 20."
+        },
+        {
+          "id": "skills-dimensional-control",
+          "kind": "skills",
+          "title": "Dimensional Control",
+          "text": "Mainly a PvP tool: at level 16 it gets the Root option and becomes worth a slot. Below 16 the video doesn't recommend it, and it isn't used in PvE."
+        },
+        {
+          "id": "skills-stigmas",
+          "kind": "skills",
+          "title": "Stigma priority",
+          "text": "Spirit's Benediction to 20 first, then Ancient Spirit to 15; Corrode is fine at level 1. The fourth slot is open (Siphon or Magic Block); the final set uses Jointstrike: Destructive Attack."
+        },
+        {
+          "id": "skills-combo",
+          "kind": "skills",
+          "title": "Burst combo",
+          "text": "Spirit's Benediction, Ancient Spirit, Corrode, Soul's Cry twice, then Elemental Fusion. Line them up on keys you can hit in one quick sequence."
+        },
+        {
+          "id": "build-passives",
+          "kind": "build",
+          "title": "Passives",
+          "text": "Heroic-grade passives first: Spirit Strike, Mental Focus, Spirit Protection and Corrode. Revitalization Contract and Spirit Revitalization come later."
+        },
+        {
+          "id": "build-playstyle",
+          "kind": "build",
+          "title": "No single right answer",
+          "text": "The author stresses that specializations should fit your own play style; the lists are a starting point, not a rule."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-spiritmaster-gamerblurb-pvp",
+      "name": "PvP control and survival — GamerBlurb",
+      "cls": "spiritmaster",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "GamerBlurb", "author": "GamerBlurb Team" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "The PvP section of a global-version build guide. It argues that Spiritmaster PvP is less about a perfect Elemental Fusion loop and more about disrupting the enemy so your summons can keep up the pressure safely. Stats go to PvP Accuracy and Status Effect Chance first, then survival; Ancient Spirit and Spirit's Benediction stay, with Command: Proxy and Seize Magic added for PvP."
+        ]
+      },
+      "source": {
+        "title": "AION 2 Spiritmaster Build Guide: PvE, PvP, & Leveling (Global)",
+        "url": "https://gamerblurb.com/guides/aion-2-spiritmaster-build-guide-pve-pvp-leveling-global",
+        "author": "GamerBlurb Team",
+        "date": "2026-10-06",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "AION 2 Spiritmaster Build Guide: PvE, PvP, & Leveling (Global)",
+          "url": "https://gamerblurb.com/guides/aion-2-spiritmaster-build-guide-pve-pvp-leveling-global",
+          "author": "GamerBlurb Team",
+          "date": "2026-10-06",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 16200000, "role": "core", "specs": [3], "note": "First in the PvP priority list; the HP-recovery option." },
+        { "skill": 16010000, "role": "core", "note": "Second: keeps your MP up." },
+        { "skill": 16140000, "role": "core", "note": "Third: steady damage and debuff pressure." },
+        { "skill": 16040000, "role": "core", "note": "Fourth in the PvP priority list." },
+        { "skill": 16070000, "role": "core", "note": "Fifth, but Fear is far more valuable in PvP than in PvE." },
+        { "skill": 16300000, "role": "support", "note": "Rebuild Four Elements after repositioning before casting it." },
+        { "skill": 16250000, "role": "stigma", "equip": true, "note": "Keeps the summon engine running." },
+        { "skill": 16190000, "role": "stigma", "equip": true, "note": "Keeps the summon engine running." },
+        { "skill": 16170000, "role": "stigma", "equip": true, "note": "Shares incoming damage with a spirit once players focus you." },
+        { "skill": 16230000, "role": "stigma", "equip": true, "note": "Utility against player defensive buffs." },
+        { "skill": 16150000, "role": "stigma", "equip": false, "note": "Against healers: replaces Command: Proxy for its healing reduction and summon amplification." },
+        { "skill": 16760000, "role": "passive", "note": "Main long-term passive." },
+        { "skill": 16710000, "role": "passive", "note": "Main long-term passive." },
+        { "skill": 16720000, "role": "passive", "note": "A defensive, PvP-oriented investment." },
+        { "skill": 16780000, "role": "passive" },
+        { "skill": 16750000, "role": "passive" }
+      ],
+      "stats": [
+        { "stat": 113, "weight": 5, "note": "So your control lands." },
+        { "stat": 158, "weight": 4, "note": "Keeps control effects sticking." },
+        { "stat": 193, "weight": 4, "note": "Survive long enough for summon pressure to matter." },
+        { "stat": 76, "weight": 4 },
+        { "stat": 159, "weight": 3 },
+        { "stat": 65, "weight": 2 },
+        { "stat": 317, "weight": 1 },
+        { "stat": 32, "weight": 1 },
+        { "stat": 28, "weight": 1 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": {
+        "attack": [16300000, 16100000, 16040000, 16010000],
+        "passive": [16760000, 16710000],
+        "useless": [],
+        "notes": "General Arcana advice from the article, not specific to PvP."
+      },
+      "daevanion": { "goals": [] },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "manual": [
+          { "skill": 16200000, "when": "Save it for dangerous crowd control." },
+          { "skill": 16070000, "when": "To make distance or interrupt an important cast." },
+          { "skill": 16170000, "when": "When you are being focused." },
+          { "skill": 16230000, "when": "On a valuable enemy buff." }
+        ],
+        "notes": "The article keeps Fear, Proxy, Seize Magic, Defiance and movement manual: their value depends on what the opponent has already used."
+      },
+      "rotation": [
+        "Have your summons out before the fight starts.",
+        "Pressure from the backline and let the summons work; don't overexpose yourself.",
+        "After repositioning, rebuild Four Elements before Elemental Fusion."
+      ],
+      "tips": [
+        {
+          "id": "build-priority",
+          "kind": "build",
+          "title": "Control and survival over damage",
+          "text": "PvP Accuracy and Status Effect Chance first so your control lands, then HP and PvP Damage Tolerance, then Status Effect Resist, and only then PvP damage and other offense."
+        },
+        {
+          "id": "skills-stigmas",
+          "kind": "skills",
+          "title": "PvP stigmas",
+          "text": "Keep Ancient Spirit and Spirit's Benediction for the summon engine, add Command: Proxy for when you are focused and Seize Magic against enemy buffs. Against healers, Corrode can take Proxy's slot."
+        },
+        {
+          "id": "skills-manual",
+          "kind": "skills",
+          "title": "Keep PvP buttons manual",
+          "text": "Fear, Command: Proxy, Seize Magic and Defiance should not sit in an automatic sequence: their value depends on what the enemy has already used."
+        },
+        {
+          "id": "build-matchups",
+          "kind": "build",
+          "title": "Matchups",
+          "text": "Against melee, always keep a defensive answer for their gap closer. Against ranged, reposition rather than take one more exposed cast. In the Abyss, coordinate Fear and dispels with your group."
+        },
+        {
+          "id": "build-general",
+          "kind": "build",
+          "title": "Daevanion and gear (general part)",
+          "text": "Outside the PvP section the article takes core skill-level nodes first, then Combat Speed, Cooldown Reduction, Damage Boost, Critical Damage Boost and Multi-Hit, and notes that rings can add levels to Elemental Fusion, Combustion and Fire Spirit."
+        }
+      ]
+    }
+  ]
+}

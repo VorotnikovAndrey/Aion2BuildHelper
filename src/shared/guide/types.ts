@@ -260,6 +260,19 @@ export interface Guide {
   checklist?: { id: string; text: string }[]
 }
 
+/** Встроенный гайд из статьи в интернете (не билд Questlog) — у него своя пометка в интерфейсе. */
+export const isWebGuide = (g: Pick<Guide, 'builtin' | 'source'>): boolean => !!g.builtin && g.source?.kind === 'guide'
+
+/** Сайт источника по адресу: «mobalytics.gg». */
+export function sourceSite(src?: GuideSource): string | undefined {
+  if (!src?.url) return undefined
+  try {
+    return new URL(src.url).hostname.replace(/^www\./, '')
+  } catch {
+    return undefined
+  }
+}
+
 export const MODE_LABEL: Record<GuideMode, string> = {
   pve: 'PvE',
   pvp: 'PvP',

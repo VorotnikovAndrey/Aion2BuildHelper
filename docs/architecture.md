@@ -65,3 +65,4 @@
 - [0003 — Гайды по игровым ID](decisions/0003-guides-by-game-ids.md)
 - [0010 — Перевод интерфейса на 9 языков](decisions/0010-localization.md)
 - [0011 — PvP-гайды и советы автора](decisions/0011-pvp-guides-and-author-tips.md)
+- [0012 — PvP-гайды из интернета (не Questlog)](decisions/0012-pvp-web-guides.md)

@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { BookOpen, Check, ChevronDown, Flag } from 'lucide-react'
 import { sortedStages } from '@shared/guide/stages'
-import { MODE_LABEL } from '@shared/guide/types'
+import { MODE_LABEL, isWebGuide, sourceSite } from '@shared/guide/types'
 import type { Character } from '@shared/types'
 import { cn } from '@/lib/format'
 import { DropdownPanel } from '@/components/ui/Dropdown'
@@ -143,7 +143,9 @@ function GuidePicker({ char }: { char: Character }) {
                       p2: g.stages?.length ?? 0,
                       p3: g.source.region === 'korea' ? t(' · Корея') : ''
                     })}`
-                  : `${MODE_LABEL[g.mode]} · ${g.builtin ? t('встроенный') : t('свой')}${g.source?.title ? ` · ${g.source.title}` : ''}`}
+                  : isWebGuide(g)
+                    ? `${MODE_LABEL[g.mode]} · ${t('не Questlog · {site}', { site: sourceSite(g.source) ?? '—' })}`
+                    : `${MODE_LABEL[g.mode]} · ${g.builtin ? t('встроенный') : t('свой')}${g.source?.title ? ` · ${g.source.title}` : ''}`}
               </span>
             </span>
           </button>

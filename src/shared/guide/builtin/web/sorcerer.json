@@ -1,0 +1,402 @@
+{
+  "_source": "PvP-гайды из статей в интернете (не Questlog), собраны помощником — decisions/0012",
+  "fetchedAt": "2026-11-10",
+  "guides": [
+    {
+      "schema": 1,
+      "id": "web-sorcerer-aion2meta-pvp-data",
+      "name": "Sorcerer PvP by player data — AION 2 META",
+      "cls": "sorcerer",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "aion2-meta.com", "author": "AION 2 META" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A data-driven fan site that builds its advice from what ranked Sorcerers actually run. For PvP it raises Hellfire, Bittercold Wind, Firestorm and Winter's Shackles to 20 with PvP-specific specialties, tags Arctic Armor, Glacial Smite and Hibernation as PvP stigmas, and shows the usual opening path on the Azphel PvP board. Its stat order is taken from PvE rankings, so treat the stat weights as a rough guide."
+        ]
+      },
+      "source": {
+        "title": "Aion 2 Sorcerer Build Guide: Skills, Stigmas and Daevanion",
+        "url": "https://aion2-meta.com/guides/sorcerer/",
+        "author": "AION 2 META",
+        "date": "2026-11-10",
+        "region": "mixed",
+        "kind": "guide",
+        "note": "Picks are based on usage by ranked players (Korean rankings, PvP sample of 725 players) plus a global column for equipped stigmas."
+      },
+      "sources": [
+        {
+          "title": "Aion 2 Sorcerer Build Guide: Skills, Stigmas and Daevanion",
+          "url": "https://aion2-meta.com/guides/sorcerer/",
+          "author": "AION 2 META",
+          "date": "2026-11-10",
+          "region": "mixed",
+          "kind": "guide",
+          "note": "Picks are based on usage by ranked players (Korean rankings, PvP sample of 725 players) plus a global column for equipped stigmas."
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 15060000, "role": "core", "level": 20, "specs": [4, 5, 1], "note": "Last slot: 1 (Skill Speed) or 3 (mobile cast)." },
+        { "skill": 15280000, "role": "core", "level": 20, "specs": [3, 4, 5], "note": "The most used Lv 20+ skill in PvP; Pull drags the target into your control." },
+        { "skill": 15040000, "role": "core", "level": 20, "specs": [3, 5, 4], "note": "Specialty 3 cuts the target's incoming healing." },
+        { "skill": 15110000, "role": "core", "level": 20, "specs": [3, 4, 5], "note": "Second slot: 4 (Winter's Illusion) or 1 (mobile cast) — the page points to the alternative for melee matchups in Arena." },
+        { "skill": 15050000, "role": "support", "level": 20, "specs": [4, 5, 1] },
+        { "skill": 15310000, "role": "support", "level": 20, "specs": [2, 5, 4] },
+        { "skill": 15210000, "role": "support", "level": 20, "specs": [4, 5, 2], "note": "Same picks for PvE and PvP." },
+        { "skill": 15150000, "role": "situational", "specs": [4, 5], "note": "Freeze setup for Frost Burst." },
+        { "skill": 15220000, "role": "situational", "specs": [4, 5], "note": "Only hits frozen targets." },
+        { "skill": 15240000, "role": "situational", "specs": [3, 5], "note": "Last in the page's raise order." },
+        { "skill": 15400000, "role": "stigma", "equip": true, "note": "Used by almost every PvP Sorcerer." },
+        { "skill": 15230000, "role": "stigma", "equip": true, "note": "Tagged as a PvP pick; can freeze melee attackers." },
+        { "skill": 15410000, "role": "stigma", "equip": true, "note": "Tagged as a strong PvP pick: covers a burst you cannot dodge." },
+        { "skill": 15120000, "role": "stigma", "equip": true, "note": "Tagged as a PvP pick. The page gives no exact 4-slot PvP set — this slot is the helper's reading of the tags." },
+        { "skill": 15160000, "role": "stigma", "equip": false, "note": "Very common in PvP, but not tagged as a PvP pick." },
+        { "skill": 15320000, "role": "stigma", "equip": false, "note": "Very common in PvP, but not tagged as a PvP pick." },
+        { "skill": 15130000, "role": "stigma", "equip": false, "note": "Situational PvP pick: chance to Seal." },
+        { "skill": 15140000, "role": "stigma", "equip": false, "note": "Situational PvP pick: removes one player until hit." },
+        { "skill": 15740000, "role": "passive", "note": "The only passive the page says to look for." }
+      ],
+      "stats": [
+        { "stat": 317, "weight": 5, "note": "The page's stat order comes from Korean PvE rankings; PvP Damage Boost is added from its gear upgrade order (Crit, then PvE/PvP damage amplification)." },
+        { "stat": 128, "weight": 4 },
+        { "stat": 65, "weight": 4 },
+        { "stat": 442, "weight": 3 },
+        { "stat": 193, "weight": 3 },
+        { "stat": 199, "weight": 2 },
+        { "stat": 32, "weight": 2 }
+      ],
+      "gear": {
+        "skills": [
+          { "skill": 15740000, "weight": 4 },
+          { "skill": 15710000, "weight": 2 },
+          { "skill": 15750000, "weight": 2 },
+          { "skill": 15800000, "weight": 2 },
+          { "skill": 15780000, "weight": 2 }
+        ],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "manastones": [
+        { "stat": 317, "weight": 5 },
+        { "stat": 128, "weight": 4 },
+        { "stat": 193, "weight": 4 },
+        { "stat": 199, "weight": 3 },
+        { "stat": 32, "weight": 2 }
+      ],
+      "arcana": {
+        "attack": [],
+        "passive": [],
+        "useless": [],
+        "notes": "The page shows only PvP arcana usage, not skills: Vigor dominates Chalice, Parchment and Compass, Magic dominates Bell, Mirror is split."
+      },
+      "daevanion": {
+        "goals": [
+          {
+            "id": "azphel-opening",
+            "name": "Azphel: opening path",
+            "description": "The usual first 12 nodes on the PvP board (opens at level 45): HP, PvP Attack, Status Effect Resist, PvP Defense, MP, PvP Accuracy/Evasion, PvP Crit Resist, PvP Attack, PvP Damage Boost, then MP, PvP Attack, Status Effect Resist.",
+            "boards": [66],
+            "nodes": [660098, 660099, 660100, 660101, 660102, 660103, 660118, 660119, 660120, 660128, 660127, 660126]
+          }
+        ]
+      },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "titles": {
+        "attack": [12030005, 23020043, 13020043],
+        "defense": [13010025],
+        "utility": [13050009],
+        "notes": "Most used by Sorcerers on the page. The two Wings titles (PvP Damage Boost, PvP Attack, PvP Accuracy) are faction-specific."
+      },
+      "tips": [
+        {
+          "kind": "skills",
+          "title": "Freeze, then burst",
+          "text": "Frost has roughly a 50% freeze chance and Frost Burst only hits frozen targets, so fire Frost Burst right after a freeze lands."
+        },
+        {
+          "kind": "skills",
+          "title": "Keep melee off you",
+          "text": "Bittercold Wind roots and Winter's Shackles slows. Together they are your main tools to hold melee classes at range."
+        },
+        {
+          "kind": "skills",
+          "title": "Anti-heal and isolation",
+          "text": "Firestorm's specialty 3 cuts incoming healing by 60% for 5s. Curse: Tree takes one player out for 10s and lowers their Fire Tolerance, but any hit breaks it."
+        },
+        {
+          "kind": "build",
+          "title": "Azphel is the PvP board",
+          "text": "Azphel opens at level 45. The common opening path walks right through PvP stats to the first PvP Damage Boost node, then fills HP/MP and Status Effect Resist near the start."
+        },
+        {
+          "kind": "build",
+          "title": "Upgrade order",
+          "text": "Finish the max-level dungeon set, then the main weapon, Critical Hit, PvE/PvP damage amplification, then bonus stats, Daevanion, Arcana and titles."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-sorcerer-gamerblurb-pvp-control",
+      "name": "Sorcerer PvP control — GamerBlurb",
+      "cls": "sorcerer",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "gamerblurb.com", "author": "GamerBlurb Team" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A control-first PvP plan: make distance and lock the target with Ice Chain, Bittercold Wind and Frost, isolate a second enemy with Curse: Tree, and spend Hellfire only when the opponent cannot punish the cast. Stigmas lean defensive (Arctic Armor, Hibernation), and stats start with Accuracy, then PvP damage and bulk."
+        ]
+      },
+      "source": {
+        "title": "AION 2 Sorcerer Build Guide PvE, PvP, & Leveling (Global)",
+        "url": "https://gamerblurb.com/guides/aion-2-sorcerer-build-guide-pve-pvp-and-leveling-global",
+        "author": "GamerBlurb Team",
+        "date": "2026-10-06",
+        "region": "global",
+        "kind": "guide",
+        "note": "The page shows \"Oct 6\" without a year; 2026 is assumed from the site's other posts."
+      },
+      "sources": [
+        {
+          "title": "AION 2 Sorcerer Build Guide PvE, PvP, & Leveling (Global)",
+          "url": "https://gamerblurb.com/guides/aion-2-sorcerer-build-guide-pve-pvp-and-leveling-global",
+          "author": "GamerBlurb Team",
+          "date": "2026-10-06",
+          "region": "global",
+          "kind": "guide",
+          "note": "The page shows \"Oct 6\" without a year; 2026 is assumed from the site's other posts."
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 15150000, "role": "core", "specs": [3, 4, 5], "note": "First in the PvP upgrade order." },
+        { "skill": 15220000, "role": "core", "note": "Follow-up to a landed Frost." },
+        { "skill": 15060000, "role": "core", "specs": [1, 3, 4], "note": "Your strongest spell — cast it only when the target cannot punish you." },
+        { "skill": 15240000, "role": "support", "specs": [3, 4, 5], "note": "Save it for control that would stop you from repositioning." },
+        { "skill": 15310000, "role": "support", "specs": [2, 4, 5], "note": "General picks, not PvP-specific." },
+        { "skill": 15040000, "role": "support", "specs": [2, 4, 3] },
+        { "skill": 15050000, "role": "support", "specs": [1, 4, 5] },
+        { "skill": 15280000, "role": "support", "note": "Opening control and distance." },
+        { "skill": 15090000, "role": "support", "note": "Opening control and distance." },
+        { "skill": 15400000, "role": "stigma", "equip": true },
+        { "skill": 15230000, "role": "stigma", "equip": true, "note": "Turn it on before heavy pressure arrives." },
+        { "skill": 15410000, "role": "stigma", "equip": true, "note": "Emergency reset." },
+        { "skill": 15140000, "role": "stigma", "equip": true, "note": "Isolates a dangerous target; attacking it ends the polymorph early." },
+        { "skill": 15770000, "role": "passive", "note": "Called out as more valuable in PvP." }
+      ],
+      "stats": [
+        { "stat": 318, "weight": 5, "note": "Accuracy here covers gear Accuracy, Accuracy Bonus manastones and PvP Accuracy." },
+        { "stat": 104, "weight": 5 },
+        { "stat": 113, "weight": 4 },
+        { "stat": 65, "weight": 4 },
+        { "stat": 58, "weight": 4 },
+        { "stat": 193, "weight": 3 },
+        { "stat": 76, "weight": 3 },
+        { "stat": 159, "weight": 3 },
+        { "stat": 282, "weight": 2 },
+        { "stat": 199, "weight": 1 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": { "attack": [], "passive": [], "useless": [] },
+      "daevanion": { "goals": [] },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "opener": [
+          { "skill": 15090000, "note": "Make distance or start control." },
+          { "skill": 15280000, "note": "Root to keep them off you." },
+          { "skill": 15150000, "note": "When a control window opens." },
+          { "skill": 15220000, "note": "Right after Frost lands." },
+          { "skill": 15400000, "note": "Only in a safe window." },
+          { "skill": 15310000, "note": "Together with Element Enhancement." },
+          { "skill": 15060000, "note": "Once the target cannot punish the cast." }
+        ],
+        "openerNote": "Control and distance first, then spend the damage window.",
+        "manual": [
+          { "skill": 15140000, "when": "Take a dangerous second enemy out of the fight; do not hit the polymorphed target." },
+          { "skill": 15230000, "when": "Before heavy pressure reaches you." },
+          { "skill": 15410000, "when": "Emergency reset when you are about to die." },
+          { "skill": 15240000, "when": "Only against control that would stop you from repositioning." }
+        ]
+      },
+      "rotation": [
+        "Create distance or control first with Ice Chain and Bittercold Wind.",
+        "Use Frost into Frost Burst when a control window opens.",
+        "Isolate the most dangerous enemy with Curse: Tree and leave that target alone.",
+        "If the enemy breaks control with their own stun-break, wait out their Tenacity before the next control.",
+        "Buff with Element Enhancement and Wish of Concentration only in a safe window.",
+        "Cast Hellfire when the opponent cannot immediately punish it."
+      ],
+      "tips": [
+        {
+          "kind": "skills",
+          "title": "Respect enemy Tenacity",
+          "text": "After an opponent pops their stun-break, your freezes and roots will not stick. Kite and wait for Tenacity to fade before the next control."
+        },
+        {
+          "kind": "skills",
+          "title": "Hellfire is a punish, not an opener",
+          "text": "Standing still to cast Hellfire is the riskiest moment for a Sorcerer. Spend it only after control lands or the enemy has used their escapes."
+        },
+        {
+          "kind": "build",
+          "title": "Separate PvP stigma set",
+          "text": "For PvP the guide swaps to Element Enhancement for damage, Arctic Armor and Hibernation for survival, and Curse: Tree to split one enemy off."
+        },
+        {
+          "kind": "build",
+          "title": "Accuracy before damage",
+          "text": "Hits and control must land on players first. Then PvP damage, then bulk (HP, PvP Damage Tolerance), Status Effect Resist, Combat Speed and MP."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-sorcerer-expcarry-arena-control",
+      "name": "Sorcerer Arena control — ExpCarry",
+      "cls": "sorcerer",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "expcarry.com", "author": "ExpCarry Editorial Team" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "Arena-focused advice with three stigma sets (control, shield and Abyss group) and a clear lean toward survivability for solo play. Never open with Hellfire: make melee burn their gap-closers, land control first, and keep defensives and control on manual keys. Keep MP high for Arctic Armor and Grace of Enhancement."
+        ]
+      },
+      "source": {
+        "title": "AION 2 Sorcerer Build Guide: PvE, PvP, Skills & Stigmas",
+        "url": "https://expcarry.com/aion-2-sorcerer-guide",
+        "author": "ExpCarry Editorial Team",
+        "date": "2026-10-29",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "AION 2 Sorcerer Build Guide: PvE, PvP, Skills & Stigmas",
+          "url": "https://expcarry.com/aion-2-sorcerer-guide",
+          "author": "ExpCarry Editorial Team",
+          "date": "2026-10-29",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 15060000, "role": "core", "note": "Never open with it — cast after control lands or the target has used its escape." },
+        { "skill": 15150000, "role": "core" },
+        { "skill": 15280000, "role": "core", "note": "Pull specialty (3) only when pulling the target is safe." },
+        { "skill": 15110000, "role": "core" },
+        { "skill": 15240000, "role": "support" },
+        { "skill": 15400000, "role": "stigma", "equip": true },
+        { "skill": 15410000, "role": "stigma", "equip": true, "note": "Immunity to damage and status effects, but no attacks — save it for real danger." },
+        { "skill": 15230000, "role": "stigma", "equip": true, "note": "Magic Displacement needs at least 50% MP." },
+        { "skill": 15140000, "role": "stigma", "equip": true, "note": "Or Soul Freeze; damage breaks the polymorph." },
+        { "skill": 15130000, "role": "stigma", "equip": false, "note": "Alternative to Curse: Tree (chance to Seal)." },
+        { "skill": 15160000, "role": "stigma", "equip": false, "note": "Shield set: instead of Arctic Armor." },
+        { "skill": 15390000, "role": "stigma", "equip": false, "note": "Abyss group damage set." },
+        { "skill": 15200000, "role": "stigma", "equip": false, "note": "Abyss group damage set." },
+        { "skill": 15780000, "role": "passive", "note": "+10% PvP Damage Boost while MP is at least 25%." },
+        { "skill": 15740000, "role": "passive" },
+        { "skill": 15710000, "role": "passive" },
+        { "skill": 15720000, "role": "passive", "note": "Critical Hit bonus while MP is at least 50%." }
+      ],
+      "stats": [
+        { "stat": 318, "weight": 5, "note": "The page gives a rough order, not a ranking. Accuracy covers gear Accuracy, Accuracy Bonus manastones and PvP Accuracy." },
+        { "stat": 104, "weight": 5 },
+        { "stat": 158, "weight": 5 },
+        { "stat": 113, "weight": 4 },
+        { "stat": 317, "weight": 4 },
+        { "stat": 193, "weight": 4 },
+        { "stat": 76, "weight": 4 },
+        { "stat": 159, "weight": 4 },
+        { "stat": 215, "weight": 3 },
+        { "stat": 282, "weight": 3 },
+        { "stat": 199, "weight": 2 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": {
+        "attack": [15240000, 15150000, 15110000, 15280000, 15090000],
+        "passive": [15770000, 15790000, 15750000, 15780000, 15740000, 15720000],
+        "useless": [],
+        "notes": "Compass: Defiance or control skills. Bell: defensive passives. Mirror: Robe of Flame, Grace of Enhancement or Robe of Earth."
+      },
+      "daevanion": {
+        "goals": [
+          {
+            "id": "azphel-pvp",
+            "name": "Azphel: PvP Damage Boost and Tolerance",
+            "description": "The guide's PvP board (opens at level 45): aim for the PvP Damage Boost and PvP Damage Tolerance nodes, taking status nodes along the way.",
+            "boards": [66],
+            "nodes": [660120, 660106, 660015, 660211, 660008, 660218, 660001, 660225]
+          }
+        ]
+      },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "manual": [
+          { "skill": 15410000, "when": "Only in real danger — not the moment someone closes in." },
+          { "skill": 15230000, "when": "Before melee reaches you; keep MP at 50% or more." },
+          { "skill": 15140000, "when": "Take one enemy out of the fight; any damage breaks it." },
+          { "skill": 15130000, "when": "To Seal a dangerous target (chance-based).", "optional": true },
+          { "skill": 15160000, "when": "Shield set: absorb a burst instead of Arctic Armor.", "optional": true },
+          { "skill": 15060000, "when": "After your control lands or the target has used its escape." }
+        ],
+        "notes": "The guide recommends separate hotkeys rather than macros in Arena."
+      },
+      "rotation": [
+        "Keep distance and make melee spend their gap-closers before using your strongest control.",
+        "Do not open with Hellfire: land control or force an escape first.",
+        "Do not burn every defensive at once — save Hibernation for real danger.",
+        "Against ranged classes, play line of sight and cooldowns, and pressure with faster skills first.",
+        "In the Abyss, stay behind your frontline and hold defensives for target switches."
+      ],
+      "tips": [
+        {
+          "kind": "skills",
+          "title": "Manual keys in Arena",
+          "text": "Keep Hibernation, Soul Freeze, Curse: Tree, shields and burst on their own keys instead of a combo macro, so you choose the moment."
+        },
+        {
+          "kind": "build",
+          "title": "Survivability for solo Arena",
+          "text": "A glass cannon can work in a coordinated group, but solo Arena players usually do better with HP, PvP Damage Tolerance and resistances."
+        },
+        {
+          "kind": "build",
+          "title": "Three stigma sets",
+          "text": "Arena control: Element Enhancement, Hibernation, Curse: Tree or Soul Freeze, Arctic Armor. Arena shield: Steel Barrier instead of Arctic Armor. Abyss group: Element Enhancement, Fire Wall, Cold Storm plus one defensive. Stigmas cannot be swapped mid-fight."
+        },
+        {
+          "kind": "build",
+          "title": "Keep MP up",
+          "text": "Arctic Armor's Magic Displacement needs 50%+ MP and Grace of Enhancement needs 25%+ MP, so MP matters more than it looks."
+        }
+      ]
+    }
+  ]
+}

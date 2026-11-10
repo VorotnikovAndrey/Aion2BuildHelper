@@ -307,9 +307,14 @@ function normalizeCombat(v: unknown): GuideCombat | undefined {
  * В конце файла: normalizeGuide и его помощники должны быть уже объявлены.
  */
 const QUESTLOG_FILES = import.meta.glob<{ guides: unknown[] }>('./builtin/questlog/*.json', { eager: true, import: 'default' })
+/**
+ * PvP-гайды из статей в интернете (не Questlog) — по просьбе владельца, до 3 на класс (builtin/web/<класс>.json,
+ * собраны помощником по статьям, decisions/0012). Идут после билдов Questlog своего класса.
+ */
+const WEB_FILES = import.meta.glob<{ guides: unknown[] }>('./builtin/web/*.json', { eager: true, import: 'default' })
 const CLASS_ORDER = ['templar', 'gladiator', 'assassin', 'ranger', 'sorcerer', 'spiritmaster', 'cleric', 'chanter']
-const fileClass = (file: string) => CLASS_ORDER.indexOf(file.match(/(\w+)\.json$/)?.[1] ?? '')
 
-export const BUILTIN_GUIDES: Guide[] = Object.entries(QUESTLOG_FILES)
-  .sort(([a], [b]) => fileClass(a) - fileClass(b))
-  .flatMap(([file, data]) => data.guides.map((g, i) => ({ ...normalizeGuide(localizeTexts(g), `${file}-${i}`), builtin: true })))
+const load = (files: Record<string, { guides: unknown[] }>): Guide[] =>
+  Object.entries(files).flatMap(([file, data]) => data.guides.map((g, i) => ({ ...normalizeGuide(localizeTexts(g), `${file}-${i}`), builtin: true })))
+
+export const BUILTIN_GUIDES: Guide[] = [...load(QUESTLOG_FILES), ...load(WEB_FILES)].sort((a, b) => CLASS_ORDER.indexOf(a.cls) - CLASS_ORDER.indexOf(b.cls))

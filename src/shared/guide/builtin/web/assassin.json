@@ -1,0 +1,487 @@
+{
+  "_source": "PvP-гайды из статей в интернете (не Questlog), собраны помощником — decisions/0012",
+  "fetchedAt": "2026-11-10",
+  "guides": [
+    {
+      "schema": 1,
+      "id": "web-assassin-game8-heart-gore-burst",
+      "name": "Heart Gore burst PvP — Game8",
+      "cls": "assassin",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "Game8", "author": "Game8 AION 2 Walkthrough Team" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A single-target burst build for endgame PvP. Buff with Swift Contract and Illusive Clone, open with a Shadowstrike stun from behind, then hold a right-click macro of Insignia Explosion and Heart Gore. Heart Gore, Quick Slice and Insignia Explosion are levelled first; manastones go into PvP accuracy, PvP damage and back-attack damage."
+        ]
+      },
+      "source": {
+        "title": "DPS Assassin PvP Build",
+        "url": "https://game8.co/games/Aion-2/archives/631912",
+        "author": "Game8 AION 2 Walkthrough Team",
+        "date": "2026-10-16",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "DPS Assassin PvP Build",
+          "url": "https://game8.co/games/Aion-2/archives/631912",
+          "author": "Game8 AION 2 Walkthrough Team",
+          "date": "2026-10-16",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 13350000, "role": "core", "level": 20, "specs": [5, 4, 1], "note": "Top levelling priority" },
+        { "skill": 13010000, "role": "core", "level": 20, "specs": [5, 4, 3] },
+        { "skill": 13130000, "role": "core", "level": 20, "specs": [5, 2] },
+        { "skill": 13070000, "role": "core", "level": 16, "specs": [2, 3], "note": "Stun opener from behind" },
+        { "skill": 13050000, "role": "support", "level": 16, "specs": [4, 2], "note": "Gap closer" },
+        { "skill": 13360000, "role": "support", "level": 16, "specs": [2, 1], "note": "Gap closer" },
+        { "skill": 13100000, "role": "support", "level": 5, "specs": [3, 2], "note": "Mostly for the early game" },
+        { "skill": 13220000, "role": "situational", "level": 5 },
+        { "skill": 13210000, "role": "situational", "level": 5 },
+        { "skill": 13340000, "role": "situational", "level": 5 },
+        { "skill": 13310000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 13390000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 13180000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 13270000, "role": "stigma", "level": 20, "equip": true },
+        { "skill": 13720000, "role": "passive", "level": 20 },
+        { "skill": 13740000, "role": "passive", "level": 15 },
+        { "skill": 13750000, "role": "passive", "level": 15 },
+        { "skill": 13770000, "role": "passive", "level": 15 },
+        { "skill": 13730000, "role": "passive", "level": 15 },
+        { "skill": 13780000, "role": "passive", "level": 15 },
+        { "skill": 13800000, "role": "passive", "level": 15 },
+        { "skill": 13710000, "role": "passive", "level": 15 }
+      ],
+      "stats": [
+        { "stat": 317, "weight": 5 },
+        { "stat": 282, "weight": 4 },
+        { "stat": 318, "weight": 4 },
+        { "stat": 102, "weight": 4 },
+        { "stat": 65, "weight": 4 },
+        { "stat": 113, "weight": 4 },
+        { "stat": 128, "weight": 3 },
+        { "stat": 58, "weight": 3 },
+        { "stat": 32, "weight": 3 },
+        { "stat": 125, "weight": 2 }
+      ],
+      "gear": {
+        "skills": [
+          { "skill": 13350000, "weight": 5 },
+          { "skill": 13010000, "weight": 4 },
+          { "skill": 13720000, "weight": 4 },
+          { "skill": 13740000, "weight": 3 },
+          { "skill": 13750000, "weight": 3 },
+          { "skill": 13770000, "weight": 3 },
+          { "skill": 13730000, "weight": 3 },
+          { "skill": 13780000, "weight": 2 },
+          { "skill": 13800000, "weight": 2 },
+          { "skill": 13710000, "weight": 2 }
+        ],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "manastones": [
+        { "stat": 113, "weight": 5 },
+        { "stat": 65, "weight": 5 },
+        { "stat": 102, "weight": 5 },
+        { "stat": 125, "weight": 4 },
+        { "stat": 32, "weight": 4 },
+        { "stat": 58, "weight": 4 },
+        { "stat": 132, "weight": 2 }
+      ],
+      "arcana": {
+        "attack": [13350000, 13010000],
+        "passive": [13720000],
+        "useless": [],
+        "notes": "The article lists the Magic set (Chalice, Parchment, Compass, Bell and Mirror of Magic) but its text calls Primal Vigor the best DPS set: check the original."
+      },
+      "daevanion": {
+        "goals": [
+          {
+            "id": "core-skills",
+            "name": "Heart Gore, Quick Slice, Insignia Explosion +1",
+            "description": "Max these skill nodes first on the PvE boards, then open the stat nodes.",
+            "skills": [13350000, 13010000, 13130000],
+            "boards": [41, 42, 43, 44]
+          },
+          {
+            "id": "secondary-nodes",
+            "name": "Secondary nodes per board",
+            "description": "Nezekan: Exploit Weakness, Combat Speed. Zikel: Ambush Stance, Damage Boost, Damage Tolerance. Vaizel: Determination, Critical Damage Boost. Triniel: Heightened Sixth Sense, Multi-hit Chance.",
+            "nodes": [410037, 410163, 410033, 410193, 420100, 420154, 420043, 420183, 420033, 420193, 430130, 430033, 430193, 440161, 440023, 440197, 440209]
+          },
+          {
+            "id": "azphel-corners",
+            "name": "Azphel: PvP Damage Boost and PvP Damage Tolerance",
+            "boards": [46],
+            "nodes": [460015, 460106, 460120, 460211, 460001, 460008, 460218, 460225]
+          },
+          {
+            "id": "azphel-next",
+            "name": "Azphel: Status Effect Chance, then PvP Attack / Defense",
+            "boards": [46],
+            "nodes": [460004, 460040, 460061, 460068, 460158, 460165, 460186, 460222, 460034, 460045, 460070, 460097, 460148, 460156, 460181, 460220]
+          }
+        ]
+      },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "titles": {
+        "attack": [23020043],
+        "defense": [22030003],
+        "utility": [13050009]
+      },
+      "combat": {
+        "macros": [
+          { "id": "insignia-explosion", "name": "Insignia Explosion", "skills": [13130000] },
+          { "id": "heart-gore", "name": "Heart Gore", "skills": [13350000] },
+          { "id": "savage-roar", "name": "Savage Roar", "skills": [13100000], "note": "Lowest priority, mostly for the early game." }
+        ],
+        "delayNote": "Set the macro delay to about half of your ping.",
+        "opener": [
+          { "skill": 13390000, "note": "Buff" },
+          { "skill": 13310000, "note": "Buff" },
+          { "skill": 13070000, "note": "Stun from behind" },
+          { "skill": 13270000 },
+          { "skill": 13130000 },
+          { "skill": 13350000, "note": "Then hold the macro" }
+        ],
+        "openerNote": "Pop both buffs before you start the macro: they are the damage window.",
+        "manual": [
+          { "skill": 13390000, "when": "Right before the burst; can share one key with Illusive Clone." },
+          { "skill": 13310000, "when": "Right after Swift Contract, before holding the macro." },
+          { "skill": 13070000, "when": "To open on the target from behind." },
+          { "skill": 13270000, "when": "After the stun, before the macro." },
+          { "skill": 13050000, "when": "To close distance or get behind the target." },
+          { "skill": 13360000, "when": "To close distance or reposition behind the target." },
+          { "skill": 13180000, "when": "To approach an unaware target or reposition while skills are on cooldown." }
+        ]
+      },
+      "rotation": [
+        "Pop Swift Contract and Illusive Clone before anything else.",
+        "Open from behind with a Shadowstrike stun, then Savage Fang.",
+        "Hold the macro: Insignia Explosion first, Heart Gore next; Heart Gore resets when it crits.",
+        "Use Flash Slice, Infiltrate or Shadow Walk to get back behind the target."
+      ],
+      "tips": [
+        {
+          "kind": "skills",
+          "title": "Buffs first",
+          "text": "Swift Contract and Illusive Clone are the damage window of this build. Use them before you start spamming the macro; putting both on one key makes it easy."
+        },
+        {
+          "kind": "skills",
+          "title": "Macro delay",
+          "text": "Set the macro delay to roughly half of your ping."
+        },
+        {
+          "kind": "skills",
+          "title": "Staying behind the target",
+          "text": "Flash Slice and Infiltrate close gaps and put you behind the target; Shadow Walk lets you sneak up on unaware players while your skills recover."
+        },
+        {
+          "kind": "build",
+          "title": "One target at a time",
+          "text": "The build is made to pick off single targets from behind. Choose an isolated enemy and focus it down instead of spreading damage."
+        },
+        {
+          "kind": "build",
+          "title": "Levelling order",
+          "text": "Push Heart Gore, Quick Slice and Insignia Explosion to 20 first, on skills and on Daevanion boards; most other actives can stay low."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-assassin-fextralife-stealth-control",
+      "name": "Stealth control PvP — Fextralife",
+      "cls": "assassin",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "Fextralife", "author": "Fextralife Aion 2 Wiki" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A skirmish and duel build: open from stealth, chain a stun into a knockdown, then stack five Insignias for a guaranteed Aerial Bind and detonate them. Stigmas are Shadow Walk, Illusive Clone, Aerial Bind and Evasion Contract, with Defiance and Evasion Contract kept for breaking control. Accuracy comes first, then PvP Damage Tolerance and Status Effect Resist."
+        ]
+      },
+      "source": {
+        "title": "Assassin Builds: PvP Stealth, Control and Survival Build",
+        "url": "https://aion2.wiki.fextralife.com/Assassin_Builds",
+        "author": "Fextralife Aion 2 Wiki",
+        "date": "2026-10-09",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "Assassin Builds: PvP Stealth, Control and Survival Build",
+          "url": "https://aion2.wiki.fextralife.com/Assassin_Builds",
+          "author": "Fextralife Aion 2 Wiki",
+          "date": "2026-10-09",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 13070000, "role": "core", "specs": [1, 4, 3], "note": "Stun opener" },
+        { "skill": 13220000, "role": "core", "level": 16, "specs": [5, 4, 2], "note": "Level 16 lets it hit Blinded targets" },
+        { "skill": 13130000, "role": "core", "specs": [4, 5, 3] },
+        { "skill": 13350000, "role": "core", "specs": [5, 4, 1] },
+        { "skill": 13010000, "role": "support", "specs": [5, 4, 2] },
+        { "skill": 13100000, "role": "support", "specs": [4, 2, 5], "note": "Builds Insignias" },
+        { "skill": 13060000, "role": "support", "specs": [1, 5, 3], "note": "Builds Insignias from behind" },
+        { "skill": 13050000, "role": "support", "specs": [5, 4, 2], "note": "Blind if the stun fails" },
+        { "skill": 13360000, "role": "support", "note": "Blind if the stun fails" },
+        { "skill": 13260000, "role": "support", "specs": [5, 4, 3], "note": "Save for hard CC" },
+        { "skill": 13340000, "role": "situational", "specs": [5, 4, 1], "note": "Only hits Staggered targets" },
+        { "skill": 13180000, "role": "stigma", "level": 15, "equip": true, "note": "Level 15: Stealth in combat" },
+        { "skill": 13310000, "role": "stigma", "level": 10, "equip": true },
+        { "skill": 13230000, "role": "stigma", "level": 10, "equip": true, "note": "Level 10: Aerial Slaughter chain" },
+        { "skill": 13370000, "role": "stigma", "level": 10, "equip": true },
+        { "skill": 13080000, "role": "stigma", "level": 10, "equip": false, "note": "Replaces Shadow Walk in long arena fights" },
+        { "skill": 13710000, "role": "passive" },
+        { "skill": 13790000, "role": "passive" },
+        { "skill": 13730000, "role": "passive" }
+      ],
+      "stats": [
+        { "stat": 318, "weight": 5 },
+        { "stat": 76, "weight": 4 },
+        { "stat": 159, "weight": 4 },
+        { "stat": 128, "weight": 3 },
+        { "stat": 193, "weight": 2 },
+        { "stat": 312, "weight": 1 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": { "attack": [], "passive": [], "useless": [] },
+      "daevanion": { "goals": [] },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "opener": [
+          { "skill": 13180000, "note": "Stealth" },
+          { "skill": 13070000, "note": "Stun" },
+          { "skill": 13220000, "note": "Knockdown" },
+          { "skill": 13310000, "note": "Only once the CC has landed" }
+        ],
+        "openerNote": "Start every fight from stealth; burst only after your control is confirmed.",
+        "manual": [
+          { "skill": 13050000, "when": "If the Shadowstrike stun misses: Blind the target, then Shadow Fall (needs Shadow Fall 16)." },
+          { "skill": 13360000, "when": "Alternative Blind when the stun misses, then Shadow Fall." },
+          { "skill": 13100000, "when": "To stack Insignias before Aerial Bind." },
+          { "skill": 13060000, "when": "From behind, to stack Insignias before Aerial Bind." },
+          { "skill": 13230000, "when": "Only when the target has 5 Insignias: then Airborne is guaranteed." },
+          { "skill": 13130000, "when": "Right after Aerial Bind lands, to finish the kill." },
+          { "skill": 13370000, "when": "As a reaction to Slows and Roots." },
+          { "skill": 13260000, "when": "Only against hard CC (Stun, Knockdown, Fear); use the Tenacity window to reposition or re-stealth." },
+          { "skill": 13080000, "when": "In long arena fights, in place of Shadow Walk.", "optional": true }
+        ]
+      },
+      "rotation": [
+        "Open from stealth: Shadow Walk, Shadowstrike stun, Shadow Fall knockdown.",
+        "If the stun misses, Blind with Flash Slice or Infiltrate and Shadow Fall anyway (Shadow Fall 16).",
+        "Stack 5 Insignias with Savage Roar and back-attack Ambush, then Aerial Bind for a sure Airborne and Insignia Explosion to finish.",
+        "Use Illusive Clone only once the target is locked in CC."
+      ],
+      "tips": [
+        {
+          "kind": "skills",
+          "title": "When Shadow Fall works",
+          "text": "Shadow Fall needs a Stunned target, or a Blinded one with the level 16 option. Knockdown and Airborne do not enable it."
+        },
+        {
+          "kind": "skills",
+          "title": "Aerial Bind needs 5 Insignias",
+          "text": "With fewer stacks Airborne is a coin flip, so build all five Insignias before casting Aerial Bind."
+        },
+        {
+          "kind": "skills",
+          "title": "Storm Rampage in PvP",
+          "text": "Storm Rampage only hits Staggered targets, so it does little against players."
+        },
+        {
+          "kind": "build",
+          "title": "Respect enemy Defiance",
+          "text": "When the opponent uses Defiance, back off and wait out their Tenacity before spending more control on them."
+        },
+        {
+          "kind": "build",
+          "title": "Long brawls",
+          "text": "For extended arena fights swap Shadow Walk for Evasion Stance: an extra charge at level 5 and casting on the move at level 10."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-assassin-expcarry-arena-abyss",
+      "name": "Arena & Abyss PvP — ExpCarry",
+      "cls": "assassin",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "ExpCarry", "author": "ExpCarry Editorial Team" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "Two PvP presets: Arena / 1v1 with Illusive Clone, Triniel's Dagger, Shadowstep and Spiral Slice, and Abyss / group PvP with Shadow Walk and Throw Shadowblade instead. Specializations favour longer stuns and knockdowns, shield break and reliable crits; Azphel goes to Status Effect Chance first, then PvP Damage Tolerance. Fight from behind, control first and burst only inside a safe stun window."
+        ]
+      },
+      "source": {
+        "title": "AION 2 Assassin Build Guide: PvE, PvP, Skills & Stigmas",
+        "url": "https://expcarry.com/aion-2-assassin-guide",
+        "author": "ExpCarry Editorial Team",
+        "date": "2026-10-29",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "AION 2 Assassin Build Guide: PvE, PvP, Skills & Stigmas",
+          "url": "https://expcarry.com/aion-2-assassin-guide",
+          "author": "ExpCarry Editorial Team",
+          "date": "2026-10-29",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 13070000, "role": "core", "specs": [1, 4, 3], "note": "Get behind and control" },
+        { "skill": 13220000, "role": "core", "specs": [4] },
+        { "skill": 13130000, "role": "core", "specs": [4] },
+        { "skill": 13350000, "role": "core" },
+        { "skill": 13010000, "role": "support", "specs": [5] },
+        { "skill": 13050000, "role": "support", "specs": [4] },
+        { "skill": 13360000, "role": "support", "specs": [3], "note": "Breaks shields" },
+        { "skill": 13210000, "role": "support", "specs": [4] },
+        { "skill": 13260000, "role": "support", "specs": [4, 5] },
+        { "skill": 13310000, "role": "stigma", "equip": true },
+        { "skill": 13300000, "role": "stigma", "level": 10, "equip": true, "note": "Level 10: -10% cooldowns on hit" },
+        { "skill": 13140000, "role": "stigma", "level": 10, "equip": true, "note": "Escape; level 10 applies 5 Insignias" },
+        { "skill": 13280000, "role": "stigma", "level": 10, "equip": true, "note": "Strips buffs" },
+        { "skill": 13180000, "role": "stigma", "equip": false, "note": "Abyss / group PvP preset" },
+        { "skill": 13020000, "role": "stigma", "equip": false, "note": "Abyss / group PvP preset" },
+        { "skill": 13740000, "role": "passive" },
+        { "skill": 13720000, "role": "passive" },
+        { "skill": 13760000, "role": "passive" },
+        { "skill": 13730000, "role": "passive" },
+        { "skill": 13710000, "role": "passive", "note": "Survival" },
+        { "skill": 13800000, "role": "situational" }
+      ],
+      "stats": [
+        { "stat": 318, "weight": 5 },
+        { "stat": 158, "weight": 4 },
+        { "stat": 128, "weight": 3 },
+        { "stat": 65, "weight": 3 },
+        { "stat": 76, "weight": 2 },
+        { "stat": 193, "weight": 2 },
+        { "stat": 159, "weight": 2 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": {
+        "attack": [13070000, 13220000, 13210000, 13360000, 13050000, 13260000],
+        "passive": [13760000, 13710000],
+        "useless": [],
+        "notes": "Parchment: Shadowstrike, Whirlwind Slice or Shadow Fall. Compass: Infiltrate, Flash Slice or Defiance. Mirror: Impact Hit. Bell: Heightened Sixth Sense."
+      },
+      "daevanion": {
+        "goals": [
+          {
+            "id": "azphel-offense",
+            "name": "Azphel: Status Effect Chance and PvP Damage Boost",
+            "description": "First priority on the PvP board: control chance and offensive pressure.",
+            "boards": [46],
+            "nodes": [460004, 460040, 460061, 460068, 460158, 460165, 460186, 460222, 460015, 460106, 460120, 460211]
+          },
+          {
+            "id": "azphel-defense",
+            "name": "Azphel: PvP Damage Tolerance and Status Effect Resist",
+            "boards": [46],
+            "nodes": [460001, 460008, 460218, 460225, 460012, 460065, 460073, 460100, 460126, 460153, 460161, 460214]
+          }
+        ]
+      },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "opener": [
+          { "skill": 13070000, "note": "Get behind and control" },
+          { "skill": 13220000, "note": "While the stun holds" },
+          { "skill": 13310000, "note": "Once the target is locked" },
+          { "skill": 13130000, "note": "Detonate Insignias" },
+          { "skill": 13350000, "note": "Keep pressing on crit resets" }
+        ],
+        "openerNote": "Pick a target its team is not covering and come in from a good angle, from Stealth if you can.",
+        "manual": [
+          { "skill": 13140000, "when": "When the target survives and turns on you: disengage." },
+          { "skill": 13280000, "when": "Against buffed targets: strips buffs and stuns if it removes two or more." },
+          { "skill": 13300000, "when": "During the burst: a hit cuts your cooldowns." }
+        ],
+        "notes": "The article gives no macro: keep movement and defensive skills on manual keys."
+      },
+      "rotation": [
+        "Pick a target that is not covered by its team and approach from a good angle, in Stealth if possible.",
+        "Shadowstrike to get behind and control, Shadow Fall while the stun holds.",
+        "Build or apply Insignias, then Illusive Clone and your damage skills while the target is helpless.",
+        "Detonate with Insignia Explosion and keep pressing Heart Gore whenever crits reset it.",
+        "If the target survives and fights back, leave with Shadowstep."
+      ],
+      "tips": [
+        {
+          "kind": "skills",
+          "title": "Control can fail",
+          "text": "Even at five Insignias, Insignia Explosion has only a base 50% stun chance on players. Have a backup plan before you commit."
+        },
+        {
+          "kind": "skills",
+          "title": "Defence stays manual",
+          "text": "Keep movement and defensive skills on their own keys instead of putting them in a macro."
+        },
+        {
+          "kind": "build",
+          "title": "Arena stigmas",
+          "text": "Do not take the PvE stigma set into Arena: Shadowstep and Spiral Slice bring the control and escape a duel needs."
+        },
+        {
+          "kind": "build",
+          "title": "Abyss preset",
+          "text": "For Abyss and group PvP swap to Shadow Walk and Throw Shadowblade. Stats then shift to Accuracy, PvP Damage Tolerance, Status Effect Resist and HP."
+        },
+        {
+          "kind": "build",
+          "title": "Choosing targets in the Abyss",
+          "text": "Hunt isolated or distracted players, commit from a flank and leave before their group reacts. Do not dive a protected target."
+        },
+        {
+          "kind": "build",
+          "title": "Getting controlled first",
+          "text": "If you keep getting controlled before you can act, Status Effect Resist helps more than a little extra Attack."
+        }
+      ]
+    }
+  ]
+}

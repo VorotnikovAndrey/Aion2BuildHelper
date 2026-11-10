@@ -59,7 +59,7 @@ export async function runShots(win: BrowserWindow): Promise<void> {
   setTimeout(() => {
     console.error('[shots] timeout')
     app.exit(1)
-  }, 120_000).unref()
+  }, 240_000).unref()
   const out = join(resolve(app.getAppPath()), 'out', 'shots')
   mkdirSync(out, { recursive: true })
   // Старые снимки убираем: номера страниц сдвигаются, и прежние файлы путались бы с новыми.

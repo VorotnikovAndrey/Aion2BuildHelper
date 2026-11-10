@@ -1,0 +1,453 @@
+{
+  "_source": "PvP-гайды из статей в интернете (не Questlog), собраны помощником — decisions/0012",
+  "fetchedAt": "2026-11-10",
+  "guides": [
+    {
+      "schema": 1,
+      "id": "web-templar-game8-tank-pvp",
+      "name": "Tank Templar PvP — Game8",
+      "cls": "templar",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "Game8", "author": "Game8 AION 2 Walkthrough Team" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A tanky Templar for duels and group PvP: lock enemies down with stuns, knockdowns and debuffs, survive on HP, Block and Defense, and let a Judgment-centred macro do the damage. The article gives separate specialization and stigma sets for 1v1 and group fights — this guide follows the 1v1 set, the group changes are in the tips."
+        ]
+      },
+      "source": {
+        "title": "Tank Templar PvP Build",
+        "url": "https://game8.co/games/Aion-2/archives/631349",
+        "author": "Game8 AION 2 Walkthrough Team",
+        "date": "2026-10-16",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "Tank Templar PvP Build",
+          "url": "https://game8.co/games/Aion-2/archives/631349",
+          "author": "Game8 AION 2 Walkthrough Team",
+          "date": "2026-10-16",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 12240000, "role": "core", "level": 20, "specs": [5, 3, 4], "note": "Macro centrepiece: cast after every trigger" },
+        { "skill": 12090000, "role": "core", "level": 20, "specs": [3, 1, 5], "note": "Macro finisher" },
+        { "skill": 12040000, "role": "core", "level": 20, "specs": [2, 3, 5], "note": "Macro filler, last in priority" },
+        { "skill": 12300000, "role": "core", "level": 16, "specs": [4, 2], "note": "Right mouse button, after Judgment" },
+        { "skill": 12010000, "role": "support", "level": 14, "specs": [2, 3] },
+        { "skill": 12350000, "role": "support", "level": 14, "specs": [4, 2], "note": "Judgment trigger" },
+        { "skill": 12100000, "role": "support", "level": 16, "specs": [4, 1], "note": "Judgment trigger" },
+        { "skill": 12270000, "role": "support", "level": 15, "note": "The article lists no specializations" },
+        { "skill": 12130000, "role": "situational", "level": 5 },
+        { "skill": 12430000, "role": "situational", "level": 5 },
+        { "skill": 12070000, "role": "stigma", "level": 20, "equip": true, "note": "Gap closer: opens a Judgment window, resets Annihilate" },
+        { "skill": 12110000, "role": "stigma", "level": 20, "equip": true, "note": "Guaranteed block that procs Annihilate" },
+        { "skill": 12410000, "role": "stigma", "level": 20, "equip": true, "note": "Defense down right before a fully charged Punishment" },
+        { "skill": 12120000, "role": "stigma", "level": 20, "equip": true, "note": "Debuff for duels" },
+        { "skill": 12250000, "role": "stigma", "level": 20, "equip": false, "note": "Group PvP: save for the team push" },
+        { "skill": 12310000, "role": "stigma", "level": 20, "equip": false, "note": "Group PvP: extra stun, pairs with Shield Smite" },
+        { "skill": 12220000, "role": "stigma", "level": 20, "equip": false, "note": "Group PvP: pulls up to four enemies" },
+        { "skill": 12700000, "role": "stigma", "level": 20, "equip": false, "note": "Group PvP swap: gap closer" },
+        { "skill": 12320000, "role": "stigma", "level": 20, "equip": false, "note": "Group PvP swap: when the team lacks survivability" },
+        { "skill": 12780000, "role": "passive", "level": 20 },
+        { "skill": 12760000, "role": "passive", "level": 15 },
+        { "skill": 12730000, "role": "passive", "level": 15 },
+        { "skill": 12770000, "role": "passive", "level": 15, "note": "Enmity does nothing in PvP, the front-damage bonus does" },
+        { "skill": 12710000, "role": "passive", "level": 15 },
+        { "skill": 12720000, "role": "passive", "level": 15 },
+        { "skill": 12740000, "role": "passive", "level": 15 },
+        { "skill": 12750000, "role": "passive", "level": 15 },
+        { "skill": 12790000, "role": "passive", "level": 15 },
+        { "skill": 12800000, "role": "passive", "level": 14 }
+      ],
+      "stats": [
+        { "stat": 317, "weight": 5 },
+        { "stat": 318, "weight": 4 },
+        { "stat": 255, "weight": 3 },
+        { "stat": 307, "weight": 2 }
+      ],
+      "gear": {
+        "skills": [
+          { "skill": 12780000, "weight": 3 },
+          { "skill": 12240000, "weight": 2 },
+          { "skill": 12090000, "weight": 2 },
+          { "skill": 12750000, "weight": 1 },
+          { "skill": 12770000, "weight": 1 },
+          { "skill": 12760000, "weight": 1 },
+          { "skill": 12730000, "weight": 1 },
+          { "skill": 12710000, "weight": 1 },
+          { "skill": 12720000, "weight": 1 },
+          { "skill": 12740000, "weight": 1 }
+        ],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "manastones": [
+        { "stat": 113, "weight": 4 },
+        { "stat": 58, "weight": 4 },
+        { "stat": 569, "weight": 4 },
+        { "stat": 61, "weight": 4 },
+        { "stat": 317, "weight": 4 },
+        { "stat": 307, "weight": 4 },
+        { "stat": 255, "weight": 4 },
+        { "stat": 193, "weight": 4 }
+      ],
+      "arcana": {
+        "attack": [12090000, 12240000],
+        "passive": [12780000],
+        "useless": [],
+        "preferredSet": "magic",
+        "notes": "The article names the Magic Armor set, but the deity stats it lists (Time, Life, Freedom, Justice) belong to the Vigor cards — check the original."
+      },
+      "daevanion": {
+        "goals": [
+          { "id": "skill-levels", "name": "Judgment, Pummel and Punishment +1 nodes first", "skills": [12240000, 12040000, 12090000] },
+          { "id": "azphel-pvp-damage", "name": "Azphel: PvP Damage Boost", "boards": [26], "nodes": [260015, 260106, 260120, 260211] },
+          { "id": "azphel-pvp-tolerance", "name": "Azphel: PvP Damage Tolerance", "boards": [26], "nodes": [260001, 260008, 260218, 260225] },
+          {
+            "id": "azphel-status-chance",
+            "name": "Azphel: Status Effect Chance",
+            "boards": [26],
+            "nodes": [260004, 260040, 260061, 260068, 260158, 260165, 260186, 260222]
+          }
+        ],
+        "notes": "Next on Azphel: PvP Attack and PvP Defense. Leftover points go to Critical Damage Tolerance and Multi-Hit Resist nodes."
+      },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "titles": { "attack": [23020043], "defense": [22030003], "utility": [13050009] },
+      "combat": {
+        "macros": [
+          { "id": "step-1", "name": { "$skill": 12070000 }, "skills": [12070000] },
+          { "id": "step-2", "name": { "$skill": 12240000 }, "skills": [12240000] },
+          { "id": "step-3", "name": { "$skill": 12100000 }, "skills": [12100000], "note": "Drop it from the queue to save the AoE Stun for groups" },
+          { "id": "step-4", "name": { "$skill": 12240000 }, "skills": [12240000] },
+          { "id": "step-5", "name": { "$skill": 12350000 }, "skills": [12350000] },
+          { "id": "step-6", "name": { "$skill": 12240000 }, "skills": [12240000] },
+          { "id": "step-7", "name": { "$skill": 12090000 }, "skills": [12090000] },
+          { "id": "step-8", "name": { "$skill": 12040000 }, "skills": [12040000], "note": "Filler, last in priority" }
+        ],
+        "delayNote": "Set Macro Display MS to half your current ping.",
+        "manual": [
+          { "skill": 12300000, "key": "RMB", "when": "Right mouse button macro: Judgment first, Annihilate next" },
+          { "skill": 12410000, "when": "Right before a fully charged Punishment" },
+          { "skill": 12110000, "when": "For a guaranteed block that procs Annihilate" },
+          { "skill": 12120000, "when": "Debuff your duel target" }
+        ]
+      },
+      "rotation": [
+        "Open with Doom Shield: it closes the gap and opens a Judgment window.",
+        "Cast Judgment after every trigger — Shield Smite, Warding Strike, Doom Shield.",
+        "Finish the chain with Punishment; Pummel fills the gaps.",
+        "Control, stigmas and defensives go by hand."
+      ],
+      "tips": [
+        {
+          "kind": "build",
+          "title": "Role in PvP",
+          "text": "Control comes first: AoE stuns, displacement and debuffs set enemies up for your team's AoE damage. In a duel the Templar wins by outlasting the opponent on HP, Defense, Block and damage mitigation."
+        },
+        {
+          "kind": "skills",
+          "title": "Macro setup",
+          "text": "Key-bind priority: Judgment first, the other Judgment triggers next, Pummel last. Set Macro Display MS to half your ping. With Shield Smite's AoE Stun option, take Shield Smite out of the queue and save it for several targets."
+        },
+        {
+          "kind": "skills",
+          "title": "Stigma timing",
+          "text": "Shield of Protection forces a block, which procs Annihilate. Put Executing Blade on the target just before a fully charged Punishment. In group fights Doom Shield is for chasing, and Comrade in Arms waits for the moment your team commits — its cooldown can't be reduced."
+        },
+        {
+          "kind": "build",
+          "title": "Group PvP variant",
+          "text": "Stigmas: Doom Shield, Comrade in Arms, Empyrean Lord's Punishment (extra stun chance, combos with Shield Smite) and Grapple (pulls up to four enemies); Assault Fury or Nezekan's Shield as swaps. Specializations change on three skills: Warding Strike adds the party damage-tolerance option (5), Shield Smite takes AoE Stun (5) with +1s Stun, and Pummel trades its fewer-targets bonus for a cooldown option."
+        },
+        {
+          "kind": "build",
+          "title": "Passives",
+          "text": "Fury first, then Impact Hit, Punishing Benediction and Insulting Roar. The rest of the points go into the defensive passives."
+        },
+        {
+          "kind": "build",
+          "title": "Gear, Pantheon and Arcana",
+          "text": "Weapon and armor manastones: PvP Accuracy, PvP Attack, PvP Block, PvP Defense; accessory soulstones: Attack, Defense, Block, HP. Soul-bind lines carry Fury, Judgment and Punishment levels. Pantheon order: Time, Life, Freedom, Justice — survivability first. Arcana lines: Punishment, Judgment and Fury."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-templar-fextralife-burst-control",
+      "name": "PvP Burst and Control — Fextralife",
+      "cls": "templar",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "Fextralife", "author": "Fextralife Aion 2 Wiki" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "A disruptive frontline bruiser for duels and Abyss skirmishes. It catches targets with Poach or Doom Shield, chains stuns and knockdowns into Annihilate and Executing Blade, and keeps healers in check with Debilitating Smash. Accuracy comes first, then PvP Damage Tolerance and Status Effect Resist."
+        ]
+      },
+      "source": {
+        "title": "Templar — Aion 2 Wiki: PvP Burst and Control Build",
+        "url": "https://aion2.wiki.fextralife.com/Templar",
+        "author": "Fextralife Aion 2 Wiki",
+        "date": "2026-10-08",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "Templar — Aion 2 Wiki: PvP Burst and Control Build",
+          "url": "https://aion2.wiki.fextralife.com/Templar",
+          "author": "Fextralife Aion 2 Wiki",
+          "date": "2026-10-08",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 12240000, "role": "core", "level": 20, "specs": [5, 3, 4] },
+        {
+          "skill": 12090000,
+          "role": "core",
+          "level": 20,
+          "specs": [3, 4, 5],
+          "note": "Swap mobile cast (4) for damage over time (2) when charging in place is safe"
+        },
+        { "skill": 12040000, "role": "core", "level": 20, "specs": [2, 3, 5] },
+        { "skill": 12270000, "role": "core", "specs": [3, 4, 5], "note": "Anti-heal: land it through a Block or Shield Smite" },
+        { "skill": 12300000, "role": "core", "specs": [2, 4, 5], "note": "Follow up every stun or knockdown" },
+        { "skill": 12130000, "role": "support", "specs": [2, 4, 5], "note": "Hook a priority target" },
+        { "skill": 12100000, "role": "support", "specs": [3, 4, 5], "note": "Single target: +1s Stun (1) instead of AoE Stun" },
+        { "skill": 12010000, "role": "support", "specs": [2, 4, 5] },
+        { "skill": 12350000, "role": "support", "specs": [1, 2, 5] },
+        { "skill": 12260000, "role": "support", "specs": [3, 4, 5], "note": "Hold it for hard crowd control" },
+        { "skill": 12410000, "role": "stigma", "equip": true, "note": "Lv 5: −15 s cooldown; Lv 10: Exposed" },
+        { "skill": 12310000, "role": "stigma", "equip": true, "note": "Ranged burst; Lv 20: +25% Stun chance" },
+        { "skill": 12070000, "role": "stigma", "equip": true, "note": "Gap closer from 20 m; Lv 5 resets Annihilate, Lv 20 +25% Knockdown chance" },
+        { "skill": 12320000, "role": "stigma", "equip": true, "note": "Lv 10: +2 s barrier; Lv 15: +10% PvP Damage Tolerance" },
+        { "skill": 12250000, "role": "stigma", "equip": false, "note": "Swap: soaks damage for the backline" },
+        { "skill": 12190000, "role": "stigma", "equip": false, "note": "Swap: more PvP Damage Tolerance" },
+        { "skill": 12780000, "role": "passive" },
+        { "skill": 12730000, "role": "passive" },
+        { "skill": 12740000, "role": "passive" },
+        { "skill": 12750000, "role": "passive" },
+        { "skill": 12800000, "role": "passive" }
+      ],
+      "stats": [
+        { "stat": 318, "weight": 5 },
+        { "stat": 76, "weight": 4 },
+        { "stat": 159, "weight": 4 },
+        { "stat": 193, "weight": 3 },
+        { "stat": 255, "weight": 2 },
+        { "stat": 128, "weight": 1 },
+        { "stat": 282, "weight": 1 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": { "attack": [], "passive": [], "useless": [] },
+      "daevanion": { "goals": [] },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "opener": [
+          { "skill": 12130000, "note": "Hook a priority target (−20% Status Effect Resist)" },
+          { "skill": 12070000, "note": "Or gap-close from 20 m: opens a 3 s Judgment window" },
+          { "skill": 12310000, "note": "Ranged burst and a stun chance" },
+          { "skill": 12300000, "note": "On the stunned or knocked-down target" },
+          { "skill": 12410000, "note": "Defense down, extra damage on Impact-afflicted targets" },
+          { "skill": 12270000, "note": "Through a Block or Shield Smite: −60% incoming healing" }
+        ],
+        "openerNote": "Start with either Poach or Doom Shield.",
+        "manual": [
+          { "skill": 12320000, "when": "Before you engage, or when the enemy focuses you" },
+          { "skill": 12260000, "when": "Only to break hard crowd control" }
+        ]
+      },
+      "rotation": [
+        "Catch the target: Poach a priority target or Doom Shield in from 20 m.",
+        "Chain control into damage: Empyrean Lord's Punishment, Annihilate on any stun or knockdown, then Executing Blade.",
+        "Keep Debilitating Smash on healers and self-healers.",
+        "Stagger Judgment triggers (Shield Smite, Warding Strike, Doom Shield) instead of firing them together.",
+        "Don't spend hard crowd control on targets with CC immunity."
+      ],
+      "tips": [
+        {
+          "kind": "build",
+          "title": "Build idea",
+          "text": "Long-range hooks, gap closers, defense reduction and anti-heal make the Templar a frontline disruptor in duels and Abyss skirmishes. Accuracy is the top stat so that the control actually lands."
+        },
+        {
+          "kind": "skills",
+          "title": "Judgment windows",
+          "text": "Judgment's cooldown removal (option 5) only works inside a trigger window, so spread Shield Smite, Warding Strike and Doom Shield out and spend the Judgment casts each of them opens."
+        },
+        {
+          "kind": "skills",
+          "title": "Punishment against kiters",
+          "text": "Against ranged opponents who keep their distance, use Punishment's mobile-cast option; when you can safely charge in place, the damage-over-time option is the alternative."
+        },
+        {
+          "kind": "build",
+          "title": "Stigma swaps",
+          "text": "Comrade in Arms (takes damage for the backline) or Second Skin (more PvP Damage Tolerance) can replace Nezekan's Shield or Empyrean Lord's Punishment."
+        },
+        {
+          "kind": "skills",
+          "title": "Defensive timing",
+          "text": "Pop Nezekan's Shield before you engage or as soon as you are focused, and keep Defiance for hard crowd control."
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "id": "web-templar-expcarry-arena",
+      "name": "Templar PvP: 1v1 and Arena — ExpCarry",
+      "cls": "templar",
+      "mode": "pvp",
+      "builtin": true,
+      "description": {
+        "$join": [
+          {
+            "$t": "PvP-гайд из интернета, не с Questlog: {site}, автор {author}. Собран помощником по статье — сверяйтесь с оригиналом.",
+            "p": { "site": "ExpCarry", "author": "ExpCarry Editorial Team" }
+          },
+          "\n\n",
+          { "$t": "Описание автора:" },
+          "\n",
+          "In PvP the Templar wins by forcing bad fights on the enemy: pull a target with Poach, cut its healing with Debilitating Smash and coordinate the kill — sometimes guarding your own healer matters more than chasing a damage dealer. Control reliability and survival come before raw damage. This guide follows the 1v1 / Arena setup; the 5v5 variant is in the tips."
+        ]
+      },
+      "source": {
+        "title": "AION 2 Templar Build Guide: Tank, PvE, PvP & Macro",
+        "url": "https://expcarry.com/aion-2-templar-guide",
+        "author": "ExpCarry Editorial Team",
+        "date": "2026-10-29",
+        "region": "global",
+        "kind": "guide"
+      },
+      "sources": [
+        {
+          "title": "AION 2 Templar Build Guide: Tank, PvE, PvP & Macro",
+          "url": "https://expcarry.com/aion-2-templar-guide",
+          "author": "ExpCarry Editorial Team",
+          "date": "2026-10-29",
+          "region": "global",
+          "kind": "guide"
+        }
+      ],
+      "updatedAt": "2026-11-10T00:00:00.000Z",
+      "skills": [
+        { "skill": 12270000, "role": "core", "specs": [3], "note": "Anti-heal against Clerics and other sustain targets" },
+        { "skill": 12130000, "role": "core", "specs": [2], "note": "Pull, then make the follow-up control land" },
+        { "skill": 12260000, "role": "core", "note": "Breaks crowd control — time it by hand" },
+        { "skill": 12240000, "role": "core", "level": 16, "specs": [5], "note": "Lv 16 cooldown removal is the key breakpoint" },
+        { "skill": 12100000, "role": "support", "specs": [1] },
+        { "skill": 12300000, "role": "support", "specs": [2] },
+        { "skill": 12350000, "role": "support", "specs": [2] },
+        { "skill": 12040000, "role": "support", "specs": [2] },
+        { "skill": 12090000, "role": "support", "note": "Counterattack together with Battlefield Banner" },
+        { "skill": 12110000, "role": "stigma", "equip": true },
+        { "skill": 12320000, "role": "stigma", "equip": true },
+        { "skill": 12450000, "role": "stigma", "equip": true },
+        { "skill": 12070000, "role": "stigma", "equip": true },
+        { "skill": 12220000, "role": "stigma", "equip": false, "note": "5v5 / Abyss" },
+        { "skill": 12310000, "role": "stigma", "equip": false, "note": "5v5 / Abyss" },
+        { "skill": 12250000, "role": "stigma", "equip": false, "note": "5v5 / Abyss" },
+        { "skill": 12760000, "role": "passive", "note": "Makes Impact-type control more reliable" },
+        { "skill": 12790000, "role": "passive", "note": "Resists enemy crowd control" }
+      ],
+      "stats": [
+        { "stat": 318, "weight": 5 },
+        { "stat": 158, "weight": 4 },
+        { "stat": 159, "weight": 3 },
+        { "stat": 76, "weight": 2 },
+        { "stat": 193, "weight": 1 }
+      ],
+      "gear": {
+        "skills": [],
+        "notes": { "$t": "Веса статов — оценка помощника по приоритетам из статьи: в статье порядок статов, а не числа." }
+      },
+      "arcana": { "attack": [], "passive": [], "useless": [] },
+      "daevanion": {
+        "goals": [
+          {
+            "id": "azphel-status-chance",
+            "name": "Azphel: enough Status Effect Chance",
+            "boards": [26],
+            "nodes": [260004, 260040, 260061, 260068, 260158, 260165, 260186, 260222]
+          },
+          { "id": "azphel-pvp-tolerance", "name": "Azphel: PvP Damage Tolerance", "boards": [26], "nodes": [260001, 260008, 260218, 260225] },
+          { "id": "azphel-pvp-damage", "name": "Azphel, later: PvP Damage Boost", "boards": [26], "nodes": [260015, 260106, 260120, 260211] }
+        ],
+        "notes": "For 5v5 / Abyss take Status Effect Resist and PvP Damage Tolerance first."
+      },
+      "genus": { "notes": { "$t": "Приоритеты для Знания о видах — оценка помощника: в статье их нет." } },
+      "combat": {
+        "opener": [
+          { "skill": 12130000, "note": "Pull the target" },
+          { "skill": 12100000, "note": "Stun once their Defiance immunity is over" },
+          { "skill": 12300000, "note": "Knockdown" },
+          { "skill": 12240000, "note": "Damage pressure while they are controlled" }
+        ],
+        "openerNote": "After the pull, bait the opponent's Defiance and wait out its immunity before committing.",
+        "manual": [
+          { "skill": 12260000, "when": "When you are caught in a control chain" },
+          { "skill": 12450000, "when": "After surviving the enemy burst — counterattack with Punishment" },
+          { "skill": 12320000, "when": "Defensive cooldown, by hand" },
+          { "skill": 12220000, "when": "5v5: on the agreed target", "optional": true }
+        ]
+      },
+      "rotation": [
+        "Pull with Poach.",
+        "Bait the opponent's Defiance and wait for its immunity to end.",
+        "Commit: stun, knockdown, Judgment.",
+        "Survive the burst first, then counterattack with Battlefield Banner and Punishment."
+      ],
+      "tips": [
+        {
+          "kind": "build",
+          "title": "Role in PvP",
+          "text": "Force bad fights: pull targets, cut their healing and coordinate damage with your team. Guarding your own healer is sometimes worth more than chasing a damage dealer, and you should never be the easy crowd-control target yourself."
+        },
+        {
+          "kind": "skills",
+          "title": "Don't hit into Defiance",
+          "text": "Attacking into a Defiance immunity window wastes your control — wait it out, then chain stun, knockdown and Judgment."
+        },
+        {
+          "kind": "skills",
+          "title": "Keep it manual",
+          "text": "Targeting, movement, Defiance, Grapple and defensive cooldowns stay manual; a short macro for Debilitating Smash and its follow-ups is fine, a fully automated PvP combo is not."
+        },
+        {
+          "kind": "build",
+          "title": "5v5 / Abyss variant",
+          "text": "Stigmas: Grapple, Empyrean Lord's Punishment, Comrade in Arms and Doom Shield — the article calls it a specialised setup, not settled meta; swap a slot for Shield of Protection or Nezekan's Shield if the team needs defence. Stat order: Status Effect Resist, PvP Damage Tolerance, HP, Status Effect Chance, PvP Damage Boost. Agree on a target, such as the enemy healer, before pulling."
+        },
+        {
+          "kind": "build",
+          "title": "Theostones and manastones",
+          "text": "A Theostone with a control or disruption effect can beat a small damage gain, and two identical Theostones don't stack. HP manastones are the safe PvP pick; Critical Hit Resist is situational."
+        }
+      ]
+    }
+  ]
+}
