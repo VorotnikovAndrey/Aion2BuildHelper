@@ -151,7 +151,8 @@ describe.each(CLASSES.map((c) => [c.ru, c.key] as const))('%s', (_ru, cls) => {
     }
     const report = analyzeBuild(char, byClass(cls)[0], namer)
     expect(compareWithTop(char, report, topData(cls)!).skills.length).toBeGreaterThan(10)
-  })
+    // Десятки стадий × разбор — дольше стандартных 5 с в общем прогоне.
+  }, 30_000)
 
   it('гайды переживают экспорт и импорт вместе со стадиями', () => {
     for (const g of byClass(cls)) {
