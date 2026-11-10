@@ -18,6 +18,8 @@ import { cn } from '@/lib/format'
 import { useCharacterContext } from '@/lib/report'
 import { verdictWhy, type Tone } from '@/lib/status'
 import { useApp } from '@/lib/store'
+import { lowerInSentence, t, tn } from '@shared/i18n'
+import { term } from '@shared/names'
 
 type Ctx = NonNullable<ReturnType<typeof useCharacterContext>>
 
@@ -32,19 +34,19 @@ function itemTone(i: ItemReport): Tone {
 }
 
 const TONE_WHY: Record<Tone, string> = {
-  ok: 'Цель достигнута: строки и камни — как нужно по гайду.',
-  warn: 'Есть строки или камни, которые можно заметно улучшить.',
-  bad: 'Есть строки не по гайду — их стоит перековать.',
-  neutral: 'Случайных строк нет — важны грейд и заточка.'
+  ok: t('Цель достигнута: строки и камни — как нужно по гайду.'),
+  warn: t('Есть строки или камни, которые можно заметно улучшить.'),
+  bad: t('Есть строки не по гайду — их стоит перековать.'),
+  neutral: t('Случайных строк нет — важны грейд и заточка.')
 }
 
 const lineLabel = (l: { kind: 'stat' | 'skill'; id: number }, ctx: Ctx) => (l.kind === 'stat' ? ctx.namer.stat(l.id).main : ctx.namer.skill(l.id).main)
-const lineValue = (l: GearLine) => (l.kind === 'stat' ? formatStatValue(l.id, l.value) : `ур. ${l.value}`)
+const lineValue = (l: GearLine) => (l.kind === 'stat' ? formatStatValue(l.id, l.value) : t('ур. {l}', { l: l.value }))
 
 const PANEL_GROUPS: { id: SlotGroup; ru: string }[] = [
-  { id: 'weapon', ru: 'Оружие' },
-  { id: 'armor', ru: 'Броня' },
-  { id: 'accessory', ru: 'Украшения' }
+  { id: 'weapon', ru: t('Оружие') },
+  { id: 'armor', ru: t('Броня') },
+  { id: 'accessory', ru: t('Украшения') }
 ]
 
 export function GearPage() {
@@ -68,44 +70,46 @@ export function GearPage() {
     <>
       <PageHeader
         icon={<Shirt size={22} />}
-        title="Шмот"
-        subtitle="Каждая строка вещи сверена с приоритетами гайда: зелёное — как нужно, жёлтое — приемлемо или слабо, красное зачёркнутое — не по гайду. Справа — цель: какую строку на что перековать (только замены, которые заметно лучше и бывают на этом слоте). Камни — отдельно под строками. Наведите на любой элемент — там пояснение."
+        title={t('Шмот')}
+        subtitle={t(
+          'Каждая строка вещи сверена с приоритетами гайда: зелёное — как нужно, жёлтое — приемлемо или слабо, красное зачёркнутое — не по гайду. Справа — цель: какую строку на что перековать (только замены, которые заметно лучше и бывают на этом слоте). Камни — отдельно под строками. Наведите на любой элемент — там пояснение.'
+        )}
         actions={<GuideSwitcher char={char} />}
       />
 
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatTile
-          label="Оценка шмота"
+          label={t('Оценка шмота')}
           value={`${report.scores.gear} / 100`}
           valueClassName={report.scores.gear >= 85 ? 'text-good' : report.scores.gear >= 60 ? 'text-warning' : 'text-critical'}
-          hint="Средняя польза строк на вещах (75%) и манакамней (25%) по весам гайда. 85+ — зелёный, 60–84 — жёлтый, ниже — красный."
+          hint={t('Средняя польза строк на вещах (75%) и манакамней (25%) по весам гайда. 85+ — зелёный, 60–84 — жёлтый, ниже — красный.')}
         />
         <StatTile
-          label="Полезных строк"
-          value={`${useful} из ${total}`}
-          sub="важность в гайде 3 и выше"
-          hint="Строки вещей, которые гайд ценит (зелёные и жёлтые «приемлемо»)."
+          label={t('Полезных строк')}
+          value={t('{useful} из {total}', { useful, total })}
+          sub={t('важность в гайде 3 и выше')}
+          hint={t('Строки вещей, которые гайд ценит (зелёные и жёлтые «приемлемо»).')}
         />
         <StatTile
-          label="Перековать"
+          label={t('Перековать')}
           value={toSwap}
           valueClassName={toReplace ? 'text-critical' : toSwap ? 'text-warning' : 'text-good'}
-          sub={toReplace ? `из них не по гайду: ${toReplace}` : 'строк до цели'}
-          hint="Сколько строк стоит перековать на заметно более важные по гайду (на 2 и больше из 5). Строки не по гайду (красные) — в первую очередь."
+          sub={toReplace ? t('из них не по гайду: {toReplace}', { toReplace }) : t('строк до цели')}
+          hint={t('Сколько строк стоит перековать на заметно более важные по гайду (на 2 и больше из 5). Строки не по гайду (красные) — в первую очередь.')}
         />
         <StatTile
-          label="Камни маны"
-          value={`${stones.filter((m) => m.weight >= 3).length} из ${stones.length}`}
-          sub={`слабых: ${weakStones}`}
+          label={t('Камни маны')}
+          value={t('{filterCount} из {stonesCount}', { filterCount: stones.filter((m) => m.weight >= 3).length, stonesCount: stones.length })}
+          sub={t('слабых: {weakStones}', { weakStones })}
           valueClassName={weakStones ? 'text-warning' : 'text-good'}
-          hint="Сколько камней маны и духовных камней со статами, важными по гайду (важность 3+). Слабые — важность 0–1."
+          hint={t('Сколько камней маны и духовных камней со статами, важными по гайду (важность 3+). Слабые — важность 0–1.')}
         />
       </div>
 
       <Card
-        title="Снаряжение"
+        title={t('Снаряжение')}
         className="mb-5"
-        hint="Все надетые вещи — как в окне персонажа. Значок в углу — итог сверки с гайдом; нажмите на вещь, чтобы перейти к её строкам."
+        hint={t('Все надетые вещи — как в окне персонажа. Значок в углу — итог сверки с гайдом; нажмите на вещь, чтобы перейти к её строкам.')}
       >
         <div className="flex flex-wrap gap-x-8 gap-y-5">
           {PANEL_GROUPS.map((g) => {
@@ -129,40 +133,42 @@ export function GearPage() {
 
       <Card
         bodyClassName="p-0"
-        title="Строки вещей"
+        title={t('Строки вещей')}
         actions={
-          <Tooltip content="Показать только вещи, где есть что перековать или слабые камни.">
+          <Tooltip content={t('Показать только вещи, где есть что перековать или слабые камни.')}>
             <label className="flex cursor-pointer items-center gap-2 text-xs text-ink-2">
               <input type="checkbox" checked={onlyFix} onChange={(e) => setOnlyFix(e.target.checked)} className="accent-[var(--color-accent)]" />
-              Только что менять
+              {t('Только что менять')}
             </label>
           </Tooltip>
         }
       >
         <div className={cn('grid gap-x-4 border-b border-line px-5 py-2 text-[11px] tracking-wide text-ink-3 uppercase', COLS)}>
-          <span>Вещь</span>
-          <Tooltip content="Сколько строк вещи (статы и умения) гайд ценит на 3 и выше — из всех строк.">
-            <span>Полезных</span>
+          <span>{t('Вещь')}</span>
+          <Tooltip content={t('Сколько строк вещи (статы и умения) гайд ценит на 3 и выше — из всех строк.')}>
+            <span>{t('Полезных')}</span>
           </Tooltip>
-          <span>Сейчас стоит</span>
+          <span>{t('Сейчас стоит')}</span>
           <Tooltip
             wide
-            content="Цель по вещи: какую строку на что перековать. Самая слабая строка меняется на самый важный по гайду стат, который бывает на этом слоте, и так дальше — пока замена заметно лучше (на 2 и больше из 5). Стат меняется на стат, умение — на умение."
+            content={t(
+              'Цель по вещи: какую строку на что перековать. Самая слабая строка меняется на самый важный по гайду стат, который бывает на этом слоте, и так дальше — пока замена заметно лучше (на 2 и больше из 5). Стат меняется на стат, умение — на умение.'
+            )}
           >
-            <span>Цель</span>
+            <span>{t('Цель')}</span>
           </Tooltip>
         </div>
         {shown.map((item) => (
           <ItemRow key={item.slot} item={item} ctx={ctx} />
         ))}
-        {shown.length === 0 && <p className="px-5 py-6 text-[13px] text-good">Менять нечего — все строки полезны по гайду.</p>}
+        {shown.length === 0 && <p className="px-5 py-6 text-[13px] text-good">{t('Менять нечего — все строки полезны по гайду.')}</p>}
       </Card>
 
       {rest.length > 0 && (
         <Card
-          title="Без случайных строк"
+          title={t('Без случайных строк')}
           className="mt-5"
-          hint="Браслеты, пояс, руны, амулет: у них нет строк, которые можно сверить с гайдом — важны грейд и заточка."
+          hint={t('Браслеты, пояс, руны, амулет: у них нет строк, которые можно сверить с гайдом — важны грейд и заточка.')}
         >
           <div className="flex flex-wrap gap-3">
             {rest.map((i) => {
@@ -170,7 +176,13 @@ export function GearPage() {
               return (
                 <Tooltip
                   key={i.slot}
-                  content={`${name}: ${slotDef(i.slot).ru.toLowerCase()}, ${GRADES[i.grade].ru.toLowerCase()}, заточка +${i.item.enchant}, уровень предмета ${i.item.itemLevel}.`}
+                  content={t('{name}: {toLowerCase}, {toLowerCase2}, заточка +{enchant}, уровень предмета {itemLevel}.', {
+                    name,
+                    toLowerCase: lowerInSentence(term(slotDef(i.slot))),
+                    toLowerCase2: lowerInSentence(term(GRADES[i.grade])),
+                    enchant: i.item.enchant,
+                    itemLevel: i.item.itemLevel
+                  })}
                 >
                   <div id={`gear-${i.slot}`} className="flex items-center gap-3 rounded-xl border border-line bg-surface-2 py-2 pr-4 pl-2">
                     <ItemIcon itemId={i.item.item} slot={i.slot} enchant={i.item.enchant} size={44} />
@@ -179,7 +191,11 @@ export function GearPage() {
                         <GradeText grade={i.grade}>{name}</GradeText>
                       </div>
                       <div className="tnum text-[11px] text-ink-3">
-                        {slotDef(i.slot).ru} · +{i.item.enchant} · ур. {i.item.itemLevel}
+                        {t('{slotDef} · +{enchant} · ур. {itemLevel}', {
+                          slotDef: term(slotDef(i.slot)),
+                          enchant: i.item.enchant,
+                          itemLevel: i.item.itemLevel
+                        })}
                       </div>
                     </div>
                   </div>
@@ -192,21 +208,21 @@ export function GearPage() {
 
       <Legend
         items={[
-          { swatch: <VerdictChip verdict="great">зелёное</VerdictChip>, text: 'нужно по гайду (важность 4–5)' },
-          { swatch: <VerdictChip verdict="good">жёлтое</VerdictChip>, text: 'приемлемо (3)' },
-          { swatch: <VerdictChip verdict="weak">пунктир</VerdictChip>, text: 'слабо (1–2), при случае заменить' },
-          { swatch: <VerdictChip verdict="bad">зачёркнутое</VerdictChip>, text: 'не по гайду — менять' },
+          { swatch: <VerdictChip verdict="great">{t('зелёное')}</VerdictChip>, text: t('нужно по гайду (важность 4–5)') },
+          { swatch: <VerdictChip verdict="good">{t('жёлтое')}</VerdictChip>, text: t('приемлемо (3)') },
+          { swatch: <VerdictChip verdict="weak">{t('пунктир')}</VerdictChip>, text: t('слабо (1–2), при случае заменить') },
+          { swatch: <VerdictChip verdict="bad">{t('зачёркнутое')}</VerdictChip>, text: t('не по гайду — менять') },
           {
             swatch: (
               <span className="inline-flex items-center gap-1 text-xs">
-                <span className="text-warning line-through">Блок</span>
+                <span className="text-warning line-through">{t('Блок')}</span>
                 <ArrowRight size={12} className="text-ink-3" />
-                <span className="rounded-md border border-aether/40 bg-aether-soft px-1.5 text-aether">СКР боя</span>
+                <span className="rounded-md border border-aether/40 bg-aether-soft px-1.5 text-aether">{t('СКР боя')}</span>
               </span>
             ),
-            text: 'цель: что на что перековать'
+            text: t('цель: что на что перековать')
           },
-          { swatch: <StatusBadge tone="ok" />, text: 'значок на вещи — итог по ней' }
+          { swatch: <StatusBadge tone="ok" />, text: t('значок на вещи — итог по ней') }
         ]}
       />
     </>
@@ -225,12 +241,17 @@ function PanelItem({ item, ctx, onClick }: { item: ItemReport; ctx: Ctx; onClick
             {name}
           </GradeText>
           <span className="block text-ink-3">
-            {slotDef(item.slot).ru} · {GRADES[item.grade].ru.toLowerCase()} · заточка +{item.item.enchant} · ур. предмета {item.item.itemLevel}
+            {t('{slotDef} · {toLowerCase} · заточка +{enchant} · ур. предмета {itemLevel}', {
+              slotDef: term(slotDef(item.slot)),
+              toLowerCase: lowerInSentence(term(GRADES[item.grade])),
+              enchant: item.item.enchant,
+              itemLevel: item.item.itemLevel
+            })}
           </span>
           {item.total > 0 && (
             <span className="mt-1 block">
-              Полезных строк: {item.useful} из {item.total}
-              {item.swaps.length ? `, перековать: ${item.swaps.length}` : ''}.
+              {t('Полезных строк: {useful} из {total}', { useful: item.useful, total: item.total })}
+              {item.swaps.length ? t(', перековать: {swapsCount}', { swapsCount: item.swaps.length }) : ''}.
             </span>
           )}
           <span className="mt-1 block">{TONE_WHY[tone]}</span>
@@ -246,7 +267,7 @@ function PanelItem({ item, ctx, onClick }: { item: ItemReport; ctx: Ctx; onClick
           status={tone}
           className="transition-transform group-hover:-translate-y-0.5"
         />
-        <span className="w-full truncate text-center text-[10.5px] text-ink-3 group-hover:text-ink-2">{slotDef(item.slot).ru}</span>
+        <span className="w-full truncate text-center text-[10.5px] text-ink-3 group-hover:text-ink-2">{term(slotDef(item.slot))}</span>
       </button>
     </Tooltip>
   )
@@ -273,7 +294,12 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
     <div id={`gear-${item.slot}`} className={cn('grid items-start gap-x-4 border-b border-line px-5 py-3 last:border-b-0 hover:bg-surface-2/50', COLS)}>
       <div className="flex min-w-0 items-start gap-3">
         <Tooltip
-          content={`${slot.ru} · ${GRADES[item.grade].ru.toLowerCase()} · заточка +${item.item.enchant} · уровень предмета ${item.item.itemLevel}. Цвет подложки — грейд, как в игре.`}
+          content={t('{slot} · {toLowerCase} · заточка +{enchant} · уровень предмета {itemLevel}. Цвет подложки — грейд, как в игре.', {
+            slot: term(slot),
+            toLowerCase: lowerInSentence(term(GRADES[item.grade])),
+            enchant: item.item.enchant,
+            itemLevel: item.item.itemLevel
+          })}
         >
           <ItemIcon itemId={item.item.item} slot={item.slot} enchant={item.item.enchant} size={48} />
         </Tooltip>
@@ -291,7 +317,7 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
               className="w-full rounded-md border border-line-strong bg-surface-3 px-2 py-0.5 text-[13px] outline-none focus:border-accent"
             />
           ) : (
-            <Tooltip content="Нажмите, чтобы дать вещи своё название. Пустое поле — вернуть название из игры (или слота, если вещь неизвестна).">
+            <Tooltip content={t('Нажмите, чтобы дать вещи своё название. Пустое поле — вернуть название из игры (или слота, если вещь неизвестна).')}>
               <button onClick={() => setEditing(true)} className="flex max-w-full items-start gap-1.5 text-left">
                 <GradeText grade={item.grade} className="text-[13px] leading-snug font-semibold">
                   {label.main}
@@ -301,7 +327,7 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
             </Tooltip>
           )}
           <div className="tnum mt-0.5 text-[11px] text-ink-3">
-            {slot.ru} · ур. предмета {item.item.itemLevel}
+            {t('{slot} · ур. предмета {itemLevel}', { slot: term(slot), itemLevel: item.item.itemLevel })}
           </div>
           <StageItem item={item} ctx={ctx} />
         </div>
@@ -310,9 +336,13 @@ function ItemRow({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
       <div className="pt-1">
         <Pill
           tone={toneOfShare(item.useful, item.total)}
-          tip={`${item.useful} из ${item.total} строк гайд ценит на 3+. ${item.replace.length ? `Менять: ${item.replace.length}.` : 'Бесполезных строк нет.'}`}
+          tip={t('{useful} из {total} строк гайд ценит на 3+. {p}', {
+            useful: item.useful,
+            total: item.total,
+            p: item.replace.length ? t('Менять: {replaceCount}.', { replaceCount: item.replace.length }) : t('Бесполезных строк нет.')
+          })}
         >
-          {item.useful} из {item.total}
+          {t('{useful} из {total}', { useful: item.useful, total: item.total })}
         </Pill>
       </div>
 
@@ -342,17 +372,25 @@ function StageItem({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
   const tip = (
     <>
       <b className="text-ink">
-        Стадия «{stage.name}»: {name} +{target.enchant}
-        {target.surpass ? ` (превосхождение ${target.surpass})` : ''}
+        {t('Стадия «{stage}»: {name} +{enchant}', { stage: stage.name, name, enchant: target.enchant })}
+        {target.surpass ? t(' (превосхождение {surpass})', { surpass: target.surpass }) : ''}
       </b>
-      {lines.length > 0 && <span className="mt-1 block">Строки у автора: {lines.join(', ')}.</span>}
-      {skills.length > 0 && <span className="mt-1 block">Умения: {skills.join(', ')}.</span>}
+      {lines.length > 0 && (
+        <span className="mt-1 block">
+          {t('Строки у автора:')} {lines.join(', ')}.
+        </span>
+      )}
+      {skills.length > 0 && (
+        <span className="mt-1 block">
+          {t('Умения:')} {skills.join(', ')}.
+        </span>
+      )}
       <span className={cn('mt-1 block', enough ? 'text-good' : 'text-warning')}>
         {enough
-          ? 'Эта вещь и заточка — как у автора на этой стадии.'
+          ? t('Эта вещь и заточка — как у автора на этой стадии.')
           : same
-            ? `Та же вещь — заточить до +${target.enchant}.`
-            : 'У автора на этой стадии другая вещь.'}
+            ? t('Та же вещь — заточить до +{enchant}.', { enchant: target.enchant })
+            : t('У автора на этой стадии другая вещь.')}
       </span>
     </>
   )
@@ -362,7 +400,13 @@ function StageItem({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
         {enough ? <Check size={12} className="shrink-0 text-good" /> : <ArrowRight size={12} className="shrink-0 text-warning" />}
         {!same && <ItemIcon itemId={target.item} slot={target.slot} enchant={target.enchant} size={18} />}
         <span className="min-w-0 truncate text-ink-3">
-          {enough ? 'как у автора' : same ? `у автора +${target.enchant}` : <GradeText grade={grade}>{`${name} +${target.enchant}`}</GradeText>}
+          {enough ? (
+            t('как у автора')
+          ) : same ? (
+            t('у автора +{enchant}', { enchant: target.enchant })
+          ) : (
+            <GradeText grade={grade}>{`${name} +${target.enchant}`}</GradeText>
+          )}
         </span>
       </div>
     </Tooltip>
@@ -377,21 +421,21 @@ function Target({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
     return (
       <Tray>
         <TraySection
-          title="Цель"
+          title={t('Цель')}
           tip={
             noBetter
-              ? 'Эти строки гайд не ценит, но заметно лучшего стата для этого слота в данных нет — перековать при случае.'
-              : 'Все строки и камни — лучшее по гайду из того, что бывает на этом слоте: любая замена дала бы меньше 2 по важности.'
+              ? t('Эти строки гайд не ценит, но заметно лучшего стата для этого слота в данных нет — перековать при случае.')
+              : t('Все строки и камни — лучшее по гайду из того, что бывает на этом слоте: любая замена дала бы меньше 2 по важности.')
           }
         >
           {noBetter ? (
-            <span className="text-xs leading-relaxed text-warning">Строки не по гайду — лучшей замены на этом слоте не нашлось</span>
+            <span className="text-xs leading-relaxed text-warning">{t('Строки не по гайду — лучшей замены на этом слоте не нашлось')}</span>
           ) : (
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-good">
               <span className="flex h-4 w-4 items-center justify-center rounded-full bg-good text-bg">
                 <Check size={11} strokeWidth={3} />
               </span>
-              Цель достигнута
+              {t('Цель достигнута')}
             </span>
           )}
         </TraySection>
@@ -404,9 +448,13 @@ function Target({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
         <div>
           <Tooltip
             wide
-            content="Что на что перековать: сверху текущая строка, ниже — важнее по гайду и бывает на этом слоте. Метка — важность «было → станет» (из 5). Сверху — то, что менять в первую очередь."
+            content={t(
+              'Что на что перековать: сверху текущая строка, ниже — важнее по гайду и бывает на этом слоте. Метка — важность «было → станет» (из 5). Сверху — то, что менять в первую очередь.'
+            )}
           >
-            <div className="mb-1.5 text-[10px] font-semibold tracking-wider text-ink-3 uppercase">Перековать строки · {item.swaps.length}</div>
+            <div className="mb-1.5 text-[10px] font-semibold tracking-wider text-ink-3 uppercase">
+              {t('Перековать строки · {swapsCount}', { swapsCount: item.swaps.length })}
+            </div>
           </Tooltip>
           <div className="space-y-1.5">
             {item.swaps.map((x, i) => (
@@ -419,9 +467,13 @@ function Target({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
         <div className={cn(item.swaps.length > 0 && 'border-t border-line pt-2')}>
           <Tooltip
             wide
-            content="Камни, которые стоит перековать, и во что. Пока меткость ниже порога контента, самые слабые камни — в доп. меткость; остальные слабые — в лучший по гайду стат. Приемлемые камни (блок, ОЗ) не трогаем."
+            content={t(
+              'Камни, которые стоит перековать, и во что. Пока меткость ниже порога контента, самые слабые камни — в доп. меткость; остальные слабые — в лучший по гайду стат. Приемлемые камни (блок, ОЗ) не трогаем.'
+            )}
           >
-            <div className="mb-1.5 text-[10px] font-semibold tracking-wider text-ink-3 uppercase">Перековать камни · {item.stoneSwaps.length}</div>
+            <div className="mb-1.5 text-[10px] font-semibold tracking-wider text-ink-3 uppercase">
+              {t('Перековать камни · {stoneSwapsCount}', { stoneSwapsCount: item.stoneSwaps.length })}
+            </div>
           </Tooltip>
           <div className="space-y-1.5">
             {stoneGroups.map((g) => (
@@ -462,12 +514,10 @@ function StoneSwapRow({ group, ctx }: { group: StoneGroup; ctx: Ctx }) {
       wide
       content={
         <>
-          Перековать {group.from.length === 1 ? 'камень' : `${group.from.length} ${stonesWord(group.from.length)}`}:{' '}
+          {t('Перековать')} {group.from.length === 1 ? t('камень') : `${group.from.length} ${stonesWord(group.from.length)}`}:{' '}
           <b className="text-ink">{group.from.map((m) => namer.stat(m.stat).main).join(', ')}</b> → <b className="text-aether">{namer.stat(group.to).main}</b>.
           {group.reason && <span className="mt-1 block">{group.reason}.</span>}
-          <span className="mt-1 block text-ink-3">
-            Важность по гайду: {worst} → {group.weight} из 5.
-          </span>
+          <span className="mt-1 block text-ink-3">{t('Важность по гайду: {worst} → {weight} из 5.', { worst, weight: group.weight })}</span>
         </>
       }
     >
@@ -505,11 +555,12 @@ function SwapRow({ swap, ctx }: { swap: LineSwap; ctx: Ctx }) {
       wide
       content={
         <>
-          Перековать <b className="text-ink">{`${lineLabel(from, ctx)} ${lineValue(from)}`}</b> (важность {from.weight} из 5) на{' '}
-          <b className="text-aether">{lineLabel(to, ctx)}</b> (важность {to.weight} из 5).
+          {t('Перековать')} <b className="text-ink">{`${lineLabel(from, ctx)} ${lineValue(from)}`}</b>{' '}
+          {t('(важность {weight} из 5) на', { weight: from.weight })}
+          <b className="text-aether">{lineLabel(to, ctx)}</b> {t('(важность {weight} из 5).', { weight: to.weight })}
           <span className="mt-1 block text-ink-3">
-            {to.kind === 'skill' ? 'Это умение бывает строкой на вещах этого слота.' : 'Этот стат встречается строкой на этом слоте.'}
-            {bad ? ' Текущая строка гайду не нужна — менять в первую очередь.' : ''}
+            {to.kind === 'skill' ? t('Это умение бывает строкой на вещах этого слота.') : t('Этот стат встречается строкой на этом слоте.')}
+            {bad ? t(' Текущая строка гайду не нужна — менять в первую очередь.') : ''}
           </span>
         </>
       }
@@ -562,7 +613,7 @@ function Lines({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
       tip={
         <>
           <b className="text-ink">{lineLabel(l, ctx)}</b>
-          {l.kind === 'skill' && <span className="block text-ink-3">Умение строкой на вещи: +{l.value} к уровню.</span>}
+          {l.kind === 'skill' && <span className="block text-ink-3">{t('Умение строкой на вещи: +{l} к уровню.', { l: l.value })}</span>}
           <span className="mt-1 block">{verdictWhy(l.verdict, l.weight)}</span>
         </>
       }
@@ -574,7 +625,7 @@ function Lines({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
       ) : (
         <>
           <SkillIcon id={l.id} size={16} />
-          {namer.skill(l.id).main} <span className="opacity-70">ур. {l.value}</span>
+          {namer.skill(l.id).main} <span className="opacity-70">{t('ур. {l}', { l: l.value })}</span>
         </>
       )}
     </VerdictChip>
@@ -583,8 +634,10 @@ function Lines({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
     <Tray>
       {stats.length > 0 && (
         <TraySection
-          title={`Доп. характеристики · ${stats.length}`}
-          tip="Случайные строки вещи — в окне вещи это «Доп. характеристики». Их можно перековать. Цвет — польза стата по гайду, наведите на строку для пояснения."
+          title={t('Доп. характеристики · {statsCount}', { statsCount: stats.length })}
+          tip={t(
+            'Случайные строки вещи — в окне вещи это «Доп. характеристики». Их можно перековать. Цвет — польза стата по гайду, наведите на строку для пояснения.'
+          )}
         >
           {stats.map(chip)}
         </TraySection>
@@ -592,8 +645,8 @@ function Lines({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
       {skills.length > 0 && (
         <TraySection
           divided={stats.length > 0}
-          title={`Умения · ${skills.length}`}
-          tip="Строки «+N к уровню умения». Цвет — нужно ли это умение по гайду: такие строки помогают дотянуть главные умения до ур. 16 и 20."
+          title={t('Умения · {skillsCount}', { skillsCount: skills.length })}
+          tip={t('Строки «+N к уровню умения». Цвет — нужно ли это умение по гайду: такие строки помогают дотянуть главные умения до ур. 16 и 20.')}
         >
           {skills.map(chip)}
         </TraySection>
@@ -613,11 +666,11 @@ function Sockets({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
     <Tray>
       {item.manastones.length > 0 && (
         <TraySection
-          title={`${soul ? 'Духовные камни' : 'Камни маны'} · ${item.manastones.length}`}
+          title={`${soul ? t('Духовные камни') : t('Камни маны')} · ${item.manastones.length}`}
           tip={
             soul
-              ? 'Духовные камни — гнёзда украшений. Цвет — польза стата по гайду, точки — сила строки (1–3).'
-              : 'Камни маны — гнёзда оружия и брони. Цвет — польза стата по гайду, точки — сила строки (1–3).'
+              ? t('Духовные камни — гнёзда украшений. Цвет — польза стата по гайду, точки — сила строки (1–3).')
+              : t('Камни маны — гнёзда оружия и брони. Цвет — польза стата по гайду, точки — сила строки (1–3).')
           }
         >
           {item.manastones.map((m, i) => {
@@ -630,9 +683,7 @@ function Sockets({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
                 tip={
                   <>
                     <b className="text-ink">{info.ru}</b>
-                    <span className="block">
-                      {namer.stat(m.stat).main}, сила строки {m.grade} из 3.
-                    </span>
+                    <span className="block">{t('{stat}, сила строки {grade} из 3.', { stat: namer.stat(m.stat).main, grade: m.grade })}</span>
                     <span className="mt-1 block">
                       {verdictWhy(m.verdict, m.weight)} ({VERDICT_TEXT[m.verdict]})
                     </span>
@@ -650,17 +701,17 @@ function Sockets({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
       {item.godstoneSlots > 0 && (
         <TraySection
           divided={item.manastones.length > 0}
-          title="Священный камень"
-          tip="Гнездо священного камня: в оружии и наручах по одному. Камень даёт шанс дополнительного эффекта при атаке."
+          title={t('Священный камень')}
+          tip={t('Гнездо священного камня: в оружии и наручах по одному. Камень даёт шанс дополнительного эффекта при атаке.')}
         >
           {god ? (
             <Tooltip
               wide
               content={
                 <>
-                  <b className="text-ink">{godDef?.en ?? `Камень #${god}`}</b>
+                  <b className="text-ink">{godDef?.en ?? t('Камень #{god}', { god })}</b>
                   {godDef && <span className="mt-1 block">{godstoneEffectRu(godDef.effect)}</span>}
-                  <span className="mt-1 block text-ink-3">Русского названия в данных нет — показано английское.</span>
+                  <span className="mt-1 block text-ink-3">{t('Русского названия в данных нет — показано английское.')}</span>
                 </>
               }
             >
@@ -670,9 +721,11 @@ function Sockets({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
               </span>
             </Tooltip>
           ) : (
-            <Tooltip content="Гнездо пустое: любой священный камень даёт шанс дополнительного эффекта при атаке — урон стихией, кровотечение или контроль.">
+            <Tooltip
+              content={t('Гнездо пустое: любой священный камень даёт шанс дополнительного эффекта при атаке — урон стихией, кровотечение или контроль.')}
+            >
               <span className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-warning/50 px-2.5 py-0.5 text-[11px] text-warning">
-                <span className="h-3 w-3 rounded-full border border-dashed border-warning/70" /> пусто
+                <span className="h-3 w-3 rounded-full border border-dashed border-warning/70" /> {t('пусто')}
               </span>
             </Tooltip>
           )}
@@ -682,14 +735,8 @@ function Sockets({ item, ctx }: { item: ItemReport; ctx: Ctx }) {
   )
 }
 
-/** «1 камень», «3 камня», «21 камень», «5 камней». */
-function stonesWord(n: number): string {
-  const d = n % 10
-  const dd = n % 100
-  if (d === 1 && dd !== 11) return 'камень'
-  if (d >= 2 && d <= 4 && (dd < 12 || dd > 14)) return 'камня'
-  return 'камней'
-}
+/** «камень», «камня», «камней» — слово после числа (по правилам числительных языка интерфейса). */
+const stonesWord = (n: number): string => tn(n, 'камень|камня|камней')
 
 /** План по камням на всю экипировку: порог меткости, во что перековать, что оставить, что бесполезно в PvE. */
 function StonePlan({ ctx }: { ctx: Ctx }) {
@@ -712,24 +759,33 @@ function StonePlan({ ctx }: { ctx: Ctx }) {
   )
   return (
     <Card
-      title="Камни: что ставить"
+      title={t('Камни: что ставить')}
       className="mb-5"
-      hint="Совет по камням маны и духовным камням с учётом ваших статов: пока меткость ниже порога контента, слабые камни — в доп. меткость (примерно столько, сколько нужно до порога), остальные слабые — в лучший по гайду стат. Только PvE."
+      hint={t(
+        'Совет по камням маны и духовным камням с учётом ваших статов: пока меткость ниже порога контента, слабые камни — в доп. меткость (примерно столько, сколько нужно до порога), остальные слабые — в лучший по гайду стат. Только PvE.'
+      )}
     >
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
         <div className="space-y-4">
           {targets.map((t) => (
             <TargetBar key={t.target.id} t={t} />
           ))}
-          {!targets.length && <p className="text-xs text-ink-3">В гайде нет порогов для статов камней — советы только по важности статов.</p>}
+          {!targets.length && <p className="text-xs text-ink-3">{t('В гайде нет порогов для статов камней — советы только по важности статов.')}</p>}
         </div>
         <div className="space-y-3">
           {groups.length > 0 ? (
             <div>
-              <div className="mb-1.5 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Перековать · {swaps.length}</div>
+              <div className="mb-1.5 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">
+                {t('Перековать · {swapsCount}', { swapsCount: swaps.length })}
+              </div>
               <div className="space-y-1.5">
                 {groups.map((g) => (
-                  <Tooltip key={g.to} block wide content={g.reason ? `${g.reason}.` : `Лучший по гайду стат для камней (важность ${g.weight} из 5).`}>
+                  <Tooltip
+                    key={g.to}
+                    block
+                    wide
+                    content={g.reason ? `${g.reason}.` : t('Лучший по гайду стат для камней (важность {weight} из 5).', { weight: g.weight })}
+                  >
                     <div className="flex w-full flex-wrap items-center gap-2 text-[13px]">
                       <span className="tnum font-semibold text-ink">{g.from.length}</span>
                       <span className="text-ink-3">{stonesWord(g.from.length)} →</span>
@@ -744,13 +800,13 @@ function StonePlan({ ctx }: { ctx: Ctx }) {
             </div>
           ) : (
             <span className="inline-flex items-center gap-1.5 text-[13px] text-good">
-              <Check size={14} strokeWidth={2.5} /> Камни — как нужно
+              <Check size={14} strokeWidth={2.5} /> {t('Камни — как нужно')}
             </span>
           )}
           {keep.length > 0 && (
-            <Tooltip block wide content="Приемлемые камни (важность 3+): менять не обязательно. Блок запускает Ярость — бафф урона всей группе.">
+            <Tooltip block wide content={t('Приемлемые камни (важность 3+): менять не обязательно. Блок запускает Ярость — бафф урона всей группе.')}>
               <div className="w-full text-xs text-ink-3">
-                <span className="text-good">Оставить:</span> {keep.map(([stat, n]) => `${namer.stat(stat).main} ×${n}`).join(', ')}
+                <span className="text-good">{t('Оставить:')}</span> {keep.map(([stat, n]) => `${namer.stat(stat).main} ×${n}`).join(', ')}
               </div>
             </Tooltip>
           )}
@@ -758,10 +814,10 @@ function StonePlan({ ctx }: { ctx: Ctx }) {
             <Tooltip
               block
               wide
-              content="Эти статы гайд почти не ценит (у стража, например, ОМ, уклонение, сопротивление криту) — их и стоит перековывать в первую очередь."
+              content={t('Эти статы гайд почти не ценит (у стража, например, ОМ, уклонение, сопротивление криту) — их и стоит перековывать в первую очередь.')}
             >
               <div className="w-full text-xs text-ink-3">
-                <span className="text-critical">Бесполезно в PvE:</span> {useless.map(([stat, n]) => `${namer.stat(stat).main} ×${n}`).join(', ')}
+                <span className="text-critical">{t('Бесполезно в PvE:')}</span> {useless.map(([stat, n]) => `${namer.stat(stat).main} ×${n}`).join(', ')}
               </div>
             </Tooltip>
           )}

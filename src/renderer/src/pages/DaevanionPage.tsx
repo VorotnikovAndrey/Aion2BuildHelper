@@ -16,6 +16,8 @@ import { shareTone, TONE_TEXT, type Tone } from '@/lib/status'
 import { SkillIcon } from '@/components/icons'
 import { Tooltip } from '@/components/ui/InfoTip'
 import { useCharacterContext } from '@/lib/report'
+import { t } from '@shared/i18n'
+import { term, termWithEn } from '@shared/names'
 
 type Ctx = NonNullable<ReturnType<typeof useCharacterContext>>
 
@@ -30,9 +32,9 @@ export function DaevanionPage() {
   if (!d.available) {
     return (
       <>
-        <PageHeader icon={<Waypoints size={22} />} title="Даэванион" actions={<GuideSwitcher char={char} />} />
-        <EmptyState title="Для этого класса ещё нет данных досок">
-          Доски скачиваются командой <code className="text-ink-2">npm run gamedata -- --classes {char.cls}</code> (см. docs/data-sources.md).
+        <PageHeader icon={<Waypoints size={22} />} title={t('Даэванион')} actions={<GuideSwitcher char={char} />} />
+        <EmptyState title={t('Для этого класса ещё нет данных досок')}>
+          {t('Доски скачиваются командой')} <code className="text-ink-2">npm run gamedata -- --classes {char.cls}</code> {t('(см. docs/data-sources.md).')}
         </EmptyState>
       </>
     )
@@ -42,8 +44,10 @@ export function DaevanionPage() {
     <>
       <PageHeader
         icon={<Waypoints size={22} />}
-        title="Даэванион"
-        subtitle="Шесть досок: узел можно взять, только если он соединён со взятым. Голубая обводка — узлы, которые просит гайд; пунктир — самый дешёвый путь к ним."
+        title={t('Даэванион')}
+        subtitle={t(
+          'Шесть досок: узел можно взять, только если он соединён со взятым. Голубая обводка — узлы, которые просит гайд; пунктир — самый дешёвый путь к ним.'
+        )}
         actions={<GuideSwitcher char={char} />}
       />
 
@@ -60,7 +64,21 @@ export function DaevanionPage() {
               key={b.board.id}
               block
               wide
-              content={`${b.board.ru} (${b.board.en}): открывается на ур. ${b.board.needLevel}, оплата — ${BOARD_CURRENCY[b.board.en] ?? 'кристаллы'}. Взято ${b.takenCount} из ${b.totalCount} узлов, вложено ${b.spent} из ${b.total} очк.${need.length ? ` Нужных по гайду узлов: ${needDone} из ${need.length}.` : ' Гайд на этой доске ничего не требует.'}`}
+              content={t(
+                '{board}: открывается на ур. {needLevel}, оплата — {p}. Взято {takenCount} из {totalCount} узлов, вложено {spent} из {total} очк.{p2}',
+                {
+                  board: termWithEn(b.board),
+                  needLevel: b.board.needLevel,
+                  p: BOARD_CURRENCY[b.board.en] ?? t('кристаллы'),
+                  takenCount: b.takenCount,
+                  totalCount: b.totalCount,
+                  spent: b.spent,
+                  total: b.total,
+                  p2: need.length
+                    ? t(' Нужных по гайду узлов: {needDone} из {needCount}.', { needDone, needCount: need.length })
+                    : t(' Гайд на этой доске ничего не требует.')
+                }
+              )}
             >
               <button
                 onClick={() => setBoardId(b.board.id)}
@@ -70,7 +88,7 @@ export function DaevanionPage() {
                 )}
               >
                 <div className="flex items-center justify-between gap-1">
-                  <span className="text-[13px] font-semibold">{b.board.ru}</span>
+                  <span className="text-[13px] font-semibold">{term(b.board)}</span>
                   {!b.open ? (
                     <Lock size={12} className="text-ink-3" />
                   ) : need.length ? (
@@ -80,7 +98,12 @@ export function DaevanionPage() {
                   ) : null}
                 </div>
                 <div className="tnum mt-1 text-[11px] text-ink-3">
-                  {b.takenCount}/{b.totalCount} узлов · {b.spent}/{b.total} очк.
+                  {t('{takenCount}/{totalCount} узлов · {spent}/{total} очк.', {
+                    takenCount: b.takenCount,
+                    totalCount: b.totalCount,
+                    spent: b.spent,
+                    total: b.total
+                  })}
                 </div>
                 <ProgressBar value={(b.spent / b.total) * 100} height={3} className="mt-1.5" color="var(--color-accent)" />
               </button>
@@ -91,29 +114,31 @@ export function DaevanionPage() {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
         <Card
-          title={`${board.board.ru} · ${board.board.en}`}
-          hint={`Открывается с ур. ${board.board.needLevel}. Оплата: ${BOARD_CURRENCY[board.board.en] ?? 'кристаллы'}.`}
+          title={term(board.board)}
+          hint={t('Открывается с ур. {needLevel}. Оплата: {p}.', { needLevel: board.board.needLevel, p: BOARD_CURRENCY[board.board.en] ?? t('кристаллы') })}
           actions={
-            <Pill tone={board.open ? 'accent' : 'neutral'} tip="Сколько очков вложено в эту доску из стоимости всех её узлов.">
-              {board.open ? `вложено ${board.spent} из ${board.total}` : `откроется на ур. ${board.board.needLevel}`}
+            <Pill tone={board.open ? 'accent' : 'neutral'} tip={t('Сколько очков вложено в эту доску из стоимости всех её узлов.')}>
+              {board.open
+                ? t('вложено {spent} из {total}', { spent: board.spent, total: board.total })
+                : t('откроется на ур. {needLevel}', { needLevel: board.board.needLevel })}
             </Pill>
           }
         >
           <BoardView board={board} goals={d.goals} ctx={ctx} />
           <Legend
             items={[
-              { swatch: <Swatch className="border-2 border-good bg-surface-3" />, text: 'иконка умения: +1 к уровню (зелёная рамка — взят)' },
-              { swatch: <Swatch className="bg-teal" />, text: 'взят: стат' },
-              { swatch: <Swatch className="rotate-45 bg-grade-legend" />, text: 'взят: крупный стат' },
-              { swatch: <Swatch className="rotate-45 bg-grade-unique" />, text: 'взят: уникальный узел' },
-              { swatch: <Swatch className="border-2 border-aether bg-transparent" />, text: 'нужен по гайду (ещё не взят)' },
-              { swatch: <Swatch className="border border-dashed border-aether bg-transparent" />, text: 'путь к нужному' }
+              { swatch: <Swatch className="border-2 border-good bg-surface-3" />, text: t('иконка умения: +1 к уровню (зелёная рамка — взят)') },
+              { swatch: <Swatch className="bg-teal" />, text: t('взят: стат') },
+              { swatch: <Swatch className="rotate-45 bg-grade-legend" />, text: t('взят: крупный стат') },
+              { swatch: <Swatch className="rotate-45 bg-grade-unique" />, text: t('взят: уникальный узел') },
+              { swatch: <Swatch className="border-2 border-aether bg-transparent" />, text: t('нужен по гайду (ещё не взят)') },
+              { swatch: <Swatch className="border border-dashed border-aether bg-transparent" />, text: t('путь к нужному') }
             ]}
           />
         </Card>
 
         <div className="flex min-w-0 flex-col gap-5">
-          <Card title="Узлы умений на доске" hint="Узлы «+1 к уровню умения» — главное, ради чего гайды качают доски.">
+          <Card title={t('Узлы умений на доске')} hint={t('Узлы «+1 к уровню умения» — главное, ради чего гайды качают доски.')}>
             <div className="-mx-2 max-h-80 overflow-y-auto">
               {board.skillNodes
                 .slice()
@@ -123,11 +148,11 @@ export function DaevanionPage() {
                   const tone: Tone = needed ? (taken ? 'ok' : 'bad') : 'neutral'
                   const why = needed
                     ? taken
-                      ? 'Взят — гайд его просит.'
-                      : `Не взят, а гайд его просит. Стоит ${node.cost} очк. (плюс узлы по пути — см. план ниже).`
+                      ? t('Взят — гайд его просит.')
+                      : t('Не взят, а гайд его просит. Стоит {cost} очк. (плюс узлы по пути — см. план ниже).', { cost: node.cost })
                     : taken
-                      ? 'Взят; гайд этот узел не требует.'
-                      : 'Не взят; гайд этот узел не требует.'
+                      ? t('Взят; гайд этот узел не требует.')
+                      : t('Не взят; гайд этот узел не требует.')
                   return (
                     <Tooltip key={node.id} block content={`${namer.node(node)}. ${why}`} wide>
                       <div className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] hover:bg-surface-2">
@@ -136,20 +161,20 @@ export function DaevanionPage() {
                           {taken ? '✓ ' : ''}
                           {namer.node(node)}
                         </span>
-                        <span className="tnum shrink-0 text-[11px] text-ink-3">{node.cost} очк.</span>
+                        <span className="tnum shrink-0 text-[11px] text-ink-3">{t('{cost} очк.', { cost: node.cost })}</span>
                       </div>
                     </Tooltip>
                   )
                 })}
-              {board.skillNodes.length === 0 && <p className="px-2 text-[13px] text-ink-3">На этой доске нет узлов умений — только статы.</p>}
+              {board.skillNodes.length === 0 && <p className="px-2 text-[13px] text-ink-3">{t('На этой доске нет узлов умений — только статы.')}</p>}
             </div>
           </Card>
-          <Card title="Статы со всех досок" hint="Сумма бонусов от всех взятых узлов.">
+          <Card title={t('Статы со всех досок')} hint={t('Сумма бонусов от всех взятых узлов.')}>
             <div className="-mx-2">
               {[...d.stats.entries()]
                 .sort((a, b) => b[1] - a[1])
                 .map(([stat, value]) => (
-                  <Tooltip key={stat} block content={`${namer.stat(stat).main}: столько дают все взятые узлы на всех досках.`}>
+                  <Tooltip key={stat} block content={t('{stat}: столько дают все взятые узлы на всех досках.', { stat: namer.stat(stat).main })}>
                     <div className="flex w-full items-center justify-between rounded-lg px-2 py-1 text-[13px] hover:bg-surface-2">
                       <span className="text-ink-2">{namer.stat(stat).main}</span>
                       <span className="tnum">{formatStatValue(stat, value, { sign: true })}</span>
@@ -183,7 +208,10 @@ function GoalCard({ g, ctx, onBoard }: { g: GoalReport; ctx: Ctx; onBoard: (id: 
     <Card
       title={g.goal.name}
       actions={
-        <Pill tone={toneOfShare(g.done, g.required.length)} tip={`Взято ${g.done} из ${g.required.length} узлов, которые просит эта цель.`}>
+        <Pill
+          tone={toneOfShare(g.done, g.required.length)}
+          tip={t('Взято {done} из {requiredCount} узлов, которые просит эта цель.', { done: g.done, requiredCount: g.required.length })}
+        >
           {g.done} / {g.required.length}
         </Pill>
       }
@@ -191,15 +219,17 @@ function GoalCard({ g, ctx, onBoard }: { g: GoalReport; ctx: Ctx; onBoard: (id: 
       {g.goal.description && <p className="mb-3 text-xs leading-relaxed text-ink-3">{g.goal.description}</p>}
       <ProgressBar value={g.required.length ? (g.done / g.required.length) * 100 : 100} />
       {done ? (
-        <p className="mt-3 text-[13px] text-good">Цель выполнена.</p>
+        <p className="mt-3 text-[13px] text-good">{t('Цель выполнена.')}</p>
       ) : (
         <>
           <div className="mt-3 mb-1.5 flex items-center justify-between text-xs text-ink-3">
-            <Tooltip content="Порядок взятия: каждый раз самый дешёвый оставшийся узел с учётом уже купленного пути. Нажмите на шаг — откроется его доска.">
-              <span>План: сначала самое дешёвое</span>
+            <Tooltip
+              content={t('Порядок взятия: каждый раз самый дешёвый оставшийся узел с учётом уже купленного пути. Нажмите на шаг — откроется его доска.')}
+            >
+              <span>{t('План: сначала самое дешёвое')}</span>
             </Tooltip>
-            <Tooltip content="Сколько очков (кристаллов) нужно на все оставшиеся узлы цели, включая узлы по пути.">
-              <span className="tnum">всего {fmt(g.remainingCost)} очк.</span>
+            <Tooltip content={t('Сколько очков (кристаллов) нужно на все оставшиеся узлы цели, включая узлы по пути.')}>
+              <span className="tnum">{t('всего {remainingCost} очк.', { remainingCost: fmt(g.remainingCost) })}</span>
             </Tooltip>
           </div>
           <ol className="-mx-2 max-h-72 overflow-y-auto">
@@ -208,7 +238,12 @@ function GoalCard({ g, ctx, onBoard }: { g: GoalReport; ctx: Ctx; onBoard: (id: 
                 <Tooltip
                   block
                   wide
-                  content={`${step.board.ru}: «${ctx.namer.node(step.node)}» — ${step.cost} очк.${step.via ? `, из них ${step.via} промежуточных узл. по пути` : ''}. Нажмите, чтобы открыть доску — нужный узел обведён голубым.`}
+                  content={t('{board}: «{node}» — {cost} очк.{p}. Нажмите, чтобы открыть доску — нужный узел обведён голубым.', {
+                    board: term(step.board),
+                    node: ctx.namer.node(step.node),
+                    cost: step.cost,
+                    p: step.via ? t(', из них {via} промежуточных узл. по пути', { via: step.via }) : ''
+                  })}
                 >
                   <button
                     onClick={() => onBoard(step.board.id)}
@@ -217,17 +252,20 @@ function GoalCard({ g, ctx, onBoard }: { g: GoalReport; ctx: Ctx; onBoard: (id: 
                     <span className="tnum w-5 shrink-0 text-[11px] text-ink-3">{i + 1}.</span>
                     {step.node.skill && <SkillIcon id={step.node.skill} size={20} />}
                     <span className="min-w-0 flex-1 truncate">
-                      <span className="text-ink-3">{step.board.ru}:</span> {ctx.namer.node(step.node)}
+                      <span className="text-ink-3">{term(step.board)}:</span> {ctx.namer.node(step.node)}
                     </span>
                     <span className="tnum shrink-0 text-[11px] text-ink-3">
-                      {step.cost} очк.{step.via ? ` (+${step.via} по пути)` : ''}
+                      {t('{cost} очк.', { cost: step.cost })}
+                      {step.via ? t(' (+{via} по пути)', { via: step.via }) : ''}
                     </span>
                   </button>
                 </Tooltip>
               </li>
             ))}
           </ol>
-          {g.lockedCount > 0 && <p className="mt-2 text-xs text-ink-3">Ещё {g.lockedCount} узл. — на досках, закрытых по уровню.</p>}
+          {g.lockedCount > 0 && (
+            <p className="mt-2 text-xs text-ink-3">{t('Ещё {lockedCount} узл. — на досках, закрытых по уровню.', { lockedCount: g.lockedCount })}</p>
+          )}
         </>
       )}
     </Card>
@@ -370,16 +408,16 @@ function BoardView({ board, goals, ctx }: { board: BoardReport; goals: GoalRepor
   return (
     <div className="relative">
       <div className="absolute top-0 right-0 z-20 flex items-center gap-1">
-        <ZoomButton onClick={z.zoomOut} tip="Уменьшить (Ctrl + колесо вниз)">
+        <ZoomButton onClick={z.zoomOut} tip={t('Уменьшить (Ctrl + колесо вниз)')}>
           <Minus size={14} />
         </ZoomButton>
-        <ZoomButton onClick={z.reset} tip="Вписать доску по ширине">
+        <ZoomButton onClick={z.reset} tip={t('Вписать доску по ширине')}>
           <span className="tnum text-[11px] font-semibold">{Math.round(z.zoom * 100)}%</span>
         </ZoomButton>
-        <ZoomButton onClick={z.zoomIn} tip="Увеличить (Ctrl + колесо вверх)">
+        <ZoomButton onClick={z.zoomIn} tip={t('Увеличить (Ctrl + колесо вверх)')}>
           <Plus size={14} />
         </ZoomButton>
-        <ZoomButton onClick={z.reset} tip="Вписать">
+        <ZoomButton onClick={z.reset} tip={t('Вписать')}>
           <Maximize2 size={13} />
         </ZoomButton>
       </div>
@@ -488,8 +526,10 @@ function BoardView({ board, goals, ctx }: { board: BoardReport; goals: GoalRepor
             >
               <div className="font-semibold text-ink">{ctx.namer.node(hover)}</div>
               <div className="mt-0.5 text-ink-3">
-                {hover.type === 'Start' ? 'Стартовый узел' : `${hover.cost} очк. · ${board.taken.has(hover.id) ? 'взят' : 'не взят'}`}
-                {wanted.has(hover.id) ? ' · нужен по гайду' : path.has(hover.id) ? ' · по пути к нужному' : ''}
+                {hover.type === 'Start'
+                  ? t('Стартовый узел')
+                  : t('{cost} очк. · {p}', { cost: hover.cost, p: board.taken.has(hover.id) ? t('взят') : t('не взят') })}
+                {wanted.has(hover.id) ? t(' · нужен по гайду') : path.has(hover.id) ? t(' · по пути к нужному') : ''}
               </div>
             </div>
           )}

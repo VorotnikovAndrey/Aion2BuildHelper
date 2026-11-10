@@ -6,9 +6,10 @@ import type { CSSProperties } from 'react'
 import type { TargetStatus } from '@shared/analysis/targets'
 import { ATTRIBUTE_EFFECT, DEITIES, deityInfo } from '@shared/gamedata/deities'
 import { formatStatValue, statByKey } from '@shared/gamedata/stats'
-import type { Namer } from '@shared/names'
+import { term, type Namer } from '@shared/names'
 import { Tooltip } from '@/components/ui/InfoTip'
 import { cn } from '@/lib/format'
+import { intlLocale, t } from '@shared/i18n'
 
 /** icon — файл в icons/attributes (не «con.png»: CON — зарезервированное имя в Windows). */
 const ATTRS: { key: string; icon: string; angle: number }[] = [
@@ -88,7 +89,10 @@ export function CharacterSheet({
   const refText = (id: number) => {
     const r = refs?.get(id)
     if (!r) return ''
-    return `В среднем у топ-игроков класса: ${r.target.goals[0].value.toLocaleString('ru-RU')} — у вас ${r.next ? 'ниже' : 'не ниже'}.`
+    return t('В среднем у топ-игроков класса: {goals} — у вас {p}.', {
+      goals: r.target.goals[0].value.toLocaleString(intlLocale()),
+      p: r.next ? t('ниже') : t('не ниже')
+    })
   }
   /** Цвет числа или рамки по ориентиру: зелёный — не ниже среднего у топ-игроков класса, жёлтый — ниже. */
   const refTone = (id: number): 'ok' | 'warn' | null => {
@@ -171,7 +175,14 @@ export function CharacterSheet({
             const label = v ? namer.stat(v.def.id).main : a.key
             return (
               <div key={a.key} className="absolute -translate-x-1/2 -translate-y-1/2" style={pos}>
-                <Tooltip content={`${label}: ${ATTRIBUTE_EFFECT[a.key]}. У вас: ${v?.value ?? 0}. ${v ? refText(v.def.id) : ''}`}>
+                <Tooltip
+                  content={t('{label}: {ATTRIBUTE_EFFECT}. У вас: {p}. {p2}', {
+                    label,
+                    ATTRIBUTE_EFFECT: ATTRIBUTE_EFFECT[a.key],
+                    p: v?.value ?? 0,
+                    p2: v ? refText(v.def.id) : ''
+                  })}
+                >
                   <div className="flex w-[78px] flex-col items-center text-center">
                     <GameIcon src={`./icons/attributes/${a.icon}.png`} size={24} className="text-ink-2" />
                     <span className="mt-0.5 text-[11.5px] leading-tight font-semibold text-aether">{label}</span>
@@ -204,9 +215,13 @@ export function CharacterSheet({
                     <>
                       <b className="text-ink">{namer.stat(v.def.id).main}</b>: {v.value ?? 0}
                       {deityInfo(key) && <span className="mt-1 block">{capital(deityInfo(key)!.effect)}.</span>}
-                      {boards ? <span className="block text-ink-3">из них от досок Даэваниона: +{boards}</span> : null}
+                      {boards ? <span className="block text-ink-3">{t('из них от досок Даэваниона: +{boards}', { boards })}</span> : null}
                       {refText(v.def.id) && <span className="block text-ink-3">{refText(v.def.id)}</span>}
-                      <span className="mt-1 block text-ink-3">Стат бога{deity ? ` ${deity}` : ''}: растёт от досок Даэваниона, аркан и пантеона.</span>
+                      <span className="mt-1 block text-ink-3">
+                        {t('Стат бога')}
+                        {deity ? ` ${deity}` : ''}
+                        {t(': растёт от досок Даэваниона, аркан и пантеона.')}
+                      </span>
                     </>
                   }
                 >
@@ -254,7 +269,7 @@ export function CharacterSheet({
                     block
                     content={
                       v
-                        ? `${namer.stat(v.def.id).main}: ${v.value === undefined ? 'оверлей это значение не отдаёт' : formatStatValue(v.def.id, v.value)}.`
+                        ? `${namer.stat(v.def.id).main}: ${v.value === undefined ? t('оверлей это значение не отдаёт') : formatStatValue(v.def.id, v.value)}.`
                         : null
                     }
                   >
@@ -269,8 +284,9 @@ export function CharacterSheet({
           ))}
         </div>
         <p className="mt-3 text-xs leading-relaxed text-ink-3">
-          Значения — как их отдаёт оверлей, по слагаемым: «АТК» и «Доп. АТК» отдельно. Итоговые АТК и ЗЩТ в окне игры считаются с множителями, поэтому там числа
-          больше. Характеристики и статы богов совпадают с игрой.
+          {t(
+            'Значения — как их отдаёт оверлей, по слагаемым: «АТК» и «Доп. АТК» отдельно. Итоговые АТК и ЗЩТ в окне игры считаются с множителями, поэтому там числа больше. Характеристики и статы богов совпадают с игрой.'
+          )}
         </p>
         <DeityLegend valueOf={valueOf} namer={namer} />
       </div>
@@ -284,7 +300,7 @@ const capital = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
 function DeityLegend({ valueOf, namer }: { valueOf: (key: string) => { def: { id: number }; value?: number } | null; namer: Namer }) {
   return (
     <div className="mt-4 rounded-xl border border-line">
-      <div className="border-b border-line px-3 py-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Что дают статы богов</div>
+      <div className="border-b border-line px-3 py-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{t('Что дают статы богов')}</div>
       <div className="grid grid-cols-1 lg:grid-flow-col lg:grid-cols-2 lg:grid-rows-5">
         {DEITIES.map((d) => {
           const v = valueOf(d.key)
@@ -297,7 +313,7 @@ function DeityLegend({ valueOf, namer }: { valueOf: (key: string) => { def: { id
               <div className="min-w-0 flex-1 text-[12px] leading-snug">
                 <div className="flex items-baseline justify-between gap-2">
                   <span>
-                    <b className="text-ink">{aspect}</b> <span className="text-ink-3">· {d.god}</span>
+                    <b className="text-ink">{aspect}</b> <span className="text-ink-3">· {term(d.god)}</span>
                   </span>
                   <span className={cn('tnum font-semibold', has ? 'text-ink' : 'text-ink-3')}>{has ? v.value : '—'}</span>
                 </div>

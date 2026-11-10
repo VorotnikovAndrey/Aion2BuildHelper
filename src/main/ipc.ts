@@ -12,6 +12,7 @@ import type { Guide } from '@shared/guide/types'
 import { getSourceState, onSourceChange, reloadSource, startWatching } from './questlog'
 import { dataDir, getSettings, listGuides, listHistory, removeGuide, saveGuide, updateSettings, updateUi } from './storage'
 import { applyUiToWindows } from './zoom'
+import { t } from '@shared/i18n'
 
 export function registerIpc(): void {
   ipcMain.handle('source:get', () => getSourceState())
@@ -19,7 +20,7 @@ export function registerIpc(): void {
   ipcMain.handle('source:pick', async (e) => {
     const win = BrowserWindow.fromWebContents(e.sender)
     const res = await dialog.showOpenDialog(win!, {
-      title: 'Файл персонажей оверлея Questlog',
+      title: t('Файл персонажей оверлея Questlog'),
       defaultPath: getSourceState().path,
       filters: [{ name: 'characters.json', extensions: ['json'] }],
       properties: ['openFile']
@@ -52,8 +53,8 @@ export function registerIpc(): void {
   ipcMain.handle('guides:import', async (e) => {
     const win = BrowserWindow.fromWebContents(e.sender)
     const res = await dialog.showOpenDialog(win!, {
-      title: 'Импорт гайда',
-      filters: [{ name: 'Гайд (JSON)', extensions: ['json'] }],
+      title: t('Импорт гайда'),
+      filters: [{ name: t('Гайд (JSON)'), extensions: ['json'] }],
       properties: ['openFile']
     })
     if (res.canceled || !res.filePaths[0]) return null
@@ -66,9 +67,9 @@ export function registerIpc(): void {
     const win = BrowserWindow.fromWebContents(e.sender)
     const name = guide.name.replace(/[\\/:*?"<>|]+/g, ' ').trim() || 'guide'
     const res = await dialog.showSaveDialog(win!, {
-      title: 'Экспорт гайда',
+      title: t('Экспорт гайда'),
       defaultPath: `${name}.json`,
-      filters: [{ name: 'Гайд (JSON)', extensions: ['json'] }]
+      filters: [{ name: t('Гайд (JSON)'), extensions: ['json'] }]
     })
     if (res.canceled || !res.filePath) return false
     const { builtin: _builtin, ...rest } = guide
@@ -109,9 +110,9 @@ export function registerIpc(): void {
           .replace(/[\\/:*?"<>|]+/g, ' ')
           .trim() || 'build'
       const res = await dialog.showSaveDialog(win!, {
-        title: 'Сохранить карточку билда',
+        title: t('Сохранить карточку билда'),
         defaultPath: `${safe}.png`,
-        filters: [{ name: 'Картинка PNG', extensions: ['png'] }]
+        filters: [{ name: t('Картинка PNG'), extensions: ['png'] }]
       })
       if (res.canceled || !res.filePath) return false
       await writeFile(res.filePath, image.toPNG())

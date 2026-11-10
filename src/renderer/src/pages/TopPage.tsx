@@ -14,8 +14,10 @@ import { EmptyState, PageHeader } from '@/components/ui/misc'
 import { Pill } from '@/components/ui/Pill'
 import { cn, compact, fmt } from '@/lib/format'
 import { useCharacterContext } from '@/lib/report'
+import { intlLocale, t } from '@shared/i18n'
+import { term } from '@shared/names'
 
-const VARIANT_RU = { vigor: 'жизни', magic: 'магии' } as const
+const VARIANT_RU = { vigor: t('жизни'), magic: t('магии') } as const
 
 export function TopPage() {
   const ctx = useCharacterContext()!
@@ -27,10 +29,13 @@ export function TopPage() {
   const header = (
     <PageHeader
       icon={<Trophy size={22} />}
-      title="Сравнение с топом"
+      title={t('Сравнение с топом')}
       subtitle={
         top
-          ? `Ваш персонаж против ${fmt(top.players)} топ-игроков класса на глобальных серверах (ур. 45, самая высокая боевая мощь в каждом регионе; metabot.gg, данные от ${top.fetchedAt}). Это не гайд, а ориентир: что носят сильнейшие и где вы отстаёте больше всего.`
+          ? t(
+              'Ваш персонаж против {players} топ-игроков класса на глобальных серверах (ур. 45, самая высокая боевая мощь в каждом регионе; metabot.gg, данные от {fetchedAt}). Это не гайд, а ориентир: что носят сильнейшие и где вы отстаёте больше всего.',
+              { players: fmt(top.players), fetchedAt: top.fetchedAt }
+            )
           : undefined
       }
     />
@@ -39,8 +44,8 @@ export function TopPage() {
     return (
       <>
         {header}
-        <EmptyState title="Нет данных о топ-игроках этого класса">
-          Данные собираются командой <code>npm run gamedata -- --classes {char.cls ?? 'класс'}</code> с публичной страницы metabot.gg.
+        <EmptyState title={t('Нет данных о топ-игроках этого класса')}>
+          {t('Данные собираются командой')} <code>npm run gamedata -- --classes {char.cls ?? t('класс')}</code> {t('с публичной страницы metabot.gg.')}
         </EmptyState>
       </>
     )
@@ -55,18 +60,18 @@ export function TopPage() {
     <>
       {header}
       <div className="mb-5 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-        <Card title="Боевая мощь" hint="Сколько топ-игроков класса в каждом диапазоне боевой мощи. Подсвечен ваш диапазон.">
+        <Card title={t('Боевая мощь')} hint={t('Сколько топ-игроков класса в каждом диапазоне боевой мощи. Подсвечен ваш диапазон.')}>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <div className="tnum text-3xl font-semibold text-accent">{fmt(cmp.cp.value)}</div>
               <div className="mt-1 text-[13px] text-ink-2">
-                сильнее <b className="tnum text-ink">{cmp.cp.percentile}%</b> топ-игроков класса
+                {t('сильнее')} <b className="tnum text-ink">{cmp.cp.percentile}%</b> {t('топ-игроков класса')}
               </div>
             </div>
             <div className="tnum text-right text-xs text-ink-3">
-              медиана топа — <b className="text-ink-2">{compact(cmp.cp.median)}</b>
+              {t('медиана топа —')} <b className="text-ink-2">{compact(cmp.cp.median)}</b>
               <br />
-              верхние 10% — от <b className="text-ink-2">{compact(cmp.cp.top10)}</b>
+              {t('верхние 10% — от')} <b className="text-ink-2">{compact(cmp.cp.top10)}</b>
             </div>
           </div>
           <div className="mt-4 flex h-24 items-end gap-1">
@@ -74,7 +79,12 @@ export function TopPage() {
               <Tooltip
                 key={b.from}
                 className="h-full flex-1 items-end"
-                content={`${compact(b.from)}–${compact(b.to + 1)}: ${fmt(b.count)} игроков${i === mineAt ? ' · вы здесь' : ''}`}
+                content={t('{from}–{p}: {count} игроков{p2}', {
+                  from: compact(b.from),
+                  p: compact(b.to + 1),
+                  count: fmt(b.count),
+                  p2: i === mineAt ? t(' · вы здесь') : ''
+                })}
               >
                 <span
                   className={cn('block w-full rounded-t-sm', i === mineAt ? 'bg-accent' : 'bg-surface-3')}
@@ -90,12 +100,14 @@ export function TopPage() {
         </Card>
 
         <Card
-          title="Где отставание больше всего"
-          hint="Самые большие разрывы с топом: умения, которые у топа на 80%+ и заметно выше, ненадетые популярные стигмы, заточка и узлы досок. Нажмите, чтобы открыть раздел."
+          title={t('Где отставание больше всего')}
+          hint={t(
+            'Самые большие разрывы с топом: умения, которые у топа на 80%+ и заметно выше, ненадетые популярные стигмы, заточка и узлы досок. Нажмите, чтобы открыть раздел.'
+          )}
         >
           {cmp.gaps.length === 0 ? (
             <div className="flex items-center gap-2 text-[13px] text-good">
-              <StatusBadge tone="ok" size={16} /> По всем пунктам вы на уровне топа.
+              <StatusBadge tone="ok" size={16} /> {t('По всем пунктам вы на уровне топа.')}
             </div>
           ) : (
             <ul className="-mx-2 space-y-0.5">
@@ -121,8 +133,10 @@ export function TopPage() {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
         <Card
-          title="Умения"
-          hint="У скольких топ-игроков умение на панели (или пассивка изучена) и средний уровень. Зелёное — вы не ниже среднего, жёлтое — ниже на 1–2, красное — ниже больше чем на 2 или не изучено."
+          title={t('Умения')}
+          hint={t(
+            'У скольких топ-игроков умение на панели (или пассивка изучена) и средний уровень. Зелёное — вы не ниже среднего, жёлтое — ниже на 1–2, красное — ниже больше чем на 2 или не изучено.'
+          )}
         >
           <ul className="space-y-1">
             {cmp.skills.map((s) => (
@@ -132,13 +146,18 @@ export function TopPage() {
                 <span className="tnum w-14 text-right text-xs text-ink-3">{s.share}%</span>
                 <span className="tnum w-24 text-right text-[13px]">
                   <b>{s.learned ? s.level : '—'}</b>
-                  <span className="text-ink-3"> / {s.avgLevel.toLocaleString('ru-RU')}</span>
+                  <span className="text-ink-3"> / {s.avgLevel.toLocaleString(intlLocale())}</span>
                 </span>
                 <Tooltip
                   content={
                     s.learned
-                      ? `Ваш ур. ${s.level}, у топа в среднем ${s.avgLevel.toLocaleString('ru-RU')} (${s.diff > 0 ? '+' : ''}${s.diff.toLocaleString('ru-RU')}).`
-                      : 'Умение не изучено.'
+                      ? t('Ваш ур. {level}, у топа в среднем {avgLevel} ({p}{diff}).', {
+                          level: s.level,
+                          avgLevel: s.avgLevel.toLocaleString(intlLocale()),
+                          p: s.diff > 0 ? '+' : '',
+                          diff: s.diff.toLocaleString(intlLocale())
+                        })
+                      : t('Умение не изучено.')
                   }
                 >
                   <StatusBadge tone={s.tone} size={16} />
@@ -146,11 +165,11 @@ export function TopPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-2 text-[11px] text-ink-3">Столбцы: доля топ-игроков · ваш уровень / средний у топа.</p>
+          <p className="mt-2 text-[11px] text-ink-3">{t('Столбцы: доля топ-игроков · ваш уровень / средний у топа.')}</p>
         </Card>
 
         <div className="space-y-5">
-          <Card title="Стигмы" hint="Доля топ-игроков, у которых стигма надета, и её средний уровень. Слотов стигм — 4, так что сумма больше 100%.">
+          <Card title={t('Стигмы')} hint={t('Доля топ-игроков, у которых стигма надета, и её средний уровень. Слотов стигм — 4, так что сумма больше 100%.')}>
             <ul className="space-y-1.5">
               {cmp.stigmas.map((s) => (
                 <li key={s.skill} className="flex items-center gap-2.5">
@@ -161,25 +180,34 @@ export function TopPage() {
                   </span>
                   <span className="tnum w-10 text-right text-xs text-ink-3">{s.share}%</span>
                   {s.equipped ? (
-                    <Pill tone="good" tip={`У вас надета, ур. ${s.level}. У топа в среднем ${s.avgLevel.toLocaleString('ru-RU')}.`}>
-                      надета
+                    <Pill
+                      tone="good"
+                      tip={t('У вас надета, ур. {level}. У топа в среднем {avgLevel}.', { level: s.level, avgLevel: s.avgLevel.toLocaleString(intlLocale()) })}
+                    >
+                      {t('надета')}
                     </Pill>
                   ) : (
-                    <Pill tip="У вас не надета.">—</Pill>
+                    <Pill tip={t('У вас не надета.')}>—</Pill>
                   )}
                 </li>
               ))}
             </ul>
           </Card>
 
-          <Card title="Арканы" hint="Самая частая карта у топа в каждом слоте и её средняя заточка — против вашей.">
+          <Card title={t('Арканы')} hint={t('Самая частая карта у топа в каждом слоте и её средняя заточка — против вашей.')}>
             <div className="grid grid-cols-5 gap-2">
               {cmp.arcana.map((a) => {
                 const card = report.arcana.cards.find((c) => c.slot === a.slot)
                 return (
                   <Tooltip
                     key={a.slot}
-                    content={`${slotDef(a.slot).ru}: у топа чаще всего «${a.top?.variant ? VARIANT_RU[a.top.variant] : '—'}» (${a.top?.share ?? 0}%, ср. +${a.top?.avgEnchant ?? 0}). У вас — ${a.yourVariant ? `«${VARIANT_RU[a.yourVariant]}» +${a.yourEnchant ?? 0}` : 'пусто'}.`}
+                    content={t('{slotDef}: у топа чаще всего «{p}» ({p2}%, ср. +{p3}). У вас — {p4}.', {
+                      slotDef: term(slotDef(a.slot)),
+                      p: a.top?.variant ? VARIANT_RU[a.top.variant] : '—',
+                      p2: a.top?.share ?? 0,
+                      p3: a.top?.avgEnchant ?? 0,
+                      p4: a.yourVariant ? `«${VARIANT_RU[a.yourVariant]}» +${a.yourEnchant ?? 0}` : t('пусто')
+                    })}
                   >
                     <div className="flex flex-col items-center gap-1.5 text-center">
                       <div className="w-[52px]" style={{ fontSize: 10 }}>
@@ -190,10 +218,10 @@ export function TopPage() {
                           empty={!card?.item}
                         />
                       </div>
-                      <span className="text-[11px] text-ink-2">{slotDef(a.slot).ru}</span>
+                      <span className="text-[11px] text-ink-2">{term(slotDef(a.slot))}</span>
                       <span className="flex items-center gap-1 text-[10.5px] text-ink-3">
                         <StatusBadge tone={a.same ? 'ok' : 'warn'} size={12} />
-                        топ: {a.top?.variant ? VARIANT_RU[a.top.variant] : '—'} {a.top?.share}%
+                        {t('топ:')} {a.top?.variant ? VARIANT_RU[a.top.variant] : '—'} {a.top?.share}%
                       </span>
                     </div>
                   </Tooltip>
@@ -203,14 +231,16 @@ export function TopPage() {
           </Card>
         </div>
 
-        <Card title="Заточка по слотам" hint="Средняя заточка у топа и самая частая. У колец, серёг, браслетов и рун — среднее по двум вашим вещам.">
+        <Card title={t('Заточка по слотам')} hint={t('Средняя заточка у топа и самая частая. У колец, серёг, браслетов и рун — среднее по двум вашим вещам.')}>
           <ul className="space-y-1">
             {cmp.enchant.map((e) => (
               <li key={e.ru} className="flex items-center gap-2.5 rounded-lg px-1 py-1 text-[13px] hover:bg-surface-2">
                 <span className="w-28 shrink-0 text-ink-2">{e.ru}</span>
-                <span className="tnum w-16 font-semibold">{e.yours === null ? '—' : `+${e.yours.toLocaleString('ru-RU')}`}</span>
+                <span className="tnum w-16 font-semibold">{e.yours === null ? '—' : `+${e.yours.toLocaleString(intlLocale())}`}</span>
                 <span className="tnum flex-1 text-xs text-ink-3">
-                  топ: ср. +{e.avg.toLocaleString('ru-RU')}, чаще всего +{e.most} ({e.mostShare}%)
+                  {t('топ: ср. +')}
+                  {e.avg.toLocaleString(intlLocale())}
+                  {t(', чаще всего +{most} ({mostShare}%)', { most: e.most, mostShare: e.mostShare })}
                 </span>
                 <StatusBadge tone={e.tone} size={15} />
               </li>
@@ -219,14 +249,14 @@ export function TopPage() {
         </Card>
 
         <div className="space-y-5">
-          <Card title="Доски Даэваниона" hint="Сколько узлов на доске берёт большинство топ-игроков, против ваших.">
+          <Card title={t('Доски Даэваниона')} hint={t('Сколько узлов на доске берёт большинство топ-игроков, против ваших.')}>
             <ul className="space-y-2">
               {cmp.boards.map((b) => (
                 <li key={b.name} className="text-[13px]">
                   <div className="flex items-baseline justify-between">
                     <span className="text-ink-2">{b.name}</span>
                     <span className="tnum text-xs text-ink-3">
-                      у вас <b className="text-ink">{b.yours}</b> · у большинства топа {b.picked} из {b.total}
+                      {t('у вас')} <b className="text-ink">{b.yours}</b> {t('· у большинства топа {picked} из {total}', { picked: b.picked, total: b.total })}
                     </span>
                   </div>
                   <div className="relative mt-1 h-1.5 rounded-full bg-surface-3">
@@ -241,14 +271,14 @@ export function TopPage() {
             </ul>
           </Card>
 
-          <Card title="Титулы и крылья у топа" hint="Что надевают топ-игроки (доли у двух фракций сложены).">
+          <Card title={t('Титулы и крылья у топа')} hint={t('Что надевают топ-игроки (доли у двух фракций сложены).')}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {(
                 [
-                  ['Атака', top.titles.attack],
-                  ['Защита', top.titles.defense],
-                  ['Другое', top.titles.other],
-                  ['Крылья', top.wings]
+                  [t('Атака'), top.titles.attack],
+                  [t('Защита'), top.titles.defense],
+                  [t('Другое'), top.titles.other],
+                  [t('Крылья'), top.wings]
                 ] as const
               ).map(([ru, list]) => (
                 <div key={ru}>

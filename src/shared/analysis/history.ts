@@ -5,6 +5,7 @@ import { classSkills } from '../gamedata/skills'
 import type { Namer } from '../names'
 import type { Character } from '../types'
 import { mergeSkills } from './gear'
+import { intlLocale, t } from '../i18n'
 
 export interface SnapshotSummary {
   /** Когда оверлей видел персонажа (мс). */
@@ -116,48 +117,58 @@ export function diffCharacters(prev: Character, next: Character): Change[] {
   return out
 }
 
-const fmt = (n: number) => n.toLocaleString('ru-RU')
+const fmt = (n: number) => n.toLocaleString(intlLocale())
 const signed = (n: number) => (n > 0 ? '+' : '') + fmt(n)
 
 /** Текст изменения для ленты истории. good: true — рост, false — потеря, undefined — нейтрально. */
 export function describeChange(c: Change, n: Namer): { text: string; good?: boolean } {
   switch (c.kind) {
     case 'cp':
-      return { text: `Боевая мощь ${fmt(c.from)} → ${fmt(c.to)} (${signed(c.to - c.from)})`, good: c.to > c.from }
+      return { text: t('Боевая мощь {from} → {to} ({signed})', { from: fmt(c.from), to: fmt(c.to), signed: signed(c.to - c.from) }), good: c.to > c.from }
     case 'gearScore':
-      return { text: `Уровень снаряжения ${fmt(c.from)} → ${fmt(c.to)}`, good: c.to > c.from }
+      return { text: t('Уровень снаряжения {from} → {to}', { from: fmt(c.from), to: fmt(c.to) }), good: c.to > c.from }
     case 'level':
-      return { text: `Уровень персонажа ${c.from} → ${c.to}`, good: c.to > c.from }
+      return { text: t('Уровень персонажа {from} → {to}', { from: c.from, to: c.to }), good: c.to > c.from }
     case 'skill':
-      return { text: `${n.skill(c.skill).main}: ур. ${c.from} → ${c.to}`, good: c.to > c.from }
+      return { text: t('{skill}: ур. {from} → {to}', { skill: n.skill(c.skill).main, from: c.from, to: c.to }), good: c.to > c.from }
     case 'specs':
-      return { text: `${n.skill(c.skill).main}: специализации ${c.from.join(', ') || '—'} → ${c.to.join(', ') || '—'}` }
+      return { text: t('{skill}: специализации {p} → {p2}', { skill: n.skill(c.skill).main, p: c.from.join(', ') || '—', p2: c.to.join(', ') || '—' }) }
     case 'equip':
-      return { text: `${n.skill(c.skill).main}: ${c.on ? 'надета' : 'снята'}` }
+      return { text: `${n.skill(c.skill).main}: ${c.on ? t('надета') : t('снята')}` }
     case 'item':
       return {
-        text: c.to === null ? `${n.item(c.from ?? 0, c.slot).main}: снято` : `${n.item(c.to, c.slot).main}: новая вещь`,
+        text: c.to === null ? t('{item}: снято', { item: n.item(c.from ?? 0, c.slot).main }) : t('{item}: новая вещь', { item: n.item(c.to, c.slot).main }),
         good: c.to !== null
       }
     case 'enchant':
-      return { text: `${n.item(c.item, c.slot).main}: заточка +${c.from} → +${c.to}`, good: c.to > c.from }
+      return { text: t('{item}: заточка +{from} → +{to}', { item: n.item(c.item, c.slot).main, from: c.from, to: c.to }), good: c.to > c.from }
     case 'itemLines':
-      return { text: `${n.item(c.item, c.slot).main}: изменились характеристики` }
+      return { text: t('{item}: изменились характеристики', { item: n.item(c.item, c.slot).main }) }
     case 'manastones':
-      return { text: `${n.item(c.item, c.slot).main}: изменились манакамни` }
+      return { text: t('{item}: изменились манакамни', { item: n.item(c.item, c.slot).main }) }
     case 'daevanion':
       return {
-        text: `Даэванион: ${c.added ? `взято узлов +${c.added}` : ''}${c.added && c.removed ? ', ' : ''}${c.removed ? `сброшено ${c.removed}` : ''}`,
+        text: t('Даэванион: {p}{p2}{p3}', {
+          p: c.added ? t('взято узлов +{added}', { added: c.added }) : '',
+          p2: c.added && c.removed ? ', ' : '',
+          p3: c.removed ? t('сброшено {removed}', { removed: c.removed }) : ''
+        }),
         good: c.added > c.removed
       }
     case 'pets':
       return {
-        text: `Питомцы: ${c.added ? `новых ${signed(c.added)}` : ''}${c.added && c.levels ? ', ' : ''}${c.levels ? `уровней ${signed(c.levels)}` : ''}`,
+        text: t('Питомцы: {p}{p2}{p3}', {
+          p: c.added ? t('новых {signed}', { signed: signed(c.added) }) : '',
+          p2: c.added && c.levels ? ', ' : '',
+          p3: c.levels ? t('уровней {signed}', { signed: signed(c.levels) }) : ''
+        }),
         good: c.added >= 0 && c.levels >= 0
       }
     case 'genus':
-      return { text: `Знание о видах, ячейка ${c.slot + 1}: ${c.from !== null ? n.stat(c.from).main + ' → ' : ''}${n.stat(c.to).main}` }
+      return {
+        text: t('Знание о видах, ячейка {p}: {p2}{stat}', { p: c.slot + 1, p2: c.from !== null ? n.stat(c.from).main + ' → ' : '', stat: n.stat(c.to).main })
+      }
     case 'titles':
-      return { text: `Новых титулов: ${c.added}`, good: true }
+      return { text: t('Новых титулов: {added}', { added: c.added }), good: true }
   }
 }

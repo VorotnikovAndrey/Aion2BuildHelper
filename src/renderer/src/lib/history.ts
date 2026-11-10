@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { HistoryEntry } from '@shared/analysis/history'
 import { api, useApp } from './store'
+import { t } from '@shared/i18n'
 
 /** История персонажа; перечитывается, когда оверлей обновил файл. */
 export function useHistory(key: string | undefined): { entries: HistoryEntry[]; loading: boolean } {
@@ -22,6 +23,6 @@ export function useHistory(key: string | undefined): { entries: HistoryEntry[]; 
 
 /** Ранг Бездны по номеру: 18 — «Воин 9-го ранга» (как в оверлее), дальше вверх. */
 export function abyssRankName(grade: number): string {
-  if (grade >= 10 && grade <= 18) return `Воин ${grade - 9}-го ранга`
-  return `Ранг ${grade}`
+  if (grade >= 10 && grade <= 18) return t('Воин {p}-го ранга', { p: grade - 9 })
+  return t('Ранг {grade}', { grade })
 }

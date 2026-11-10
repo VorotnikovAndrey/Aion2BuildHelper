@@ -19,6 +19,8 @@ import {
 import type { Guide } from '../guide/types'
 import type { Character, ClassKey, GearItem } from '../types'
 import { mergeSkills } from './gear'
+import { intlLocale, t } from '../i18n'
+import { term } from '../names'
 
 // ───────────────────────── Вероятности ─────────────────────────
 
@@ -196,7 +198,7 @@ export function analyzeArcana(char: Character, guide: Guide | null): ArcanaRepor
     variant: v,
     count: counts[v],
     active: (counts[v] >= 4 ? 4 : counts[v] >= 2 ? 2 : 0) as 0 | 2 | 4,
-    name: ARCANA_SETS[v].ru,
+    name: term(ARCANA_SETS[v]),
     bonus2: ARCANA_SETS[v].bonus2,
     bonus4: ARCANA_SETS[v].bonus4
   }))
@@ -208,8 +210,8 @@ export function analyzeArcana(char: Character, guide: Guide | null): ArcanaRepor
 
 /** «1 из 7 315» — так шансы понятнее, чем 0,0137%. */
 export function oneIn(p: number): string {
-  if (p <= 0) return 'никогда'
-  if (p >= 0.995) return 'точно'
-  if (p >= 0.1) return `${(p * 100).toLocaleString('ru-RU', { maximumFractionDigits: 1 })}%`
-  return `1 из ${Math.round(1 / p).toLocaleString('ru-RU')}`
+  if (p <= 0) return t('никогда')
+  if (p >= 0.995) return t('точно')
+  if (p >= 0.1) return `${(p * 100).toLocaleString(intlLocale(), { maximumFractionDigits: 1 })}%`
+  return t('1 из {p}', { p: Math.round(1 / p).toLocaleString(intlLocale()) })
 }

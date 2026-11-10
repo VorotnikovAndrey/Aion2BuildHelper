@@ -4,6 +4,7 @@ import './styles.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
+import { syncLanguage } from './lib/language'
 import { useApp } from './lib/store'
 
 // Сначала загружаем настройки и данные, потом рисуем — чтобы не мелькал пустой экран «нет данных».
@@ -12,6 +13,7 @@ useApp
   .load()
   .catch((e) => console.error('[load]', e))
   .finally(() => {
+    if (syncLanguage()) return
     createRoot(document.getElementById('root')!).render(
       <StrictMode>
         <App />

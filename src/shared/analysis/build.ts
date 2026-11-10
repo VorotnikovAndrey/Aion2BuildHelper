@@ -14,6 +14,8 @@ import { analyzeSkills, skillsScore, specsLookLikeSlots, stigmaLoadout, unexplai
 import { statTargetStatus, type TargetStatus } from './targets'
 import { analyzeTitles, type TitlesReport } from './titles'
 import type { KnownOptions } from '../gamedata/gearOptions'
+import { t } from '../i18n'
+import { term } from '../names'
 
 export type StepArea = 'skills' | 'stigmas' | 'gear' | 'arcana' | 'daevanion' | 'genus'
 export type Impact = 'high' | 'medium' | 'low'
@@ -121,7 +123,7 @@ const IMPACT_ORDER: Record<Impact, number> = { high: 0, medium: 1, low: 2 }
 function nextSteps(r: BuildReport, n: Namer): NextStep[] {
   const steps: NextStep[] = []
   const name = (id: number) => n.skill(id).main
-  const specList = (skill: number, list: number[]) => list.map((x) => `${x} «${n.spec(skill, x).main}»`).join(', ')
+  const specList = (skill: number, list: number[]) => list.map((x) => t('{x} «{spec}»', { x, spec: n.spec(skill, x).main })).join(', ')
 
   // ── Умения: специализации и уровни
   // Если оверлей не знает выбранных вариантов, не дублируем десять одинаковых пунктов —
@@ -133,17 +135,21 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
     if (s.specs && s.specs.missing.length) {
       const unsure = r.specsUncertain && s.specsSource === 'overlay'
       if (unsure) {
-        unsureSpecs[important ? 'core' : 'other'].push(`${name(s.skill)} — ${s.specs.wanted.join(' и ')}`)
+        unsureSpecs[important ? 'core' : 'other'].push(`${name(s.skill)} — ${s.specs.wanted.join(t(' и '))}`)
       } else {
         steps.push({
           id: `spec-${s.skill}`,
           skill: s.skill,
           area: 'skills',
           impact: important ? 'high' : 'medium',
-          title: `${name(s.skill)}: поставить ${s.specs.missing.length > 1 ? 'специализации' : 'специализацию'} ${specList(s.skill, s.specs.missing)}`,
+          title: t('{name}: поставить {p} {specList}', {
+            name: name(s.skill),
+            p: s.specs.missing.length > 1 ? t('специализации') : t('специализацию'),
+            specList: specList(s.skill, s.specs.missing)
+          }),
           detail:
-            (s.specs.current.length ? `Сейчас: ${s.specs.current.join(', ')}. ` : 'Сейчас специализаций нет. ') +
-            `Уровень ${s.level} — слотов: ${s.specs.slots}.`
+            (s.specs.current.length ? t('Сейчас: {specs}. ', { specs: s.specs.current.join(', ') }) : t('Сейчас специализаций нет. ')) +
+            t('Уровень {level} — слотов: {slots}.', { level: s.level, slots: s.specs.slots })
         })
       }
     }
@@ -154,22 +160,29 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
         skill: s.skill,
         area: 'skills',
         impact: important ? (s.levelGap <= 3 ? 'high' : 'medium') : 'low',
-        title: `${name(s.skill)}: ур. ${s.level} → ${s.targetLevel}`,
+        title: t('{name}: ур. {level} → {targetLevel}', { name: name(s.skill), level: s.level, targetLevel: s.targetLevel }),
         detail:
-          `Не хватает ${s.levelGap} ур. Сейчас от досок +${s.bonus.daevanion}, от аркан +${s.bonus.arcana}, от шмота +${s.bonus.gear}.` +
-          (nextLock ? ` На ур. ${nextLock.level} откроется специализация ${nextLock.n} «${n.spec(s.skill, nextLock.n).main}».` : '')
+          t('Не хватает {levelGap} ур. Сейчас от досок +{daevanion}, от аркан +{arcana}, от шмота +{gear}.', {
+            levelGap: s.levelGap,
+            daevanion: s.bonus.daevanion,
+            arcana: s.bonus.arcana,
+            gear: s.bonus.gear
+          }) +
+          (nextLock
+            ? t(' На ур. {level} откроется специализация {n} «{spec}».', { level: nextLock.level, n: nextLock.n, spec: n.spec(s.skill, nextLock.n).main })
+            : '')
       })
     }
   }
 
-  const UNSURE_NOTE = 'Оверлей не различает выбранные варианты — отметьте на странице «Умения», что стоит на самом деле, и пункт уточнится.'
+  const UNSURE_NOTE = t('Оверлей не различает выбранные варианты — отметьте на странице «Умения», что стоит на самом деле, и пункт уточнится.')
   if (unsureSpecs.core.length) {
     steps.push({
       id: 'specs-core',
       area: 'skills',
       impact: 'high',
-      title: `Проверить специализации главных умений (${unsureSpecs.core.length})`,
-      detail: `Нужны: ${unsureSpecs.core.join('; ')}. ${UNSURE_NOTE}`
+      title: t('Проверить специализации главных умений ({coreCount})', { coreCount: unsureSpecs.core.length }),
+      detail: t('Нужны: {core}. {UNSURE_NOTE}', { core: unsureSpecs.core.join('; '), UNSURE_NOTE })
     })
   }
   if (unsureSpecs.other.length) {
@@ -177,8 +190,8 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
       id: 'specs-other',
       area: 'skills',
       impact: 'medium',
-      title: `Проверить специализации остальных умений (${unsureSpecs.other.length})`,
-      detail: `Нужны: ${unsureSpecs.other.join('; ')}. ${UNSURE_NOTE}`
+      title: t('Проверить специализации остальных умений ({otherCount})', { otherCount: unsureSpecs.other.length }),
+      detail: t('Нужны: {other}. {UNSURE_NOTE}', { other: unsureSpecs.other.join('; '), UNSURE_NOTE })
     })
   }
 
@@ -189,8 +202,8 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
       skill: id,
       area: 'stigmas',
       impact: 'high',
-      title: `Надеть стигму «${name(id)}»`,
-      detail: 'Гайд держит её надетой постоянно.'
+      title: t('Надеть стигму «{name}»', { name: name(id) }),
+      detail: t('Гайд держит её надетой постоянно.')
     })
   }
   for (const s of r.skills) {
@@ -200,7 +213,7 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
         skill: s.skill,
         area: 'stigmas',
         impact: 'medium',
-        title: `Стигма «${name(s.skill)}»: ур. ${s.level} → ${s.targetLevel}`,
+        title: t('Стигма «{name}»: ур. {level} → {targetLevel}', { name: name(s.skill), level: s.level, targetLevel: s.targetLevel }),
         detail: s.target.note
       })
     }
@@ -215,18 +228,28 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
         skill: step.node.skill,
         area: 'daevanion',
         impact: step.cost <= 6 ? 'high' : 'medium',
-        title: `${step.board.ru}: взять «${n.node(step.node)}»`,
-        detail: `${step.cost} очк.${step.via ? `, по пути ещё ${step.via} узл.` : ''} Цель «${goal.goal.name}».`
+        title: t('{board}: взять «{node}»', { board: term(step.board), node: n.node(step.node) }),
+        detail: t('{cost} очк.{p} Цель «{goal}».', {
+          cost: step.cost,
+          p: step.via ? t(', по пути ещё {via} узл.', { via: step.via }) : '',
+          goal: goal.goal.name
+        })
       })
     }
   }
 
   // ── Арканы
   for (const c of r.arcana.cards) {
-    const typeRu = ARCANA_TYPES.find((t) => t.type === c.type)!.ru
-    const title = c.info?.ru ?? typeRu
+    const typeRu = term(ARCANA_TYPES.find((x) => x.type === c.type))
+    const title = c.info ? term(c.info) : typeRu
     if (!c.item) {
-      steps.push({ id: `arc-empty-${c.slot}`, area: 'arcana', impact: 'high', title: `${typeRu}: слот пустой`, detail: 'Любая карта лучше пустого слота.' })
+      steps.push({
+        id: `arc-empty-${c.slot}`,
+        area: 'arcana',
+        impact: 'high',
+        title: t('{typeRu}: слот пустой', { typeRu }),
+        detail: t('Любая карта лучше пустого слота.')
+      })
       continue
     }
     const wantedOnCard = c.skills.filter((s) => s.cls === 'wanted').length
@@ -235,17 +258,17 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
       const best = c.mainChances[c.mainChances.length - 1]
       const chances = [next, best !== next ? best : null]
         .filter((x): x is NonNullable<typeof x> => !!x)
-        .map((x) => `до ${x.level}: ${oneIn(x.p)}`)
+        .map((x) => t('до {level}: {oneIn}', { level: x.level, oneIn: oneIn(x.p) }))
         .join(', ')
       steps.push({
         id: `arc-enchant-${c.slot}`,
         skill: c.main ?? undefined,
         area: 'arcana',
         impact: 'medium',
-        title: `${title}: заточить (+${c.enchant}/${c.maxEnchant})`,
+        title: t('{title}: заточить (+{enchant}/{maxEnchant})', { title, enchant: c.enchant, maxEnchant: c.maxEnchant }),
         detail:
-          `Нужных умений на карте: ${wantedOnCard} из ${c.desired.length}.` +
-          (c.main && chances ? ` «${name(c.main)}» сейчас ур. ${c.mainLevel}, ${chances}.` : '')
+          t('Нужных умений на карте: {wantedOnCard} из {desiredCount}.', { wantedOnCard, desiredCount: c.desired.length }) +
+          (c.main && chances ? t(' «{name}» сейчас ур. {mainLevel}, {chances}.', { name: name(c.main), mainLevel: c.mainLevel, chances }) : '')
       })
     }
     if (c.missing.length && wantedOnCard < Math.ceil(c.desired.length / 2)) {
@@ -253,8 +276,8 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
         id: `arc-new-${c.slot}`,
         area: 'arcana',
         impact: 'low',
-        title: `${typeRu}: искать карту лучше`,
-        detail: `Не хватает: ${c.missing.map(name).join(', ')}. Точный нужный набор — ${oneIn(c.newCard.pSet)}.`
+        title: t('{typeRu}: искать карту лучше', { typeRu }),
+        detail: t('Не хватает: {map}. Точный нужный набор — {oneIn}.', { map: c.missing.map(name).join(', '), oneIn: oneIn(c.newCard.pSet) })
       })
     }
   }
@@ -269,15 +292,15 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
         // Строка, которую гайд вообще не ценит, — важнее, чем замена приемлемой на лучшую.
         impact: item.swaps.some((x) => x.from.verdict === 'bad') ? 'medium' : 'low',
         title: `${n.item(item.item.item, item.slot).main}: ${item.swaps.map((x) => `${lineName(x.from)} → ${lineName(x.to)}`).join(', ')}`,
-        detail: 'Перековать эти строки: справа — что важнее по гайду и бывает на этом слоте.'
+        detail: t('Перековать эти строки: справа — что важнее по гайду и бывает на этом слоте.')
       })
     } else if (item.replace.length) {
       steps.push({
         id: `gear-${item.slot}`,
         area: 'gear',
         impact: 'low',
-        title: `${n.item(item.item.item, item.slot).main}: строка ${item.replace.map(lineName).join(', ')} не по гайду`,
-        detail: 'Заметно лучшей замены на этом слоте не нашлось — при случае перековать.'
+        title: t('{item}: строка {map} не по гайду', { item: n.item(item.item.item, item.slot).main, map: item.replace.map(lineName).join(', ') }),
+        detail: t('Заметно лучшей замены на этом слоте не нашлось — при случае перековать.')
       })
     }
   }
@@ -293,8 +316,8 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
       id: 'manastones',
       area: 'gear',
       impact: stoneSwaps.some((x) => x.from.weight <= 1) ? 'medium' : 'low',
-      title: `Камни: ${sorted.map(([to, list]) => `${list.length} → ${n.stat(to).main}`).join(', ')}`,
-      detail: `Перековать слабые: ${kinds.join(', ')}.${reason ? ` ${reason}.` : ''}`
+      title: t('Камни: {map}', { map: sorted.map(([to, list]) => `${list.length} → ${n.stat(to).main}`).join(', ') }),
+      detail: t('Перековать слабые: {kinds}.{p}', { kinds: kinds.join(', '), p: reason ? ` ${reason}.` : '' })
     })
   }
 
@@ -305,10 +328,10 @@ function nextSteps(r: BuildReport, n: Namer): NextStep[] {
       id: 'genus',
       area: 'genus',
       impact: 'low',
-      title: `Знание о видах: ${rerolls.length} ячеек под переброс`,
+      title: t('Знание о видах: {rerollsCount} ячеек под переброс', { rerollsCount: rerolls.length }),
       detail: rerolls
         .slice(0, 4)
-        .map(({ g, s }) => `${g.def.ru} ${s.slot + 1}: ${s.empty ? 'пусто' : n.stat(s.stat).main}`)
+        .map(({ g, s }) => `${term(g.def)} ${s.slot + 1}: ${s.empty ? t('пусто') : n.stat(s.stat).main}`)
         .join('; ')
     })
   }

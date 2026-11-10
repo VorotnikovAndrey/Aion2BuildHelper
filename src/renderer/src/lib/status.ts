@@ -7,6 +7,7 @@
 
 import type { SkillReport } from '@shared/analysis/skills'
 import type { Verdict } from '@shared/analysis/weights'
+import { t } from '@shared/i18n'
 
 export type Tone = 'ok' | 'warn' | 'bad' | 'neutral'
 
@@ -39,48 +40,63 @@ export const TONE_BOX: Record<Tone, string> = {
 }
 
 export const TONE_LABEL: Record<Tone, string> = {
-  ok: 'как в гайде',
-  warn: 'обратить внимание',
-  bad: 'не по гайду',
-  neutral: 'гайд не оценивает'
+  ok: t('как в гайде'),
+  warn: t('обратить внимание'),
+  bad: t('не по гайду'),
+  neutral: t('гайд не оценивает')
 }
 
 const worst = (...tones: Tone[]): Tone => (tones.includes('bad') ? 'bad' : tones.includes('warn') ? 'warn' : tones.includes('ok') ? 'ok' : 'neutral')
 
 /** Уровень умения против цели гайда. */
 export function levelTone(s: SkillReport): ToneReason {
-  if (!s.target) return { tone: 'neutral', why: 'Гайд не ставит цель по этому умению.' }
-  if (!s.learned) return { tone: 'bad', why: 'Умение не изучено, а гайд на него рассчитывает.' }
-  if (!s.targetLevel) return { tone: 'ok', why: 'Умение изучено; конкретного уровня гайд не требует.' }
-  if (s.levelGap === 0) return { tone: 'ok', why: `Уровень ${s.level} — цель гайда (${s.targetLevel}) достигнута.` }
+  if (!s.target) return { tone: 'neutral', why: t('Гайд не ставит цель по этому умению.') }
+  if (!s.learned) return { tone: 'bad', why: t('Умение не изучено, а гайд на него рассчитывает.') }
+  if (!s.targetLevel) return { tone: 'ok', why: t('Умение изучено; конкретного уровня гайд не требует.') }
+  if (s.levelGap === 0)
+    return { tone: 'ok', why: t('Уровень {level} — цель гайда ({targetLevel}) достигнута.', { level: s.level, targetLevel: s.targetLevel }) }
   if (s.levelGap <= 2)
-    return { tone: 'warn', why: `Уровень ${s.level}, до цели ${s.targetLevel} осталось ${s.levelGap} — почти. Поднимается очками, узлами досок и арканами.` }
-  return { tone: 'bad', why: `Уровень ${s.level}, до цели ${s.targetLevel} не хватает ${s.levelGap}. Это заметно отстаёт от гайда.` }
+    return {
+      tone: 'warn',
+      why: t('Уровень {level}, до цели {targetLevel} осталось {levelGap} — почти. Поднимается очками, узлами досок и арканами.', {
+        level: s.level,
+        targetLevel: s.targetLevel,
+        levelGap: s.levelGap
+      })
+    }
+  return {
+    tone: 'bad',
+    why: t('Уровень {level}, до цели {targetLevel} не хватает {levelGap}. Это заметно отстаёт от гайда.', {
+      level: s.level,
+      targetLevel: s.targetLevel,
+      levelGap: s.levelGap
+    })
+  }
 }
 
 /** Специализации против гайда. uncertain — данные оверлея о специализациях недостоверны. */
 export function specTone(s: SkillReport, uncertain: boolean): ToneReason {
-  if (!s.specs || !s.specs.wanted.length) return { tone: 'neutral', why: 'Гайд не требует специализаций на этом уровне.' }
+  if (!s.specs || !s.specs.wanted.length) return { tone: 'neutral', why: t('Гайд не требует специализаций на этом уровне.') }
   if (uncertain && s.specsSource === 'overlay')
     return {
       tone: 'warn',
-      why: 'Оверлей не знает, какие варианты стоят. Отметьте их, нажав на нужные варианты, — тогда оценка станет точной.'
+      why: t('Оверлей не знает, какие варианты стоят. Отметьте их, нажав на нужные варианты, — тогда оценка станет точной.')
     }
   const have = s.specs.wanted.length - s.specs.missing.length
-  if (have === s.specs.wanted.length) return { tone: 'ok', why: `Стоят нужные варианты: ${s.specs.wanted.join(', ')}.` }
-  if (have > 0) return { tone: 'warn', why: `Часть нужных вариантов стоит. Не хватает: ${s.specs.missing.join(', ')}.` }
-  return { tone: 'bad', why: `Не стоит ни один из нужных вариантов (${s.specs.wanted.join(', ')}).` }
+  if (have === s.specs.wanted.length) return { tone: 'ok', why: t('Стоят нужные варианты: {wanted}.', { wanted: s.specs.wanted.join(', ') }) }
+  if (have > 0) return { tone: 'warn', why: t('Часть нужных вариантов стоит. Не хватает: {missing}.', { missing: s.specs.missing.join(', ') }) }
+  return { tone: 'bad', why: t('Не стоит ни один из нужных вариантов ({wanted}).', { wanted: s.specs.wanted.join(', ') }) }
 }
 
 /** Общий вердикт по умению: худшее из уровня, специализаций и того, надето ли (для стигм). */
 export function skillTone(s: SkillReport, uncertain: boolean): ToneReason {
   const lvl = levelTone(s)
   const spec = specTone(s, uncertain)
-  if (s.target?.role === 'stigma' && s.target.equip && !s.equipped) return { tone: 'bad', why: 'Гайд держит эту стигму надетой, а у вас её нет в наборе.' }
+  if (s.target?.role === 'stigma' && s.target.equip && !s.equipped) return { tone: 'bad', why: t('Гайд держит эту стигму надетой, а у вас её нет в наборе.') }
   if (s.target?.role === 'stigma' && s.target.equip === false)
-    return { tone: s.equipped ? 'ok' : 'neutral', why: 'По ситуации: гайд советует надевать её только в особых случаях.' }
+    return { tone: s.equipped ? 'ok' : 'neutral', why: t('По ситуации: гайд советует надевать её только в особых случаях.') }
   const tone = worst(lvl.tone, spec.tone)
-  if (tone === 'ok') return { tone, why: 'Уровень и специализации — как в гайде.' }
+  if (tone === 'ok') return { tone, why: t('Уровень и специализации — как в гайде.') }
   return { tone, why: [lvl.tone !== 'ok' ? lvl.why : '', spec.tone !== 'ok' && spec.tone !== 'neutral' ? spec.why : ''].filter(Boolean).join(' ') }
 }
 
@@ -90,10 +106,10 @@ export function verdictTone(v: Verdict): Tone {
 }
 
 export function verdictWhy(v: Verdict, weight: number): string {
-  if (v === 'great') return `Нужно по гайду (важность ${weight} из 5).`
-  if (v === 'good') return `Приемлемо: гайд ценит, но не в первую очередь (важность ${weight} из 5).`
-  if (v === 'weak') return `Слабо: пользы немного (важность ${weight} из 5). При случае заменить.`
-  return 'Гайд этот стат не ценит — строку стоит перековать или заменить.'
+  if (v === 'great') return t('Нужно по гайду (важность {weight} из 5).', { weight })
+  if (v === 'good') return t('Приемлемо: гайд ценит, но не в первую очередь (важность {weight} из 5).', { weight })
+  if (v === 'weak') return t('Слабо: пользы немного (важность {weight} из 5). При случае заменить.', { weight })
+  return t('Гайд этот стат не ценит — строку стоит перековать или заменить.')
 }
 
 /** Доля выполненного → тон: всё — зелёный, половина и больше — жёлтый, меньше — красный. */

@@ -4,6 +4,8 @@
 import { TOP_SLOT_RU, type TopData } from '../gamedata/top'
 import type { Character } from '../types'
 import type { BuildReport } from './build'
+import { t, tn } from '../i18n'
+import { term } from '../names'
 
 /** ok — на уровне топа; warn — немного ниже; bad — заметно ниже. */
 export type TopTone = 'ok' | 'warn' | 'bad'
@@ -89,11 +91,7 @@ export function cpPercentile(cp: number, buckets: TopData['cpBuckets']): number 
 }
 
 /** «1 узел», «2 узла», «5 узлов». */
-const nodes = (n: number) => {
-  const a = Math.abs(n) % 100
-  const b = a % 10
-  return `${n} ${a > 10 && a < 20 ? 'узлов' : b === 1 ? 'узел' : b > 1 && b < 5 ? 'узла' : 'узлов'}`
-}
+const nodes = (n: number) => tn(n, '{n} узел|{n} узла|{n} узлов')
 
 const toneOfDiff = (diff: number, softness = 1): TopTone => (diff >= -0.5 * softness ? 'ok' : diff >= -2 * softness ? 'warn' : 'bad')
 
@@ -144,7 +142,7 @@ export function compareWithTop(char: Character, report: BuildReport, top: TopDat
 
   const boards: TopBoardRow[] = top.boards.map((b) => {
     const mine = report.daevanion.boards.find((r) => r.board.en === b.name)
-    return { name: mine?.board.ru ?? b.name, picked: b.picked, total: b.total, yours: mine?.takenCount ?? 0 }
+    return { name: mine ? term(mine.board) : b.name, picked: b.picked, total: b.total, yours: mine?.takenCount ?? 0 }
   })
 
   // Где отставание больше всего — коротким списком.
@@ -152,19 +150,37 @@ export function compareWithTop(char: Character, report: BuildReport, top: TopDat
   for (const s of skills) {
     if (s.share < 80) continue
     if (!s.learned)
-      gaps.push({ id: `skill-${s.skill}`, text: `не изучено (у ${s.share}% топа, ср. ур. ${s.avgLevel})`, weight: s.avgLevel, skill: s.skill, link: '/skills' })
+      gaps.push({
+        id: `skill-${s.skill}`,
+        text: t('не изучено (у {share}% топа, ср. ур. {avgLevel})', { share: s.share, avgLevel: s.avgLevel }),
+        weight: s.avgLevel,
+        skill: s.skill,
+        link: '/skills'
+      })
     else if (s.diff <= -2)
-      gaps.push({ id: `skill-${s.skill}`, text: `ур. ${s.level}, у топа в среднем ${s.avgLevel}`, weight: -s.diff, skill: s.skill, link: '/skills' })
+      gaps.push({
+        id: `skill-${s.skill}`,
+        text: t('ур. {level}, у топа в среднем {avgLevel}', { level: s.level, avgLevel: s.avgLevel }),
+        weight: -s.diff,
+        skill: s.skill,
+        link: '/skills'
+      })
   }
   for (const s of stigmas) {
     if (s.share >= 75 && !s.equipped)
-      gaps.push({ id: `stigma-${s.skill}`, text: `стигма не надета — у ${s.share}% топа`, weight: s.share / 20, skill: s.skill, link: '/skills' })
+      gaps.push({
+        id: `stigma-${s.skill}`,
+        text: t('стигма не надета — у {share}% топа', { share: s.share }),
+        weight: s.share / 20,
+        skill: s.skill,
+        link: '/skills'
+      })
   }
   for (const e of enchant) {
     if (e.tone === 'bad')
       gaps.push({
         id: `enchant-${e.ru}`,
-        text: `${e.ru}: заточка ${e.yours === null ? 'нет вещи' : `+${e.yours}`}, у топа в среднем +${e.avg}`,
+        text: t('{e}: заточка {p}, у топа в среднем +{avg}', { e: e.ru, p: e.yours === null ? t('нет вещи') : `+${e.yours}`, avg: e.avg }),
         weight: -e.diff,
         link: '/gear'
       })
@@ -174,7 +190,7 @@ export function compareWithTop(char: Character, report: BuildReport, top: TopDat
     if (behind >= 8)
       gaps.push({
         id: `board-${b.name}`,
-        text: `Даэванион «${b.name}»: ${nodes(b.yours)}, у большинства топа ${b.picked}`,
+        text: t('Даэванион «{b}»: {nodes}, у большинства топа {picked}', { b: b.name, nodes: nodes(b.yours), picked: b.picked }),
         weight: behind / 4,
         link: '/daevanion'
       })

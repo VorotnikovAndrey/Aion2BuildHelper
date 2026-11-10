@@ -18,6 +18,8 @@ import { cn } from '@/lib/format'
 import { useNamer } from '@/lib/report'
 import { useApp, useGuides } from '@/lib/store'
 import { CombatSection } from './guide-editor/CombatSection'
+import { t } from '@shared/i18n'
+import { term } from '@shared/names'
 
 type Section = 'main' | 'skills' | 'stats' | 'gear' | 'arcana' | 'daevanion' | 'combat' | 'texts'
 
@@ -30,9 +32,9 @@ export function GuideEditorPage() {
   const [section, setSection] = useState<Section>('main')
   const [saved, setSaved] = useState(false)
 
-  if (!draft || !original) return <EmptyState title="Гайд не найден">Возможно, он был удалён.</EmptyState>
+  if (!draft || !original) return <EmptyState title={t('Гайд не найден')}>{t('Возможно, он был удалён.')}</EmptyState>
   if (original.builtin)
-    return <EmptyState title="Встроенный гайд нельзя менять">Скопируйте его на странице «Гайды» — копию можно править как угодно.</EmptyState>
+    return <EmptyState title={t('Встроенный гайд нельзя менять')}>{t('Скопируйте его на странице «Гайды» — копию можно править как угодно.')}</EmptyState>
 
   const set = (patch: Partial<Guide>) => {
     setDraft({ ...draft, ...patch })
@@ -47,15 +49,15 @@ export function GuideEditorPage() {
     <>
       <PageHeader
         icon={<BookOpen size={22} />}
-        title={draft.name || 'Без названия'}
-        subtitle="Изменения сохраняются по кнопке «Сохранить». Веса статов: 5 — главное, 0 — бесполезно (такие строки на шмоте будут помечены «менять»)."
+        title={draft.name || t('Без названия')}
+        subtitle={t('Изменения сохраняются по кнопке «Сохранить». Веса статов: 5 — главное, 0 — бесполезно (такие строки на шмоте будут помечены «менять»).')}
         actions={
           <>
             <Button variant="ghost" onClick={() => navigate('/guides')}>
-              К списку
+              {t('К списку')}
             </Button>
             <Button variant="primary" icon={<Save size={14} />} onClick={() => void save()}>
-              {saved ? 'Сохранено' : 'Сохранить'}
+              {saved ? t('Сохранено') : t('Сохранить')}
             </Button>
           </>
         }
@@ -65,14 +67,14 @@ export function GuideEditorPage() {
           value={section}
           onChange={setSection}
           items={[
-            { id: 'main', label: 'Основное' },
-            { id: 'skills', label: 'Умения' },
-            { id: 'stats', label: 'Статы' },
-            { id: 'gear', label: 'Умения на шмоте' },
-            { id: 'arcana', label: 'Арканы' },
-            { id: 'daevanion', label: 'Даэванион' },
-            { id: 'combat', label: 'Связка' },
-            { id: 'texts', label: 'Ротация и советы' }
+            { id: 'main', label: t('Основное') },
+            { id: 'skills', label: t('Умения') },
+            { id: 'stats', label: t('Статы') },
+            { id: 'gear', label: t('Умения на шмоте') },
+            { id: 'arcana', label: t('Арканы') },
+            { id: 'daevanion', label: t('Даэванион') },
+            { id: 'combat', label: t('Связка') },
+            { id: 'texts', label: t('Ротация и советы') }
           ]}
         />
       </div>
@@ -106,19 +108,19 @@ function MainSection({ g, set }: SectionProps) {
   return (
     <Card>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Field label="Название">
+        <Field label={t('Название')}>
           <input className={input} value={g.name} onChange={(e) => set({ name: e.target.value })} />
         </Field>
-        <Field label="Класс" hint="Смена класса не переносит умения — их ID у каждого класса свои.">
+        <Field label={t('Класс')} hint={t('Смена класса не переносит умения — их ID у каждого класса свои.')}>
           <select className={input} value={g.cls} onChange={(e) => set({ cls: e.target.value as Guide['cls'] })}>
             {CLASSES.map((c) => (
               <option key={c.key} value={c.key}>
-                {c.ru}
+                {term(c)}
               </option>
             ))}
           </select>
         </Field>
-        <Field label="Для чего">
+        <Field label={t('Для чего')}>
           <Segmented<GuideMode>
             value={g.mode}
             onChange={(mode) => set({ mode })}
@@ -127,14 +129,14 @@ function MainSection({ g, set }: SectionProps) {
         </Field>
         <div />
         <div className="lg:col-span-2">
-          <Field label="Описание">
+          <Field label={t('Описание')}>
             <textarea className={cn(input, 'min-h-24')} value={g.description ?? ''} onChange={(e) => set({ description: e.target.value || undefined })} />
           </Field>
         </div>
-        <Field label="Источник: название">
+        <Field label={t('Источник: название')}>
           <input className={input} value={g.source?.title ?? ''} onChange={(e) => set({ source: { ...g.source, title: e.target.value || undefined } })} />
         </Field>
-        <Field label="Источник: ссылка">
+        <Field label={t('Источник: ссылка')}>
           <input
             className={input}
             value={g.source?.url ?? ''}
@@ -142,10 +144,10 @@ function MainSection({ g, set }: SectionProps) {
             onChange={(e) => set({ source: { ...g.source, url: e.target.value || undefined } })}
           />
         </Field>
-        <Field label="Автор">
+        <Field label={t('Автор')}>
           <input className={input} value={g.source?.author ?? ''} onChange={(e) => set({ source: { ...g.source, author: e.target.value || undefined } })} />
         </Field>
-        <Field label="Дата гайда">
+        <Field label={t('Дата гайда')}>
           <input
             className={input}
             value={g.source?.date ?? ''}
@@ -178,22 +180,22 @@ function SkillsSection({ g, set }: SectionProps) {
   }
 
   return (
-    <Card hint="Отметьте умения, которые есть в гайде. Порядок нажатия на специализации = их важность (первые надеваются первыми).">
+    <Card hint={t('Отметьте умения, которые есть в гайде. Порядок нажатия на специализации = их важность (первые надеваются первыми).')}>
       <div className="-mx-2">
         {all.map((s) => {
-          const t = target(s.id)
+          const tg = target(s.id)
           const specs = skillSpecs(s.id)
           return (
-            <div key={s.id} className={cn('rounded-xl px-2 py-2.5', t ? 'bg-surface-2' : 'opacity-70 hover:opacity-100')}>
+            <div key={s.id} className={cn('rounded-xl px-2 py-2.5', tg ? 'bg-surface-2' : 'opacity-70 hover:opacity-100')}>
               <div className="flex flex-wrap items-center gap-3">
-                <input type="checkbox" checked={!!t} onChange={(e) => update(s.id, e.target.checked ? {} : null)} className="accent-[var(--color-accent)]" />
+                <input type="checkbox" checked={!!tg} onChange={(e) => update(s.id, e.target.checked ? {} : null)} className="accent-[var(--color-accent)]" />
                 <Name label={namer.skill(s.id)} className="w-52 text-[13px]" />
-                <span className="w-20 text-[11px] text-ink-3">{s.type === 'active' ? 'активное' : s.type === 'passive' ? 'пассивное' : 'стигма'}</span>
-                {t && (
+                <span className="w-20 text-[11px] text-ink-3">{s.type === 'active' ? t('активное') : s.type === 'passive' ? t('пассивное') : t('стигма')}</span>
+                {tg && (
                   <>
                     <select
                       className="rounded-md border border-line-strong bg-surface-3 px-2 py-1 text-xs"
-                      value={t.role}
+                      value={tg.role}
                       onChange={(e) => update(s.id, { role: e.target.value as SkillRole })}
                     >
                       {(Object.keys(ROLE_LABEL) as SkillRole[]).map((r) => (
@@ -203,13 +205,13 @@ function SkillsSection({ g, set }: SectionProps) {
                       ))}
                     </select>
                     <label className="flex items-center gap-1.5 text-xs text-ink-3">
-                      цель ур.
+                      {t('цель ур.')}
                       <input
                         type="number"
                         min={1}
                         max={40}
                         className="w-14 rounded-md border border-line-strong bg-surface-3 px-2 py-1 text-xs text-ink"
-                        value={t.level ?? ''}
+                        value={tg.level ?? ''}
                         onChange={(e) => update(s.id, { level: e.target.value ? Number(e.target.value) : undefined })}
                       />
                     </label>
@@ -217,28 +219,28 @@ function SkillsSection({ g, set }: SectionProps) {
                       <label className="flex items-center gap-1.5 text-xs text-ink-3">
                         <input
                           type="checkbox"
-                          checked={t.equip ?? false}
+                          checked={tg.equip ?? false}
                           onChange={(e) => update(s.id, { equip: e.target.checked })}
                           className="accent-[var(--color-accent)]"
                         />
-                        держать надетой
+                        {t('держать надетой')}
                       </label>
                     )}
                   </>
                 )}
               </div>
-              {t && specs.length > 0 && (
+              {tg && specs.length > 0 && (
                 <div className="mt-2 ml-7 space-y-1.5">
                   {(['specs', 'earlySpecs'] as const).map((field) => (
                     <div key={field} className="flex flex-wrap items-center gap-1.5">
-                      <span className="w-24 text-[11px] text-ink-3">{field === 'specs' ? 'специализации' : 'пока нет главных'}</span>
+                      <span className="w-24 text-[11px] text-ink-3">{field === 'specs' ? t('специализации') : t('пока нет главных')}</span>
                       {specs.map((sp) => {
-                        const pos = (t[field] ?? []).indexOf(sp.n)
+                        const pos = (tg[field] ?? []).indexOf(sp.n)
                         return (
                           <button
                             key={sp.n}
                             onClick={() => toggleSpec(s.id, sp.n, field)}
-                            title={`${namer.spec(s.id, sp.n).main}${sp.level ? ` (с ур. ${sp.level})` : ''}${sp.ruByAssistant ? ' · перевод помощника' : ''}`}
+                            title={`${namer.spec(s.id, sp.n).main}${sp.level ? t(' (с ур. {level})', { level: sp.level }) : ''}${sp.ruByAssistant ? t(' · перевод помощника') : ''}`}
                             className={cn(
                               'flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px]',
                               pos >= 0 ? 'border-accent/60 bg-accent-soft text-accent-2' : 'border-line bg-surface-3 text-ink-3 hover:text-ink-2'
@@ -254,11 +256,11 @@ function SkillsSection({ g, set }: SectionProps) {
                   ))}
                 </div>
               )}
-              {t && (
+              {tg && (
                 <input
                   className="mt-2 ml-7 w-[calc(100%-1.75rem)] rounded-md border border-line bg-surface-3 px-2 py-1 text-xs outline-none placeholder:text-ink-3 focus:border-accent"
-                  placeholder="Заметка: зачем это умение, как применять"
-                  value={t.note ?? ''}
+                  placeholder={t('Заметка: зачем это умение, как применять')}
+                  value={tg.note ?? ''}
                   onChange={(e) => update(s.id, { note: e.target.value || undefined })}
                 />
               )}
@@ -312,17 +314,17 @@ function StatsSection({ g, set }: SectionProps) {
           value={list}
           onChange={setList}
           items={[
-            { id: 'stats', label: 'Общие (шмот)' },
-            { id: 'manastones', label: 'Манакамни' },
-            { id: 'genus', label: 'Знание о видах' }
+            { id: 'stats', label: t('Общие (шмот)') },
+            { id: 'manastones', label: t('Манакамни') },
+            { id: 'genus', label: t('Знание о видах') }
           ]}
         />
       }
-      hint="Общие веса используются для строк на шмоте; для манакамней и рода — если там пусто."
+      hint={t('Общие веса используются для строк на шмоте; для манакамней и рода — если там пусто.')}
     >
       {list !== 'stats' && current.length === 0 && (
         <p className="mb-4 rounded-lg bg-surface-2 px-3 py-2 text-xs text-ink-3">
-          Сейчас здесь пусто — используются общие веса. Поставьте хотя бы один вес, чтобы задать свой список.
+          {t('Сейчас здесь пусто — используются общие веса. Поставьте хотя бы один вес, чтобы задать свой список.')}
         </p>
       )}
       <div className="columns-1 gap-6 xl:columns-2">
@@ -351,7 +353,7 @@ function GearSkillsSection({ g, set }: SectionProps) {
     set({ gear: { ...g.gear, skills: w > 0 ? [...rest, { skill: id, weight: w }].sort((a, b) => b.weight - a.weight) : rest } })
   }
   return (
-    <Card hint="Какие умения хорошо ловить строкой на шмоте. Активные выпадают на оружии, гарде и кольцах, пассивные — на броне и украшениях.">
+    <Card hint={t('Какие умения хорошо ловить строкой на шмоте. Активные выпадают на оружии, гарде и кольцах, пассивные — на броне и украшениях.')}>
       <div className="grid grid-cols-1 gap-x-8 xl:grid-cols-2">
         {all.map((s) => (
           <div key={s.id} className="flex items-center justify-between gap-3 rounded-lg px-2 py-1.5 hover:bg-surface-2">
@@ -361,7 +363,7 @@ function GearSkillsSection({ g, set }: SectionProps) {
         ))}
       </div>
       <div className="mt-4">
-        <Field label="Заметка о шмоте">
+        <Field label={t('Заметка о шмоте')}>
           <textarea
             className={cn(input, 'min-h-20')}
             value={g.gear.notes ?? ''}
@@ -424,27 +426,36 @@ function ArcanaSection({ g, set }: SectionProps) {
   const passivePool = [...new Set([...arcanaPool(g.cls, 'bell'), ...arcanaPool(g.cls, 'mirror')])]
   const a = g.arcana
   return (
-    <Card hint="Порядок = важность. Для Пергамента и Компаса берутся атакующие, для Колокола и Зеркала — пассивные, для Грааля — первые 4 атакующих и 3 пассивных.">
+    <Card
+      hint={t(
+        'Порядок = важность. Для Пергамента и Компаса берутся атакующие, для Колокола и Зеркала — пассивные, для Грааля — первые 4 атакующих и 3 пассивных.'
+      )}
+    >
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <OrderedList title="Атакующие" ids={a.attack} pool={attackPool} onChange={(attack) => set({ arcana: { ...a, attack } })} />
-        <OrderedList title="Пассивные" ids={a.passive} pool={passivePool} onChange={(passive) => set({ arcana: { ...a, passive } })} />
+        <OrderedList title={t('Атакующие')} ids={a.attack} pool={attackPool} onChange={(attack) => set({ arcana: { ...a, attack } })} />
+        <OrderedList title={t('Пассивные')} ids={a.passive} pool={passivePool} onChange={(passive) => set({ arcana: { ...a, passive } })} />
         <div className="space-y-5">
-          <OrderedList title="Бесполезные" ids={a.useless} pool={[...attackPool, ...passivePool]} onChange={(useless) => set({ arcana: { ...a, useless } })} />
-          <Field label="Какой сет собирать">
+          <OrderedList
+            title={t('Бесполезные')}
+            ids={a.useless}
+            pool={[...attackPool, ...passivePool]}
+            onChange={(useless) => set({ arcana: { ...a, useless } })}
+          />
+          <Field label={t('Какой сет собирать')}>
             <Segmented
               value={a.preferredSet ?? 'any'}
               onChange={(v) => set({ arcana: { ...a, preferredSet: v === 'any' ? undefined : (v as 'magic' | 'vigor') } })}
               items={[
-                { id: 'any', label: 'Не важно' },
-                { id: 'vigor', label: 'Жизни' },
-                { id: 'magic', label: 'Магии' }
+                { id: 'any', label: t('Не важно') },
+                { id: 'vigor', label: t('Жизни') },
+                { id: 'magic', label: t('Магии') }
               ]}
             />
           </Field>
         </div>
       </div>
       <div className="mt-5">
-        <Field label="Заметка об арканах">
+        <Field label={t('Заметка об арканах')}>
           <textarea className={cn(input, 'min-h-20')} value={a.notes ?? ''} onChange={(e) => set({ arcana: { ...a, notes: e.target.value || undefined } })} />
         </Field>
       </div>
@@ -471,20 +482,20 @@ function DaevanionSection({ g, set }: SectionProps) {
           key={goal.id}
           actions={
             <Button size="sm" variant="ghost" icon={<Trash2 size={13} />} onClick={() => write(goals.filter((_, j) => j !== i))}>
-              Удалить цель
+              {t('Удалить цель')}
             </Button>
           }
         >
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <Field label="Название">
+            <Field label={t('Название')}>
               <input className={input} value={goal.name} onChange={(e) => patch(i, { name: e.target.value })} />
             </Field>
-            <Field label="Описание">
+            <Field label={t('Описание')}>
               <input className={input} value={goal.description ?? ''} onChange={(e) => patch(i, { description: e.target.value || undefined })} />
             </Field>
           </div>
           <div className="mt-4">
-            <div className="mb-1.5 text-xs text-ink-2">Узлы «+1 к умению» для:</div>
+            <div className="mb-1.5 text-xs text-ink-2">{t('Узлы «+1 к умению» для:')}</div>
             <div className="flex flex-wrap gap-1">
               {skills.map((s) => (
                 <button
@@ -501,7 +512,7 @@ function DaevanionSection({ g, set }: SectionProps) {
             </div>
           </div>
           <div className="mt-4">
-            <div className="mb-1.5 text-xs text-ink-2">На досках (ничего не выбрано — на всех):</div>
+            <div className="mb-1.5 text-xs text-ink-2">{t('На досках (ничего не выбрано — на всех):')}</div>
             <div className="flex flex-wrap gap-1">
               {boards.map((b) => (
                 <button
@@ -512,18 +523,20 @@ function DaevanionSection({ g, set }: SectionProps) {
                     goal.boards?.includes(b.id) ? 'border-accent/60 bg-accent-soft text-accent-2' : 'border-line bg-surface-3 text-ink-3 hover:text-ink-2'
                   )}
                 >
-                  {b.ru}
+                  {term(b)}
                 </button>
               ))}
             </div>
           </div>
           {goal.nodes && goal.nodes.length > 0 && (
-            <p className="mt-3 text-[11px] text-ink-3">Плюс отдельные узлы: {goal.nodes.length} шт. (заданы в файле гайда).</p>
+            <p className="mt-3 text-[11px] text-ink-3">
+              {t('Плюс отдельные узлы: {nodesCount} шт. (заданы в файле гайда).', { nodesCount: goal.nodes.length })}
+            </p>
           )}
         </Card>
       ))}
-      <Button icon={<Plus size={14} />} onClick={() => write([...goals, { id: `goal-${Date.now()}`, name: 'Новая цель' }])}>
-        Добавить цель
+      <Button icon={<Plus size={14} />} onClick={() => write([...goals, { id: `goal-${Date.now()}`, name: t('Новая цель') }])}>
+        {t('Добавить цель')}
       </Button>
     </div>
   )
@@ -533,14 +546,14 @@ function TextsSection({ g, set }: SectionProps) {
   const tips = g.tips ?? []
   return (
     <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-      <Card title="Ротация" hint="По шагу на строку.">
+      <Card title={t('Ротация')} hint={t('По шагу на строку.')}>
         <textarea
           className={cn(input, 'min-h-64')}
           value={(g.rotation ?? []).join('\n')}
           onChange={(e) => set({ rotation: e.target.value.split('\n').filter((l, i, arr) => l.trim() || i < arr.length - 1) })}
         />
       </Card>
-      <Card title="Чек-лист" hint="Разовые дела по гайду (макросы, бинды). По пункту на строку — отмечаются на странице «Чек-лист».">
+      <Card title={t('Чек-лист')} hint={t('Разовые дела по гайду (макросы, бинды). По пункту на строку — отмечаются на странице «Чек-лист».')}>
         <textarea
           className={cn(input, 'min-h-64')}
           value={(g.checklist ?? []).map((c) => c.text).join('\n')}
@@ -554,20 +567,20 @@ function TextsSection({ g, set }: SectionProps) {
           }
         />
       </Card>
-      <Card title="Советы" className="xl:col-span-2">
+      <Card title={t('Советы')} className="xl:col-span-2">
         <div className="space-y-3">
-          {tips.map((t, i) => (
+          {tips.map((tg, i) => (
             <div key={i} className="flex gap-3">
               <div className="flex-1 space-y-1.5">
                 <input
                   className={input}
-                  value={t.title}
-                  placeholder="Заголовок"
+                  value={tg.title}
+                  placeholder={t('Заголовок')}
                   onChange={(e) => set({ tips: tips.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)) })}
                 />
                 <textarea
                   className={cn(input, 'min-h-16')}
-                  value={t.text}
+                  value={tg.text}
                   onChange={(e) => set({ tips: tips.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)) })}
                 />
               </div>
@@ -577,7 +590,7 @@ function TextsSection({ g, set }: SectionProps) {
             </div>
           ))}
           <Button icon={<Plus size={14} />} onClick={() => set({ tips: [...tips, { title: '', text: '' }] })}>
-            Добавить совет
+            {t('Добавить совет')}
           </Button>
         </div>
       </Card>

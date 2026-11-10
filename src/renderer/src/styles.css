@@ -6,7 +6,8 @@
   hex в компонентах не пишем. Подробнее: docs/design.md
 */
 @theme {
-  --font-sans: 'Inter Variable', system-ui, 'Segoe UI', sans-serif;
+  /* Японский и корейский — системными шрифтами Windows: в Inter нет этих знаков. */
+  --font-sans: 'Inter Variable', system-ui, 'Segoe UI', 'Yu Gothic UI', 'Meiryo UI', 'Malgun Gothic', sans-serif;
 
   --color-bg: #0f1117;
   --color-sidebar: #0b0d12;

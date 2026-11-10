@@ -32,6 +32,8 @@ import { useAnimate } from '@/lib/motion'
 import { useCharacterContext } from '@/lib/report'
 import { api, useApp, useCharacters } from '@/lib/store'
 import { useUpdates } from '@/lib/updates'
+import { t } from '@shared/i18n'
+import { term } from '@shared/names'
 
 interface NavItem {
   to: string
@@ -47,60 +49,71 @@ const NAV: { title?: string; items: NavItem[] }[] = [
     items: [
       {
         to: '/',
-        label: 'Обзор',
+        label: t('Обзор'),
         icon: LayoutDashboard,
-        tip: 'Персонаж целиком: оценка билда и список «что сделать дальше». Число — общий балл 0–100.',
+        tip: t('Персонаж целиком: оценка билда и список «что сделать дальше». Число — общий балл 0–100.'),
         score: (s) => s.overall
       }
     ]
   },
   {
-    title: 'Билд',
+    title: t('Билд'),
     items: [
       {
         to: '/skills',
-        label: 'Умения',
+        label: t('Умения'),
         icon: Swords,
-        tip: 'Уровни умений против гайда, откуда они берутся и какие специализации нужны. Стигмы и пассивки.',
+        tip: t('Уровни умений против гайда, откуда они берутся и какие специализации нужны. Стигмы и пассивки.'),
         score: (s) => s.skills
       },
       {
         to: '/rotation',
-        label: 'Ротация',
+        label: t('Ротация'),
         icon: Repeat,
-        tip: 'Как играть: стопки умений для макроса, что жать вручную, начало боя и советы под вашего персонажа.'
+        tip: t('Как играть: стопки умений для макроса, что жать вручную, начало боя и советы под вашего персонажа.')
       },
-      { to: '/gear', label: 'Шмот', icon: Shirt, tip: 'Каждая строка вещи и манакамни: что по гайду, что менять, что ловить.', score: (s) => s.gear },
-      { to: '/arcana', label: 'Арканы', icon: Sparkles, tip: 'Пять карт: нужные умения, шансы заточки и новой карты, сеты.', score: (s) => s.arcana },
+      { to: '/gear', label: t('Шмот'), icon: Shirt, tip: t('Каждая строка вещи и манакамни: что по гайду, что менять, что ловить.'), score: (s) => s.gear },
+      { to: '/arcana', label: t('Арканы'), icon: Sparkles, tip: t('Пять карт: нужные умения, шансы заточки и новой карты, сеты.'), score: (s) => s.arcana },
       {
         to: '/daevanion',
-        label: 'Даэванион',
+        label: t('Даэванион'),
         icon: Waypoints,
-        tip: 'Доски с отмеченными узлами, цели гайда и план прокачки по очкам.',
+        tip: t('Доски с отмеченными узлами, цели гайда и план прокачки по очкам.'),
         score: (s) => s.daevanion
       },
-      { to: '/genus', label: 'Знание о видах', icon: Layers, tip: 'Ячейки пяти родов: что как нужно, что перебросить и что ловить.', score: (s) => s.genus }
-    ]
-  },
-  {
-    title: 'Персонаж',
-    items: [
-      { to: '/collections', label: 'Питомцы и коллекции', icon: PawPrint, tip: 'Питомцы и их уровни, крылья, титулы, облики, монолиты, персонажи аккаунта.' },
-      { to: '/stats', label: 'Статы', icon: Gem, tip: 'Полный лист характеристик с важностью по гайду и вкладом досок.' },
-      { to: '/history', label: 'История', icon: History, tip: 'График боевой мощи и лента изменений: заточки, вещи, уровни, узлы.' },
       {
-        to: '/top',
-        label: 'Сравнение с топом',
-        icon: Trophy,
-        tip: 'Вы против тысяч топ-игроков класса: боевая мощь, умения, стигмы, заточка, арканы, доски — и где отставание больше всего.'
+        to: '/genus',
+        label: t('Знание о видах'),
+        icon: Layers,
+        tip: t('Ячейки пяти родов: что как нужно, что перебросить и что ловить.'),
+        score: (s) => s.genus
       }
     ]
   },
   {
-    title: 'Цели',
+    title: t('Персонаж'),
     items: [
-      { to: '/guides', label: 'Гайды', icon: BookOpen, tip: 'Выбор гайда, свои гайды, редактор, импорт и экспорт.' },
-      { to: '/checklist', label: 'Чек-лист', icon: ListChecks, tip: 'Вехи гайда (отмечаются сами), разовые дела, свои задачи и заметки.' }
+      {
+        to: '/collections',
+        label: t('Питомцы и коллекции'),
+        icon: PawPrint,
+        tip: t('Питомцы и их уровни, крылья, титулы, облики, монолиты, персонажи аккаунта.')
+      },
+      { to: '/stats', label: t('Статы'), icon: Gem, tip: t('Полный лист характеристик с важностью по гайду и вкладом досок.') },
+      { to: '/history', label: t('История'), icon: History, tip: t('График боевой мощи и лента изменений: заточки, вещи, уровни, узлы.') },
+      {
+        to: '/top',
+        label: t('Сравнение с топом'),
+        icon: Trophy,
+        tip: t('Вы против тысяч топ-игроков класса: боевая мощь, умения, стигмы, заточка, арканы, доски — и где отставание больше всего.')
+      }
+    ]
+  },
+  {
+    title: t('Цели'),
+    items: [
+      { to: '/guides', label: t('Гайды'), icon: BookOpen, tip: t('Выбор гайда, свои гайды, редактор, импорт и экспорт.') },
+      { to: '/checklist', label: t('Чек-лист'), icon: ListChecks, tip: t('Вехи гайда (отмечаются сами), разовые дела, свои задачи и заметки.') }
     ]
   }
 ]
@@ -138,7 +151,7 @@ export function Sidebar() {
         <Logo />
         <div className="leading-tight">
           <div className="text-[13px] font-semibold tracking-wide">Aion2 Build Helper</div>
-          <div className="text-[11px] text-ink-3">помощник по билду</div>
+          <div className="text-[11px] text-ink-3">{t('помощник по билду')}</div>
         </div>
       </div>
 
@@ -157,7 +170,7 @@ export function Sidebar() {
                   content={
                     <>
                       {item.tip}
-                      {score !== null && <span className="mt-1 block text-ink-3">Оценка раздела по гайду: {score} из 100.</span>}
+                      {score !== null && <span className="mt-1 block text-ink-3">{t('Оценка раздела по гайду: {score} из 100.', { score })}</span>}
                     </>
                   }
                 >
@@ -208,7 +221,9 @@ export function Sidebar() {
         <UpdateBanner />
         <Tooltip
           block
-          content="Приложение само следит за файлом оверлея Questlog. Здесь — когда файл обновился в последний раз. Нажмите, чтобы перечитать его прямо сейчас. Зелёная точка — файл найден, красная — нет."
+          content={t(
+            'Приложение само следит за файлом оверлея Questlog. Здесь — когда файл обновился в последний раз. Нажмите, чтобы перечитать его прямо сейчас. Зелёная точка — файл найден, красная — нет.'
+          )}
         >
           <button
             onClick={refresh}
@@ -216,7 +231,7 @@ export function Sidebar() {
           >
             <RefreshCw size={14} className={cn(spinning && 'animate-spin')} />
             <span className="flex-1 truncate">
-              {source?.exists ? (source.modifiedAt ? `Данные: ${ago(source.modifiedAt)}` : 'Данные загружены') : 'Нет данных оверлея'}
+              {source?.exists ? (source.modifiedAt ? t('Данные: {ago}', { ago: ago(source.modifiedAt) }) : t('Данные загружены')) : t('Нет данных оверлея')}
             </span>
             <span className="relative flex h-2 w-2">
               {fresh && <span className="fx-ping absolute inset-0 rounded-full bg-good" />}
@@ -234,11 +249,11 @@ export function Sidebar() {
           }
         >
           <Settings size={16} className="text-ink-3" />
-          Настройки
+          {t('Настройки')}
         </NavLink>
         {ctx && (
           <div className="mt-2 truncate px-2.5 text-[11px] text-ink-3">
-            {ctx.char.name} · {classInfo(ctx.char.cls)?.ru ?? 'класс неизвестен'} · БМ {compact(ctx.char.combatPower)}
+            {ctx.char.name} · {term(classInfo(ctx.char.cls), t('класс неизвестен'))} {t('· БМ {combatPower}', { combatPower: compact(ctx.char.combatPower) })}
           </div>
         )}
       </div>
@@ -270,7 +285,7 @@ function CharacterSwitcher() {
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[13px] font-semibold">{char.name}</span>
           <span className="block truncate text-[11px] text-ink-3">
-            {info?.ru ?? '—'} · ур. {char.level} · {char.server}
+            {term(info, '—')} {t('· ур. {level} · {server}', { level: char.level, server: char.server })}
           </span>
         </span>
         {chars.length > 1 && <ChevronDown size={14} className={cn('text-ink-3 transition-transform', open && 'rotate-180')} />}
@@ -291,7 +306,7 @@ function CharacterSwitcher() {
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[13px]">{c.name}</span>
                 <span className="block text-[11px] text-ink-3">
-                  {classInfo(c.cls)?.ru ?? '—'} · ур. {c.level} · БМ {compact(c.combatPower)}
+                  {term(classInfo(c.cls), '—')} {t('· ур. {level} · БМ {combatPower}', { level: c.level, combatPower: compact(c.combatPower) })}
                 </span>
               </span>
             </button>
@@ -318,8 +333,8 @@ function UpdateBanner() {
       block
       content={
         ready
-          ? 'Нажмите «Перезапустить и обновить» в настройках — или новая версия поставится сама при закрытии приложения.'
-          : 'Новая версия скачивается в фоне.'
+          ? t('Нажмите «Перезапустить и обновить» в настройках — или новая версия поставится сама при закрытии приложения.')
+          : t('Новая версия скачивается в фоне.')
       }
     >
       <button
@@ -331,7 +346,9 @@ function UpdateBanner() {
       >
         <ArrowDownCircle size={14} className={ready ? 'text-accent' : 'animate-pulse'} />
         <span className="flex-1 truncate">
-          {ready ? `Обновить до ${state.version} — перезапуск` : `Скачиваю ${state.version ?? 'обновление'} · ${Math.round((state.progress ?? 0) * 100)}%`}
+          {ready
+            ? t('Обновить до {version} — перезапуск', { version: state.version })
+            : t('Скачиваю {p} · {p2}%', { p: state.version ?? t('обновление'), p2: Math.round((state.progress ?? 0) * 100) })}
         </span>
       </button>
     </Tooltip>

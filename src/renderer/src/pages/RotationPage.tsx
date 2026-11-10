@@ -18,6 +18,7 @@ import { Pill } from '@/components/ui/Pill'
 import { cn } from '@/lib/format'
 import { useCharacterContext } from '@/lib/report'
 import type { Tone } from '@/lib/status'
+import { t } from '@shared/i18n'
 
 export function RotationPage() {
   const ctx = useCharacterContext()!
@@ -30,8 +31,10 @@ export function RotationPage() {
   const header = (
     <PageHeader
       icon={<Repeat size={22} />}
-      title="Ротация"
-      subtitle="Как играть по гайду: связка (макрос игры) и ячейки панели, что жать вручную, с чего начинать бой и как зажимать всё одной кнопкой. Справа — советы под вашего персонажа."
+      title={t('Ротация')}
+      subtitle={t(
+        'Как играть по гайду: связка (макрос игры) и ячейки панели, что жать вручную, с чего начинать бой и как зажимать всё одной кнопкой. Справа — советы под вашего персонажа.'
+      )}
       actions={<GuideSwitcher char={char} />}
     />
   )
@@ -42,14 +45,14 @@ export function RotationPage() {
         {header}
         <EmptyState
           icon={<Repeat size={28} />}
-          title="В выбранном гайде нет ротации"
+          title={t('В выбранном гайде нет ротации')}
           action={
             <Button icon={<BookOpen size={14} />} onClick={() => navigate('/guides')}>
-              Выбрать гайд
+              {t('Выбрать гайд')}
             </Button>
           }
         >
-          Ротацию и связку задаёт гайд. Выберите гайд, где они расписаны, — например, встроенный сводный.
+          {t('Ротацию и связку задаёт гайд. Выберите гайд, где они расписаны, — например, встроенный сводный.')}
         </EmptyState>
       </>
     )
@@ -70,16 +73,18 @@ export function RotationPage() {
         <div className="min-w-0 space-y-5">
           {steps.length + keyed.length > 0 && combat && (
             <Card
-              title="Связка"
-              hint="В игре: окно «Умения» → «Связки». Связка работает, пока её клавиша зажата: идёт по шагам сверху вниз и по кругу, пропуская то, что на откате. Каждый шаг — ячейка панели: до 4 умений столбиком, игра применяет первое готовое, нижний ряд 0 — главный. Красный значок — умение не изучено, жёлтый — стигма не надета."
+              title={t('Связка')}
+              hint={t(
+                'В игре: окно «Умения» → «Связки». Связка работает, пока её клавиша зажата: идёт по шагам сверху вниз и по кругу, пропуская то, что на откате. Каждый шаг — ячейка панели: до 4 умений столбиком, игра применяет первое готовое, нижний ряд 0 — главный. Красный значок — умение не изучено, жёлтый — стигма не надета.'
+              )}
               actions={
                 <>
                   {macroKey && (
                     <span className="flex items-center gap-1.5 text-xs text-ink-3">
-                      клавиша <Key>{macroKey}</Key>
+                      {t('клавиша')} <Key>{macroKey}</Key>
                     </span>
                   )}
-                  {combat.delayMs !== undefined && <Pill tip="Пауза между шагами связки.">задержка {combat.delayMs} мс</Pill>}
+                  {combat.delayMs !== undefined && <Pill tip={t('Пауза между шагами связки.')}>{t('задержка {delayMs} мс', { delayMs: combat.delayMs })}</Pill>}
                 </>
               }
             >
@@ -102,8 +107,10 @@ export function RotationPage() {
 
           {rot && rot.manual.length > 0 && (
             <Card
-              title="Вручную"
-              hint="Умения на отдельных клавишах — их не кладут в связку: важен момент. Если подсказка зависит от ваших статов, она выделена и уже выбрана под ваши цифры."
+              title={t('Вручную')}
+              hint={t(
+                'Умения на отдельных клавишах — их не кладут в связку: важен момент. Если подсказка зависит от ваших статов, она выделена и уже выбрана под ваши цифры.'
+              )}
               delay={0.05}
             >
               <ul className="grid grid-cols-1 gap-x-6 lg:grid-cols-2">
@@ -115,7 +122,7 @@ export function RotationPage() {
           )}
 
           {rot && rot.opener.length > 0 && (
-            <Card title="Начало боя" hint="Порядок умений в первые секунды боя. Дальше — макрос и ручные умения по откату." delay={0.1}>
+            <Card title={t('Начало боя')} hint={t('Порядок умений в первые секунды боя. Дальше — макрос и ручные умения по откату.')} delay={0.1}>
               <div className="flex flex-wrap items-start gap-y-4">
                 {rot.opener.map((o, i) => (
                   <Fragment key={i}>
@@ -129,7 +136,7 @@ export function RotationPage() {
           )}
 
           {principles.length > 0 && (
-            <Card title="Как играть" hint="Принципы ротации из гайда — то, что не уложить в макрос." delay={0.15}>
+            <Card title={t('Как играть')} hint={t('Принципы ротации из гайда — то, что не уложить в макрос.')} delay={0.15}>
               <ol className="space-y-2.5">
                 {principles.map((r, i) => (
                   <li key={i} className="flex gap-3 text-[13px] leading-relaxed text-ink-2">
@@ -148,7 +155,7 @@ export function RotationPage() {
           {rot && <AdviceCard advice={rot.advice} onOpen={(to) => navigate(to)} />}
           {rot && combat && <KeyMapCard guide={guide} macros={rot.macros} manual={rot.manual} namer={namer} />}
           {guide.tips && guide.tips.length > 0 && (
-            <Card title="Советы гайда" hint="Заметки гайда о ротации, макросе и том, где источники расходятся." delay={0.1}>
+            <Card title={t('Советы гайда')} hint={t('Заметки гайда о ротации, макросе и том, где источники расходятся.')} delay={0.1}>
               <div className="space-y-3.5">
                 {guide.tips.map((t, i) => (
                   <div key={i} className="flex gap-2.5">
@@ -186,8 +193,8 @@ function Key({ children, className }: { children: ReactNode; className?: string 
 const USE_TONE: Record<SkillUse, Tone | undefined> = { ready: undefined, missing: 'bad', unequipped: 'warn' }
 const USE_TEXT: Record<SkillUse, string> = {
   ready: '',
-  missing: 'Не изучено — связка его пропустит.',
-  unequipped: 'Стигма не надета.'
+  missing: t('Не изучено — связка его пропустит.'),
+  unequipped: t('Стигма не надета.')
 }
 
 function skillTip(s: RotationSkill, namer: Namer, extra?: ReactNode) {
@@ -196,8 +203,8 @@ function skillTip(s: RotationSkill, namer: Namer, extra?: ReactNode) {
     <>
       <b className="text-ink">{label.main}</b>
       {label.alt && <span className="text-ink-3"> ({label.alt})</span>}
-      <span className="mt-1 block">{s.use === 'missing' ? USE_TEXT.missing : `Ур. ${s.level}. ${USE_TEXT[s.use]}`}</span>
-      {s.specsOff && <span className="mt-1 block text-warning">Специализации не по гайду — см. «Умения».</span>}
+      <span className="mt-1 block">{s.use === 'missing' ? USE_TEXT.missing : t('Ур. {level}. {USE_TEXT}', { level: s.level, USE_TEXT: USE_TEXT[s.use] })}</span>
+      {s.specsOff && <span className="mt-1 block text-warning">{t('Специализации не по гайду — см. «Умения».')}</span>}
       {extra}
     </>
   )
@@ -207,23 +214,29 @@ function skillTip(s: RotationSkill, namer: Namer, extra?: ReactNode) {
 function CellCard({ m, step, namer }: { m: MacroReport; step?: number; namer: Namer }) {
   const w = m.macro.when
   const whenSkill = w ? namer.skill(w.skill).main : ''
-  const whenText = w ? (w.minLevel !== undefined ? `${whenSkill} — с ур. ${w.minLevel}` : `${whenSkill} — до ур. ${w.maxLevel}`) : ''
+  const whenText = w
+    ? w.minLevel !== undefined
+      ? t('{whenSkill} — с ур. {minLevel}', { whenSkill, minLevel: w.minLevel })
+      : t('{whenSkill} — до ур. {maxLevel}', { whenSkill, maxLevel: w.maxLevel })
+    : ''
   return (
     <div className={cn('flex flex-col rounded-xl border p-3.5', m.active ? 'border-line-strong bg-surface-2/50' : 'border-dashed border-line')}>
       <div className="flex flex-wrap items-center gap-2">
-        {step !== undefined && <span className="rounded-md bg-accent-soft px-1.5 py-0.5 text-[11px] font-semibold text-accent-2">Шаг {step}</span>}
+        {step !== undefined && (
+          <span className="rounded-md bg-accent-soft px-1.5 py-0.5 text-[11px] font-semibold text-accent-2">{t('Шаг {step}', { step })}</span>
+        )}
         <span className={cn('text-[13px] font-semibold', !m.active && 'text-ink-3')}>{m.macro.name}</span>
         {w &&
           (m.active ? (
-            <Pill tone="good" icon={<Check size={11} />} tip={`${whenText}. Сейчас — ур. ${m.whenLevel ?? 0}.`}>
-              подходит сейчас
+            <Pill tone="good" icon={<Check size={11} />} tip={t('{whenText}. Сейчас — ур. {p}.', { whenText, p: m.whenLevel ?? 0 })}>
+              {t('подходит сейчас')}
             </Pill>
           ) : (
-            <Pill tip={`Эта ячейка — для другого уровня умения: ${whenText}. Сейчас — ур. ${m.whenLevel ?? 0}.`}>{whenText}</Pill>
+            <Pill tip={t('Эта ячейка — для другого уровня умения: {whenText}. Сейчас — ур. {p}.', { whenText, p: m.whenLevel ?? 0 })}>{whenText}</Pill>
           ))}
         {m.macro.key && (
-          <Pill className="ml-auto" tip="Своя клавиша: эту ячейку жмут отдельно, она не входит в связку.">
-            не в связке · <Key className="h-4 min-w-4 text-[10px]">{m.macro.key}</Key>
+          <Pill className="ml-auto" tip={t('Своя клавиша: эту ячейку жмут отдельно, она не входит в связку.')}>
+            {t('не в связке ·')} <Key className="h-4 min-w-4 text-[10px]">{m.macro.key}</Key>
           </Pill>
         )}
       </div>
@@ -247,12 +260,12 @@ function CellRow({ s, row, namer }: { s: RotationSkill; row: number; namer: Name
         s,
         namer,
         <span className="mt-1 block text-ink-3">
-          {row === 0 ? 'Ряд 0 — главный: применится первым, если готов.' : `Ряд ${row}: применится, если всё ниже в ячейке на откате.`}
+          {row === 0 ? t('Ряд 0 — главный: применится первым, если готов.') : t('Ряд {row}: применится, если всё ниже в ячейке на откате.', { row })}
         </span>
       )}
     >
       <div className="flex w-full items-center gap-2.5 rounded-lg px-1 py-0.5 hover:bg-surface-2">
-        <span className={cn('tnum w-11 shrink-0 text-[10.5px]', row === 0 ? 'font-semibold text-accent' : 'text-ink-3')}>ряд {row}</span>
+        <span className={cn('tnum w-11 shrink-0 text-[10.5px]', row === 0 ? 'font-semibold text-accent' : 'text-ink-3')}>{t('ряд {row}', { row })}</span>
         <span className="relative shrink-0">
           <SkillIcon id={s.skill} size={34} tone={tone} dim={s.use === 'missing'} />
           {tone && <StatusBadge tone={tone} size={13} className="absolute -right-1 -bottom-1" />}
@@ -267,15 +280,17 @@ function CellRow({ s, row, namer }: { s: RotationSkill; row: number; namer: Name
 function OneButtonCard({ ob, macroKey, manual, namer }: { ob: GuideOneButton; macroKey?: string; manual: ManualReport[]; namer: Namer }) {
   const r = useMemo(() => analyzeInputMacro(ob.events, ob.repeatMs, macroKey), [ob, macroKey])
   const purpose = (key: string) => {
-    if (key === macroKey) return 'связка'
+    if (key === macroKey) return t('связка')
     const m = manual.find((x) => x.entry.key === key)
     return m ? namer.skill(m.entry.skill).main : ''
   }
-  const fmt = (v: number) => `${Math.round(v * 10) / 10} мс`
+  const fmt = (v: number) => t('{p} мс', { p: Math.round(v * 10) / 10 })
   return (
     <Card
-      title="Одна кнопка"
-      hint="Для тех, кто зажимает одну боковую кнопку мыши на всю ротацию: ПО мыши (SteelSeries GG, Razer Synapse, G Hub) повторяет этот макрос, пока кнопка зажата. Ниже — расчёт: сколько длится каждое нажатие и как часто отпускается клавиша связки. Игра читает ввод раз в кадр (при 60 FPS — каждые 16,7 мс)."
+      title={t('Одна кнопка')}
+      hint={t(
+        'Для тех, кто зажимает одну боковую кнопку мыши на всю ротацию: ПО мыши (SteelSeries GG, Razer Synapse, G Hub) повторяет этот макрос, пока кнопка зажата. Ниже — расчёт: сколько длится каждое нажатие и как часто отпускается клавиша связки. Игра читает ввод раз в кадр (при 60 FPS — каждые 16,7 мс).'
+      )}
       delay={0.03}
     >
       <div className="flex flex-wrap items-center gap-x-1.5 gap-y-2">
@@ -286,19 +301,21 @@ function OneButtonCard({ ob, macroKey, manual, namer }: { ob: GuideOneButton; ma
               <Key>{e.key}</Key>
               {e.down ? <ArrowDown size={13} className="text-ink-2" /> : <ArrowUp size={13} className="text-ink-2" />}
             </span>
-            {e.waitMs > 0 && <span className="tnum text-[11px] text-ink-3">{e.waitMs} мс</span>}
+            {e.waitMs > 0 && <span className="tnum text-[11px] text-ink-3">{t('{waitMs} мс', { waitMs: e.waitMs })}</span>}
           </Fragment>
         ))}
         <span className="inline-flex items-center gap-1 text-[11px] text-ink-3">
-          <Repeat size={12} /> автоповтор {ob.repeatMs} мс
+          <Repeat size={12} /> {t('автоповтор {repeatMs} мс', { repeatMs: ob.repeatMs })}
         </span>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
         <div className="rounded-xl border border-line bg-surface-2/50 px-3 py-2.5">
-          <div className="text-[11px] text-ink-3">Один прогон</div>
+          <div className="text-[11px] text-ink-3">{t('Один прогон')}</div>
           <div className="tnum mt-0.5 text-[15px] font-semibold">{fmt(r.cycleMs)}</div>
-          <div className="text-[11px] text-ink-3">{Math.round(1000 / Math.max(1, r.cycleMs))} прогонов в секунду</div>
+          <div className="text-[11px] text-ink-3">
+            {Math.round(1000 / Math.max(1, r.cycleMs))} {t('прогонов в секунду')}
+          </div>
         </div>
         {r.keys.map((k) => (
           <div key={k.key} className="rounded-xl border border-line bg-surface-2/50 px-3 py-2.5">
@@ -306,9 +323,13 @@ function OneButtonCard({ ob, macroKey, manual, namer }: { ob: GuideOneButton; ma
               <Key className="h-5 min-w-5 text-[10px]">{k.key}</Key>
               <span className="truncate">{purpose(k.key)}</span>
             </div>
-            <div className="tnum mt-1 text-[13px] font-semibold">{k.key === macroKey ? `зажата ${fmt(k.holdMs)}` : `нажатие ${fmt(k.holdMs)}`}</div>
+            <div className="tnum mt-1 text-[13px] font-semibold">
+              {k.key === macroKey ? t('зажата {holdMs}', { holdMs: fmt(k.holdMs) }) : t('нажатие {holdMs}', { holdMs: fmt(k.holdMs) })}
+            </div>
             <div className="tnum text-[11px] text-ink-3">
-              {k.key === macroKey ? `отпускается на ${fmt(k.gapMs)}` : `пауза ${fmt(k.gapMs)}, ${Math.round(k.pressesPerSec)} раз в секунду`}
+              {k.key === macroKey
+                ? t('отпускается на {gapMs}', { gapMs: fmt(k.gapMs) })
+                : t('пауза {gapMs}, {pressesPerSec} раз в секунду', { gapMs: fmt(k.gapMs), pressesPerSec: Math.round(k.pressesPerSec) })}
             </div>
           </div>
         ))}
@@ -351,11 +372,11 @@ function ManualRow({ m, namer }: { m: ManualReport; namer: Namer }) {
           <span className={cn('text-[13px] font-medium', s.use !== 'ready' && 'text-ink-3')}>{namer.skill(s.skill).main}</span>
           {m.entry.key && <Key>{m.entry.key}</Key>}
           {optional ? (
-            <Pill tip="Запасной вариант: гайд не требует это умение. Не надето — просто пропустите.">запасная</Pill>
+            <Pill tip={t('Запасной вариант: гайд не требует это умение. Не надето — просто пропустите.')}>{t('запасная')}</Pill>
           ) : s.use === 'missing' ? (
-            <Pill tone="critical">не изучено</Pill>
+            <Pill tone="critical">{t('не изучено')}</Pill>
           ) : s.use === 'unequipped' ? (
-            <Pill tone="warning">не надета</Pill>
+            <Pill tone="warning">{t('не надета')}</Pill>
           ) : null}
         </div>
         <p className="mt-0.5 text-xs leading-relaxed text-ink-3">{m.entry.when}</p>
@@ -364,7 +385,7 @@ function ManualRow({ m, namer }: { m: ManualReport; namer: Namer }) {
             <Info size={13} className="mt-0.5 shrink-0 text-accent" />
             <span>
               <b className="font-semibold text-ink">
-                У вас {namer.stat(stat).main} {formatStatValue(stat, m.statHint.value)}.
+                {t('У вас {stat} {stat2}.', { stat: namer.stat(stat).main, stat2: formatStatValue(stat, m.statHint.value) })}
               </b>{' '}
               {m.statHint.text}
             </span>
@@ -414,8 +435,10 @@ function AdviceCard({ advice, onOpen }: { advice: RotationAdvice[]; onOpen: (to:
   const sorted = [...advice].sort((a, b) => ADVICE_ORDER[a.tone] - ADVICE_ORDER[b.tone])
   return (
     <Card
-      title="Для вас"
-      hint="Советы по вашему персонажу: какая ячейка подходит по уровню умений, чего не хватает для ротации, как жать умения при ваших статах. Красное — мешает ротации, жёлтое — стоит поправить, синее — к сведению. Нажмите, чтобы открыть раздел."
+      title={t('Для вас')}
+      hint={t(
+        'Советы по вашему персонажу: какая ячейка подходит по уровню умений, чего не хватает для ротации, как жать умения при ваших статах. Красное — мешает ротации, жёлтое — стоит поправить, синее — к сведению. Нажмите, чтобы открыть раздел.'
+      )}
     >
       <ul className="-mx-2 space-y-0.5">
         {sorted.map((a) => {
@@ -458,7 +481,7 @@ function AdviceCard({ advice, onOpen }: { advice: RotationAdvice[]; onOpen: (to:
   )
 }
 
-const MOUSE = ['ЛКМ', 'ПКМ', 'СКМ']
+const MOUSE = [t('ЛКМ'), t('ПКМ'), t('СКМ')]
 const keyOrder = (k: string) => {
   const i = MOUSE.indexOf(k)
   return i >= 0 ? `0${i}` : /^\d$/.test(k) ? `1${k}` : `2${k}`
@@ -469,13 +492,17 @@ function KeyMapCard({ guide, macros, manual, namer }: { guide: Guide; macros: Ma
   const combat = guide.combat!
   const rows: { key: string; skill?: number; text: string }[] = []
   const inMacro = macros.filter((m) => m.active && !m.macro.key)
-  if (combat.macroKey && inMacro.length) rows.push({ key: combat.macroKey, text: `Связка: ${inMacro.map((m) => m.macro.name).join(' → ')}` })
+  if (combat.macroKey && inMacro.length) rows.push({ key: combat.macroKey, text: t('Связка: {map}', { map: inMacro.map((m) => m.macro.name).join(' → ') }) })
   for (const m of macros) if (m.active && m.macro.key) rows.push({ key: m.macro.key, skill: m.macro.skills[0], text: m.macro.name })
   for (const m of manual) if (m.entry.key) rows.push({ key: m.entry.key, skill: m.entry.skill, text: namer.skill(m.entry.skill).main })
   if (!rows.length) return null
   rows.sort((a, b) => keyOrder(a.key).localeCompare(keyOrder(b.key)))
   return (
-    <Card title="Раскладка клавиш" hint="Пример раскладки из гайда — подсказка, а не правило. Остальные умения — на любых свободных клавишах." delay={0.05}>
+    <Card
+      title={t('Раскладка клавиш')}
+      hint={t('Пример раскладки из гайда — подсказка, а не правило. Остальные умения — на любых свободных клавишах.')}
+      delay={0.05}
+    >
       <ul className="space-y-2">
         {rows.map((r) => (
           <li key={r.key + r.text} className="flex items-start gap-3">

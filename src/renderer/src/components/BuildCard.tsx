@@ -15,15 +15,17 @@ import { dateOnly, fmt } from '@/lib/format'
 import { abyssRankName } from '@/lib/history'
 import type { useCharacterContext } from '@/lib/report'
 import { api, isWebMode, useApp } from '@/lib/store'
+import { t } from '@shared/i18n'
+import { term } from '@shared/names'
 
 type Ctx = NonNullable<ReturnType<typeof useCharacterContext>>
 
 const SECTIONS: { key: keyof Omit<BuildReport['scores'], 'overall'>; ru: string }[] = [
-  { key: 'skills', ru: 'Умения' },
-  { key: 'daevanion', ru: 'Даэванион' },
-  { key: 'gear', ru: 'Шмот' },
-  { key: 'arcana', ru: 'Арканы' },
-  { key: 'genus', ru: 'Знание о видах' }
+  { key: 'skills', ru: t('Умения') },
+  { key: 'daevanion', ru: t('Даэванион') },
+  { key: 'gear', ru: t('Шмот') },
+  { key: 'arcana', ru: t('Арканы') },
+  { key: 'genus', ru: t('Знание о видах') }
 ]
 
 const barColor = (v: number) => (v >= 85 ? 'bg-good' : v >= 60 ? 'bg-warning' : 'bg-critical')
@@ -46,23 +48,23 @@ export function BuildCard({ ctx }: { ctx: Ctx }) {
         <div className="min-w-0 flex-1">
           <div className="text-[28px] leading-tight font-semibold tracking-tight">{char.name}</div>
           <div className="mt-0.5 text-[13px] text-ink-2">
-            {info?.ru ?? 'Класс неизвестен'} · ур. {char.level}
+            {term(info, t('Класс неизвестен'))} {t('· ур. {level}', { level: char.level })}
             {char.legion ? ` · ${char.legion}` : ''}
-            {char.race && RACES[char.race] ? ` · ${RACES[char.race].ru}` : ''}
+            {char.race && RACES[char.race] ? ` · ${term(RACES[char.race])}` : ''}
           </div>
         </div>
         <div className="text-right">
-          <div className="text-[11px] tracking-wider text-ink-3 uppercase">Боевая мощь</div>
+          <div className="text-[11px] tracking-wider text-ink-3 uppercase">{t('Боевая мощь')}</div>
           <div className="tnum text-[26px] leading-tight font-semibold text-accent">{fmt(char.combatPower)}</div>
           <div className="tnum text-xs text-ink-3">
-            снаряжение {fmt(char.gearScore)}
+            {t('снаряжение {gearScore}', { gearScore: fmt(char.gearScore) })}
             {char.abyss ? ` · ${abyssRankName(char.abyss.grade)}` : ''}
           </div>
         </div>
       </div>
 
       <div className="relative mt-5 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-6 rounded-xl border border-line bg-surface-2/60 p-4">
-        <ScoreRing value={report.scores.overall} size={92} label="по гайду" />
+        <ScoreRing value={report.scores.overall} size={92} label={t('по гайду')} />
         <div className="space-y-1.5">
           {SECTIONS.map((s) => (
             <div key={s.key} className="flex items-center gap-3 text-xs">
@@ -78,14 +80,14 @@ export function BuildCard({ ctx }: { ctx: Ctx }) {
 
       <div className="relative mt-5 grid grid-cols-[minmax(0,1fr)_auto] gap-6">
         <div>
-          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Главные умения</div>
+          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{t('Главные умения')}</div>
           <div className="flex flex-wrap gap-3">
             {core.map((s) => (
               <div key={s.skill} className="flex w-[78px] flex-col items-center gap-1 text-center">
                 <SkillIcon id={s.skill} size={40} />
                 <span className="line-clamp-2 min-h-[2.5em] text-[10.5px] leading-tight text-ink-2">{namer.skill(s.skill).main}</span>
                 <span className="tnum text-[11px] font-semibold">
-                  ур. {s.level}
+                  {t('ур. {level}', { level: s.level })}
                   {s.targetLevel ? <span className="font-normal text-ink-3">/{s.targetLevel}</span> : null}
                 </span>
               </div>
@@ -93,7 +95,7 @@ export function BuildCard({ ctx }: { ctx: Ctx }) {
           </div>
         </div>
         <div>
-          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Арканы</div>
+          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{t('Арканы')}</div>
           <div className="flex gap-1.5">
             {report.arcana.cards.map((c) => (
               <div key={c.slot} className="w-[46px]" style={{ fontSize: 10 }}>
@@ -105,7 +107,7 @@ export function BuildCard({ ctx }: { ctx: Ctx }) {
       </div>
 
       <div className="relative mt-5">
-        <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Снаряжение</div>
+        <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{t('Снаряжение')}</div>
         <div className="flex flex-wrap gap-1.5">
           {gear.map((g) => (
             <ItemIcon key={g.slot} itemId={g.item.item} slot={g.slot} enchant={g.item.enchant} size={44} />
@@ -119,7 +121,7 @@ export function BuildCard({ ctx }: { ctx: Ctx }) {
       </div>
 
       <div className="relative mt-5 flex items-center justify-between border-t border-line pt-3 text-[11px] text-ink-3">
-        <span>Aion2 Build Helper{guide ? ` · гайд: ${guide.name}` : ''}</span>
+        <span>Aion2 Build Helper{guide ? t(' · гайд: {guide}', { guide: guide.name }) : ''}</span>
         <span>{dateOnly(Date.now())}</span>
       </div>
     </div>
@@ -138,7 +140,7 @@ export function BuildCardButton({ ctx }: { ctx: Ctx }) {
     if (!el) return
     const r = el.getBoundingClientRect()
     // В приложении масштаб — zoomFactor окна: экранные точки = CSS-пиксели × масштаб.
-    const ok = await api.app.captureImage({ x: r.left, y: r.top, width: r.width, height: r.height, zoom }, action, `${ctx.char.name} — билд`)
+    const ok = await api.app.captureImage({ x: r.left, y: r.top, width: r.width, height: r.height, zoom }, action, t('{char} — билд', { char: ctx.char.name }))
     if (ok) {
       setDone(action)
       setTimeout(() => setDone(null), 2000)
@@ -148,9 +150,9 @@ export function BuildCardButton({ ctx }: { ctx: Ctx }) {
   return (
     <>
       <Button icon={<ImageDown size={14} />} onClick={() => setOpen(true)}>
-        Карточка билда
+        {t('Карточка билда')}
       </Button>
-      <Modal open={open} onClose={() => setOpen(false)} title="Карточка билда" wide>
+      <Modal open={open} onClose={() => setOpen(false)} title={t('Карточка билда')} wide>
         <div className="overflow-x-auto">
           <div ref={card} className="mx-auto w-fit">
             <BuildCard ctx={ctx} />
@@ -158,14 +160,14 @@ export function BuildCardButton({ ctx }: { ctx: Ctx }) {
         </div>
         <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
           {isWebMode ? (
-            <span className="text-xs text-ink-3">В браузерном режиме сохранить картинку нельзя — сделайте снимок экрана (Win+Shift+S).</span>
+            <span className="text-xs text-ink-3">{t('В браузерном режиме сохранить картинку нельзя — сделайте снимок экрана (Win+Shift+S).')}</span>
           ) : (
             <>
               <Button icon={done === 'copy' ? <Check size={14} /> : <Copy size={14} />} onClick={() => void capture('copy')}>
-                {done === 'copy' ? 'Скопировано' : 'Скопировать'}
+                {done === 'copy' ? t('Скопировано') : t('Скопировать')}
               </Button>
               <Button variant="primary" icon={done === 'save' ? <Check size={14} /> : <Download size={14} />} onClick={() => void capture('save')}>
-                {done === 'save' ? 'Сохранено' : 'Сохранить PNG'}
+                {done === 'save' ? t('Сохранено') : t('Сохранить PNG')}
               </Button>
             </>
           )}

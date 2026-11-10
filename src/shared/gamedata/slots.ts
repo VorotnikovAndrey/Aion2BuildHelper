@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 // Слоты экипировки. Номера — как в данных игры (их же использует оверлей Questlog).
 
 export type SlotGroup = 'weapon' | 'armor' | 'accessory' | 'arcana'
@@ -52,10 +53,10 @@ const bySlot = new Map(SLOTS.map((s) => [s.slot, s]))
 export const slotDef = (slot: number): SlotDef => bySlot.get(slot) ?? { slot, key: `slot${slot}`, ru: `Слот ${slot}`, en: `Slot ${slot}`, group: 'accessory' }
 
 export const SLOT_GROUPS: { id: SlotGroup; ru: string }[] = [
-  { id: 'weapon', ru: 'Оружие' },
-  { id: 'armor', ru: 'Броня' },
-  { id: 'accessory', ru: 'Аксессуары' },
-  { id: 'arcana', ru: 'Арканы' }
+  { id: 'weapon', ru: t('Оружие') },
+  { id: 'armor', ru: t('Броня') },
+  { id: 'accessory', ru: t('Аксессуары') },
+  { id: 'arcana', ru: t('Арканы') }
 ]
 
 /** Порядок слотов на экране «Шмот»: как в окне персонажа. */

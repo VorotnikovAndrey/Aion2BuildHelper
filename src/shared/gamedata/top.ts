@@ -2,6 +2,7 @@
 // арканы, камни, титулы, распределение боевой мощи. Собирается `npm run gamedata` в generated/top/<класс>.json.
 
 import type { ClassKey } from '../types'
+import { t } from '../i18n'
 
 export interface TopData {
   cls: ClassKey
@@ -32,20 +33,20 @@ export function topData(cls: ClassKey | null | undefined): TopData | null {
 
 /** Русские подписи слотов из таблицы заточки (у колец, серёг, браслетов и рун — по два слота). */
 export const TOP_SLOT_RU: Record<string, string> = {
-  'Main hand': 'Оружие',
-  'Off-hand': 'Наручи',
-  Helmet: 'Шлем',
-  Shoulders: 'Наплечники',
-  Chest: 'Нагрудник',
-  Legs: 'Набедренники',
-  Gloves: 'Перчатки',
-  Boots: 'Сапоги',
-  Cape: 'Плащ',
-  Necklace: 'Ожерелье',
-  Earring: 'Серьги',
-  Ring: 'Кольца',
-  Bracelet: 'Браслеты',
-  Belt: 'Пояс',
-  Amulet: 'Амулет',
-  Rune: 'Руны'
+  'Main hand': t('Оружие'),
+  'Off-hand': t('Наручи'),
+  Helmet: t('Шлем'),
+  Shoulders: t('Наплечники'),
+  Chest: t('Нагрудник'),
+  Legs: t('Набедренники'),
+  Gloves: t('Перчатки'),
+  Boots: t('Сапоги'),
+  Cape: t('Плащ'),
+  Necklace: t('Ожерелье'),
+  Earring: t('Серьги'),
+  Ring: t('Кольца'),
+  Bracelet: t('Браслеты'),
+  Belt: t('Пояс'),
+  Amulet: t('Амулет'),
+  Rune: t('Руны')
 }

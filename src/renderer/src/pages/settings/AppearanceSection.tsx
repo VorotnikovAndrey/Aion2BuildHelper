@@ -23,6 +23,7 @@ import { Card } from '@/components/ui/Card'
 import { Pill } from '@/components/ui/Pill'
 import { cn } from '@/lib/format'
 import { isWebMode, useApp } from '@/lib/store'
+import { t } from '@shared/i18n'
 
 export function AppearanceSection() {
   const ui = useApp((s) => s.settings.ui)
@@ -30,7 +31,7 @@ export function AppearanceSection() {
 
   return (
     <div className="space-y-5">
-      <Card title="Тема" hint="Готовые сочетания фона и акцентного цвета. Меняется сразу, без перезапуска.">
+      <Card title={t('Тема')} hint={t('Готовые сочетания фона и акцентного цвета. Меняется сразу, без перезапуска.')}>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
           {THEME_PRESETS.map((p) => (
             <PresetCard key={p.id} preset={p} active={ui.themeId === p.id} onClick={() => void updateUi({ themeId: p.id, base: p.base, accent: p.accent })} />
@@ -39,10 +40,10 @@ export function AppearanceSection() {
       </Card>
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-        <Card title="Свои цвета" hint="Соберите тему сами: основа задаёт фон и карточки, акцент — кнопки, активное меню и главное на экранах.">
+        <Card title={t('Свои цвета')} hint={t('Соберите тему сами: основа задаёт фон и карточки, акцент — кнопки, активное меню и главное на экранах.')}>
           <div className="space-y-5">
             <div>
-              <div className="mb-2 text-xs font-medium text-ink-2">Основа</div>
+              <div className="mb-2 text-xs font-medium text-ink-2">{t('Основа')}</div>
               <div className="grid grid-cols-3 gap-2">
                 {THEME_BASES.map((b) => (
                   <BaseSwatch
@@ -56,7 +57,7 @@ export function AppearanceSection() {
               </div>
             </div>
             <div>
-              <div className="mb-2 text-xs font-medium text-ink-2">Акцентный цвет</div>
+              <div className="mb-2 text-xs font-medium text-ink-2">{t('Акцентный цвет')}</div>
               <div className="flex flex-wrap items-center gap-2">
                 {ACCENT_SWATCHES.map((c) => (
                   <button
@@ -73,11 +74,11 @@ export function AppearanceSection() {
                   </button>
                 ))}
                 <label
-                  title="Любой цвет"
+                  title={t('Любой цвет')}
                   className="relative flex h-8 cursor-pointer items-center gap-2 rounded-full border border-line-strong bg-surface-2 pr-3 pl-1 text-xs text-ink-2 hover:text-ink"
                 >
                   <span className="h-6 w-6 rounded-full border border-line-strong" style={{ background: ui.accent }} />
-                  Другой
+                  {t('Другой')}
                   <input
                     type="color"
                     value={ui.accent}
@@ -88,18 +89,18 @@ export function AppearanceSection() {
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-bg/60 px-4 py-3">
-              <span className="text-xs text-ink-3">Так выглядит:</span>
+              <span className="text-xs text-ink-3">{t('Так выглядит:')}</span>
               <Button variant="primary" size="sm">
-                Главная кнопка
+                {t('Главная кнопка')}
               </Button>
-              <Pill tone="accent">метка</Pill>
-              <span className="text-[13px] text-accent-2 underline underline-offset-2">ссылка</span>
-              {ui.themeId === 'custom' && <span className="ml-auto text-xs text-ink-3">тема: своя</span>}
+              <Pill tone="accent">{t('метка')}</Pill>
+              <span className="text-[13px] text-accent-2 underline underline-offset-2">{t('ссылка')}</span>
+              {ui.themeId === 'custom' && <span className="ml-auto text-xs text-ink-3">{t('тема: своя')}</span>}
             </div>
           </div>
         </Card>
 
-        <Card title="Масштаб интерфейса" hint="Увеличивает всё сразу: текст, кнопки, карточки, доски Даэваниона. Запоминается между запусками.">
+        <Card title={t('Масштаб интерфейса')} hint={t('Увеличивает всё сразу: текст, кнопки, карточки, доски Даэваниона. Запоминается между запусками.')}>
           <div className="grid grid-cols-4 gap-1 rounded-lg border border-line p-1 sm:grid-cols-8">
             {ZOOM_STEPS.map((z) => (
               <button
@@ -120,7 +121,7 @@ export function AppearanceSection() {
               icon={<Minus size={14} />}
               disabled={ui.zoom <= ZOOM_MIN}
               onClick={() => void updateUi({ zoom: stepZoom(ui.zoom, -1) })}
-              aria-label="Меньше"
+              aria-label={t('Меньше')}
             />
             <span className="tnum min-w-14 text-center text-[15px] font-semibold">{Math.round(ui.zoom * 100)}%</span>
             <Button
@@ -128,32 +129,32 @@ export function AppearanceSection() {
               icon={<Plus size={14} />}
               disabled={ui.zoom >= ZOOM_MAX}
               onClick={() => void updateUi({ zoom: stepZoom(ui.zoom, 1) })}
-              aria-label="Больше"
+              aria-label={t('Больше')}
             />
             <Button size="sm" variant="ghost" icon={<RotateCcw size={13} />} disabled={ui.zoom === 1} onClick={() => void updateUi({ zoom: 1 })}>
-              Сбросить
+              {t('Сбросить')}
             </Button>
           </div>
           <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-ink-3">
             <span className="flex items-center gap-1 whitespace-nowrap">
-              <Kbd>Ctrl</Kbd>+<Kbd>колесо</Kbd> изменить
+              <Kbd>Ctrl</Kbd>+<Kbd>{t('колесо')}</Kbd> {t('изменить')}
             </span>
             <span className="flex items-center gap-1 whitespace-nowrap">
-              <Kbd>Ctrl</Kbd>+<Kbd>+</Kbd>/<Kbd>−</Kbd> по шагам
+              <Kbd>Ctrl</Kbd>+<Kbd>+</Kbd>/<Kbd>−</Kbd> {t('по шагам')}
             </span>
             <span className="flex items-center gap-1 whitespace-nowrap">
-              <Kbd>Ctrl</Kbd>+<Kbd>0</Kbd> сбросить
+              <Kbd>Ctrl</Kbd>+<Kbd>0</Kbd> {t('сбросить')}
             </span>
           </div>
           {isWebMode && (
-            <p className="mt-3 text-[11px] text-ink-3">В браузерном режиме сочетания клавиш перехватывает браузер — масштаб здесь задаётся кнопками.</p>
+            <p className="mt-3 text-[11px] text-ink-3">{t('В браузерном режиме сочетания клавиш перехватывает браузер — масштаб здесь задаётся кнопками.')}</p>
           )}
         </Card>
       </div>
 
       <Card
-        title="Анимации"
-        hint="Насколько оживлён интерфейс. Если в Windows включено «уменьшить анимацию», приложение не показывает блеск, эфир и искры, даже при «Полных»."
+        title={t('Анимации')}
+        hint={t('Насколько оживлён интерфейс. Если в Windows включено «уменьшить анимацию», приложение не показывает блеск, эфир и искры, даже при «Полных».')}
       >
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           {MOTION_LEVELS.map((m) => {
@@ -191,14 +192,14 @@ export function AppearanceSection() {
           <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5">
             <input type="checkbox" checked={ui.splash} onChange={(e) => void updateUi({ splash: e.target.checked })} className="accent-[var(--color-accent)]" />
             <span>
-              <span className="block text-[13px] text-ink">Заставка при запуске</span>
+              <span className="block text-[13px] text-ink">{t('Заставка при запуске')}</span>
               <span className="block text-[11px] text-ink-3">
-                Значок раскрывает крылья, ~2,5 с; клик или любая клавиша — пропустить. При «Выкл.» анимаций заставки нет, при «Спокойных» — без полётов.
+                {t('Значок раскрывает крылья, ~2,5 с; клик или любая клавиша — пропустить. При «Выкл.» анимаций заставки нет, при «Спокойных» — без полётов.')}
               </span>
             </span>
           </label>
           <Button size="sm" icon={<Play size={13} />} onClick={replaySplash}>
-            Показать сейчас
+            {t('Показать сейчас')}
           </Button>
         </div>
       </Card>

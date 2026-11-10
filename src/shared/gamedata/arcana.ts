@@ -7,6 +7,7 @@
 
 import type { ClassKey } from '../types'
 import poolsJson from './generated/arcana-pools.json'
+import { t } from '../i18n'
 
 export type ArcanaType = 'chalice' | 'parchment' | 'compass' | 'bell' | 'mirror'
 export type ArcanaVariant = 'magic' | 'vigor'
@@ -21,10 +22,10 @@ export const ARCANA_TYPES: { type: ArcanaType; slot: number; ru: string; en: str
 ]
 
 export const ARCANA_GRADES: Record<ArcanaGrade, { ru: string; skills: number; maxEnchant: number; mainStat: number }> = {
-  unique: { ru: 'Уникальная', skills: 4, maxEnchant: 5, mainStat: 20 },
-  legend: { ru: 'Легендарная', skills: 3, maxEnchant: 4, mainStat: 16 },
-  rare: { ru: 'Редкая', skills: 2, maxEnchant: 3, mainStat: 12 },
-  common: { ru: 'Обычная', skills: 1, maxEnchant: 2, mainStat: 8 }
+  unique: { ru: t('Уникальная'), skills: 4, maxEnchant: 5, mainStat: 20 },
+  legend: { ru: t('Легендарная'), skills: 3, maxEnchant: 4, mainStat: 16 },
+  rare: { ru: t('Редкая'), skills: 2, maxEnchant: 3, mainStat: 12 },
+  common: { ru: t('Обычная'), skills: 1, maxEnchant: 2, mainStat: 8 }
 }
 
 /** Потолок уровня одного умения на карте. */
@@ -43,14 +44,14 @@ export const ARCANA_SETS: Record<ArcanaVariant, { ru: string; en: string; bonus2
   magic: {
     ru: 'Магические доспехи',
     en: 'Magic Armor',
-    bonus2: '+1 500 ОМ, когда ОМ ≤ 20% (раз в 30 с)',
-    bonus4: '+1 000 ЗЩТ в PvE, когда ОМ ≥ 50%'
+    bonus2: t('+1 500 ОМ, когда ОМ ≤ 20% (раз в 30 с)'),
+    bonus4: t('+1 000 ЗЩТ в PvE, когда ОМ ≥ 50%')
   },
   vigor: {
     ru: 'Рождение жизни',
     en: 'Primal Vigor',
-    bonus2: '+60 АТК в PvE, когда ОЗ ≥ 70%',
-    bonus4: '+150 АТК в PvE, когда ОЗ ≥ 70%'
+    bonus2: t('+60 АТК в PvE, когда ОЗ ≥ 70%'),
+    bonus4: t('+150 АТК в PvE, когда ОЗ ≥ 70%')
   }
 }
 
@@ -69,10 +70,10 @@ export interface ArcanaInfo {
  */
 export function arcanaInfo(itemId: number): ArcanaInfo | null {
   if (Math.floor(itemId / 10_000_000) !== 81) return null
-  const t = Math.floor(itemId / 100_000) % 100
+  const typeNo = Math.floor(itemId / 100_000) % 100
   const g = Math.floor(itemId / 10_000) % 10
   const v = itemId % 10
-  const type = ARCANA_TYPES[t - 1]
+  const type = ARCANA_TYPES[typeNo - 1]
   const grade = ({ 3: 'unique', 4: 'legend', 5: 'rare', 6: 'common' } as Record<number, ArcanaGrade>)[g]
   const variant: ArcanaVariant | undefined = v === 1 ? 'vigor' : v === 2 ? 'magic' : undefined
   if (!type || !grade || !variant) return null

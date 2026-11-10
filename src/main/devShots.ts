@@ -21,6 +21,10 @@ export function prepareShots(): void {
   if (process.env.A2BH_SHOTS_SETTINGS && existsSync(join(real, 'settings.json'))) {
     mkdirSync(temp, { recursive: true })
     copyFileSync(join(real, 'settings.json'), join(temp, 'settings.json'))
+  } else {
+    // Чистые настройки взяли бы язык Windows — снимки по умолчанию русские (другой язык — A2BH_SHOTS_UI='{"lang":"de"}').
+    mkdirSync(temp, { recursive: true })
+    writeFileSync(join(temp, 'settings.json'), JSON.stringify({ ui: { lang: 'ru' } }))
   }
   // Иначе Chromium считает окно перекрытым и останавливает отрисовку — кадр ловится пустым.
   app.commandLine.appendSwitch('disable-features', 'CalculateNativeWinOcclusion')
@@ -43,8 +47,9 @@ const ROUTES: [string, string][] = [
   ['12-guides', '/guides'],
   ['13-checklist', '/checklist'],
   ['14-settings', '/settings'],
-  ['15-names', '/settings?tab=names'],
-  ['16-appearance', '/settings?tab=appearance']
+  ['15-language', '/settings?tab=language'],
+  ['16-names', '/settings?tab=names'],
+  ['17-appearance', '/settings?tab=appearance']
 ]
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
@@ -59,12 +64,15 @@ export async function runShots(win: BrowserWindow): Promise<void> {
   // Старые снимки убираем: номера страниц сдвигаются, и прежние файлы путались бы с новыми.
   for (const f of readdirSync(out)) if (f.endsWith('.png')) rmSync(join(out, f))
   win.setContentSize(1440, 900)
-  // A2BH_SHOTS_UI='{"themeId":"crimson","base":"asmodae","accent":"#e0525e","zoom":1.25}' — снять в другой теме и масштабе.
+  // A2BH_SHOTS_UI='{"themeId":"crimson","base":"asmodae","accent":"#e0525e","zoom":1.25,"lang":"de"}' — снять в другой теме, масштабе, на другом языке.
   if (process.env.A2BH_SHOTS_UI || process.env.A2BH_SHOTS_SETTINGS) {
-    await updateUi(process.env.A2BH_SHOTS_UI ? JSON.parse(process.env.A2BH_SHOTS_UI) : { zoom: 1 })
+    const { ui } = await updateUi(process.env.A2BH_SHOTS_UI ? JSON.parse(process.env.A2BH_SHOTS_UI) : { zoom: 1 })
     await applyUiToWindows()
     const loaded = new Promise((r) => win.webContents.once('did-finish-load', () => r(null)))
-    win.webContents.reload()
+    // Язык — в адресе окна (?lang=), поэтому не просто перезагрузка, а переход с новым языком.
+    const url = new URL(win.webContents.getURL())
+    url.searchParams.set('lang', ui.lang)
+    void win.loadURL(url.toString().replace('static=', 'static'))
     await loaded
   }
   // Заставка при запуске закрывается любой клавишей — на снимках её быть не должно.

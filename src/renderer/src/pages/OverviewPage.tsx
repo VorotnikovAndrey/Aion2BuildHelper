@@ -25,6 +25,8 @@ import { Tooltip } from '@/components/ui/InfoTip'
 import { abyssRankName, useHistory } from '@/lib/history'
 import { useCharacterContext } from '@/lib/report'
 import { api } from '@/lib/store'
+import { t } from '@shared/i18n'
+import { term } from '@shared/names'
 
 const AREA_ROUTE: Record<StepArea, string> = {
   skills: '/skills',
@@ -35,12 +37,13 @@ const AREA_ROUTE: Record<StepArea, string> = {
   genus: '/genus'
 }
 
+/** Что входит в оценку раздела — по маршруту раздела. */
 const SCORE_TIP: Record<string, string> = {
-  Умения: 'уровни главных умений против цели (60%) и нужные специализации (40%); главные весят втрое больше поддержки.',
-  Даэванион: 'доля нужных узлов досок, взятых по целям гайда.',
-  Шмот: 'средняя польза строк на вещах по весам гайда (75%) и манакамни (25%).',
-  Арканы: 'нужные умения на картах (70%) и заточка (30%).',
-  'Знание о видах': 'средняя польза статов в ячейках рода по весам гайда.'
+  '/skills': t('уровни главных умений против цели (60%) и нужные специализации (40%); главные весят втрое больше поддержки.'),
+  '/daevanion': t('доля нужных узлов досок, взятых по целям гайда.'),
+  '/gear': t('средняя польза строк на вещах по весам гайда (75%) и манакамни (25%).'),
+  '/arcana': t('нужные умения на картах (70%) и заточка (30%).'),
+  '/genus': t('средняя польза статов в ячейках рода по весам гайда.')
 }
 
 const AREA_ICON: Record<StepArea, typeof Swords> = {
@@ -65,7 +68,7 @@ export function OverviewPage() {
         <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
         <div className="relative flex flex-wrap items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <Tooltip content={`Класс: ${info?.ru ?? 'неизвестен'}`}>
+            <Tooltip content={t('Класс: {p}', { p: term(info, t('неизвестен')) })}>
               <span className="glow-accent flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-3 text-accent">
                 <ClassIcon cls={char.cls} size={46} />
               </span>
@@ -73,12 +76,12 @@ export function OverviewPage() {
             <div>
               <h1 className="text-3xl font-semibold tracking-tight">{char.name}</h1>
               <p className="mt-1 text-[13px] text-ink-2">
-                {info?.ru ?? 'Класс неизвестен'} · ур. {char.level}
-                {char.legion ? ` · ${char.legion}` : ''} · сервер {char.server}
-                {char.race && RACES[char.race] ? ` · ${RACES[char.race].ru}` : ''}
+                {term(info, t('Класс неизвестен'))} {t('· ур. {level}', { level: char.level })}
+                {char.legion ? ` · ${char.legion}` : ''} {t('· сервер {server}', { server: char.server })}
+                {char.race && RACES[char.race] ? ` · ${term(RACES[char.race])}` : ''}
               </p>
-              <Tooltip content="Когда оверлей Questlog последний раз обновил данные этого персонажа. Обновляются при смене зоны в игре.">
-                <p className="mt-0.5 text-[11px] text-ink-3">Оверлей видел персонажа {ago(char.updatedAt)}</p>
+              <Tooltip content={t('Когда оверлей Questlog последний раз обновил данные этого персонажа. Обновляются при смене зоны в игре.')}>
+                <p className="mt-0.5 text-[11px] text-ink-3">{t('Оверлей видел персонажа {ago}', { ago: ago(char.updatedAt) })}</p>
               </Tooltip>
             </div>
           </div>
@@ -89,28 +92,28 @@ export function OverviewPage() {
         </div>
         <div className="relative mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatTile
-            label="Боевая мощь"
+            label={t('Боевая мощь')}
             value={compact(char.combatPower)}
             sub={fmt(char.combatPower)}
             accent
-            hint="Боевая мощь из игры, как её видит оверлей. Рост по времени — на странице «История»."
+            hint={t('Боевая мощь из игры, как её видит оверлей. Рост по времени — на странице «История».')}
           />
           <StatTile
-            label="Уровень снаряжения"
+            label={t('Уровень снаряжения')}
             value={fmt(char.gearScore)}
-            hint="Сумма уровней надетых предметов (Gear Score). От него зависит доступ к контенту."
+            hint={t('Сумма уровней надетых предметов (Gear Score). От него зависит доступ к контенту.')}
           />
           <StatTile
-            label="Ранг Бездны"
+            label={t('Ранг Бездны')}
             value={char.abyss ? abyssRankName(char.abyss.grade) : '—'}
-            sub={char.abyss ? `Очки: ${compact(char.abyss.points)}` : undefined}
-            hint="Ранг и очки Бездны в текущем сезоне."
+            sub={char.abyss ? t('Очки: {points}', { points: compact(char.abyss.points) }) : undefined}
+            hint={t('Ранг и очки Бездны в текущем сезоне.')}
           />
           <StatTile
-            label="Сезон Бездны"
+            label={t('Сезон Бездны')}
             value={char.abyss ? `${char.abyss.kills} / ${char.abyss.deaths} / ${char.abyss.assists}` : '—'}
-            sub="убийства / смерти / помощь"
-            hint="Счёт PvP в текущем сезоне Бездны: убийства, смерти и помощь в убийствах."
+            sub={t('убийства / смерти / помощь')}
+            hint={t('Счёт PvP в текущем сезоне Бездны: убийства, смерти и помощь в убийствах.')}
           />
         </div>
       </section>
@@ -119,14 +122,14 @@ export function OverviewPage() {
 
       {!guide ? (
         <EmptyState
-          title="Гайд не выбран"
+          title={t('Гайд не выбран')}
           action={
             <Button variant="primary" onClick={() => navigate('/guides')}>
-              Выбрать гайд
+              {t('Выбрать гайд')}
             </Button>
           }
         >
-          Без гайда приложение показывает персонажа как есть, но не может подсказать, чего не хватает. Выберите встроенный гайд или создайте свой.
+          {t('Без гайда приложение показывает персонажа как есть, но не может подсказать, чего не хватает. Выберите встроенный гайд или создайте свой.')}
         </EmptyState>
       ) : (
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_380px]">
@@ -137,27 +140,32 @@ export function OverviewPage() {
           </div>
           <div className="flex min-w-0 flex-col gap-5">
             <Card
-              title="Готовность билда"
-              hint="Насколько персонаж совпадает с выбранным гайдом. Умения и Даэванион весят больше всего — от них зависят ключевые специализации."
+              title={t('Готовность билда')}
+              hint={t('Насколько персонаж совпадает с выбранным гайдом. Умения и Даэванион весят больше всего — от них зависят ключевые специализации.')}
             >
               <div className="flex items-center gap-5">
                 <Tooltip
-                  content="Общий балл: умения 35%, Даэванион 20%, шмот 20%, арканы 15%, Знание о видах 10%. 85+ — зелёный, 60–84 — жёлтый, ниже — красный."
+                  content={t('Общий балл: умения 35%, Даэванион 20%, шмот 20%, арканы 15%, Знание о видах 10%. 85+ — зелёный, 60–84 — жёлтый, ниже — красный.')}
                   wide
                 >
-                  <ScoreRing value={report.scores.overall} size={104} label="из 100" />
+                  <ScoreRing value={report.scores.overall} size={104} label={t('из 100')} />
                 </Tooltip>
                 <div className="min-w-0 flex-1 space-y-2.5">
                   {(
                     [
-                      ['Умения', report.scores.skills, '/skills'],
-                      ['Даэванион', report.scores.daevanion, '/daevanion'],
-                      ['Шмот', report.scores.gear, '/gear'],
-                      ['Арканы', report.scores.arcana, '/arcana'],
-                      ['Знание о видах', report.scores.genus, '/genus']
+                      [t('Умения'), report.scores.skills, '/skills'],
+                      [t('Даэванион'), report.scores.daevanion, '/daevanion'],
+                      [t('Шмот'), report.scores.gear, '/gear'],
+                      [t('Арканы'), report.scores.arcana, '/arcana'],
+                      [t('Знание о видах'), report.scores.genus, '/genus']
                     ] as const
                   ).map(([label, value, to]) => (
-                    <Tooltip key={label} block content={`${label}: ${value} из 100 — ${SCORE_TIP[label]} Нажмите, чтобы открыть раздел.`} wide>
+                    <Tooltip
+                      key={label}
+                      block
+                      content={t('{label}: {value} из 100 — {SCORE_TIP} Нажмите, чтобы открыть раздел.', { label, value, SCORE_TIP: SCORE_TIP[to] })}
+                      wide
+                    >
                       <button onClick={() => navigate(to)} className="block w-full text-left">
                         <div className="mb-1 flex items-center justify-between text-xs">
                           <span className="text-ink-2">{label}</span>
@@ -176,7 +184,7 @@ export function OverviewPage() {
                     onClick={() => void api.app.openExternal(guide.source!.url!)}
                     className="ml-1.5 inline-flex items-center gap-1 text-accent hover:underline"
                   >
-                    источник <ExternalLink size={11} />
+                    {t('источник')} <ExternalLink size={11} />
                   </button>
                 )}
               </div>
@@ -197,7 +205,11 @@ function BuildGlance({ ctx }: { ctx: Ctx }) {
   const core = report.skills.filter((s) => s.role === 'core')
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-      <Card title="Главные умения" hint="Умения, вокруг которых построен гайд: уровень против цели и специализации." actions={<GoLink to="/skills" />}>
+      <Card
+        title={t('Главные умения')}
+        hint={t('Умения, вокруг которых построен гайд: уровень против цели и специализации.')}
+        actions={<GoLink to="/skills" />}
+      >
         <div className="space-y-3">
           {core.map((s) => {
             const v = skillTone(s, report.specsUncertain)
@@ -209,7 +221,7 @@ function BuildGlance({ ctx }: { ctx: Ctx }) {
                     <div className="mb-1 flex items-center justify-between gap-2 text-[13px]">
                       <span className="truncate">{namer.skill(s.skill).main}</span>
                       <span className="tnum shrink-0 text-xs text-ink-3">
-                        ур. <span className={TONE_TEXT[levelTone(s).tone]}>{s.level}</span>
+                        {t('ур.')} <span className={TONE_TEXT[levelTone(s).tone]}>{s.level}</span>
                         {s.targetLevel ? ` / ${s.targetLevel}` : ''}
                       </span>
                     </div>
@@ -231,21 +243,21 @@ function BuildGlance({ ctx }: { ctx: Ctx }) {
                   key={id}
                   tone={wanted ? 'good' : 'warning'}
                   icon={<SkillIcon id={id} size={14} />}
-                  tip={wanted ? 'Стигма надета, и гайд держит её постоянно.' : 'Стигма надета, но гайд держит другую.'}
+                  tip={wanted ? t('Стигма надета, и гайд держит её постоянно.') : t('Стигма надета, но гайд держит другую.')}
                 >
                   {namer.skill(id).main}
                 </Pill>
               )
             })}
             {report.stigmas.missing.map((id) => (
-              <Pill key={id} tone="critical" icon={<SkillIcon id={id} size={14} dim />} tip="Гайд держит эту стигму надетой, а у вас её нет.">
-                нет: {namer.skill(id).main}
+              <Pill key={id} tone="critical" icon={<SkillIcon id={id} size={14} dim />} tip={t('Гайд держит эту стигму надетой, а у вас её нет.')}>
+                {t('нет: {skill}', { skill: namer.skill(id).main })}
               </Pill>
             ))}
           </div>
         </div>
       </Card>
-      <Card title="Арканы" hint="Сколько нужных по гайду умений на каждой карте и заточка." actions={<GoLink to="/arcana" />}>
+      <Card title={t('Арканы')} hint={t('Сколько нужных по гайду умений на каждой карте и заточка.')} actions={<GoLink to="/arcana" />}>
         <div className="space-y-2">
           {report.arcana.cards.map((c) => {
             const wanted = c.skills.filter((s) => s.cls === 'wanted').length
@@ -254,14 +266,19 @@ function BuildGlance({ ctx }: { ctx: Ctx }) {
                 key={c.slot}
                 block
                 wide
-                content={`${c.info?.ru ?? 'Слот пуст'}: нужных по гайду умений ${wanted} из ${c.desired.length}, заточка +${c.enchant} из +${c.maxEnchant}.${c.missing.length ? ' Не хватает: ' + c.missing.map((id) => namer.skill(id).main).join(', ') + '.' : ' Набор как в гайде.'}`}
+                content={t('{p}: нужных по гайду умений {wanted} из {desiredCount}, заточка +{enchant} из +{maxEnchant}.{p2}', {
+                  p: term(c.info, t('Слот пуст')),
+                  wanted,
+                  desiredCount: c.desired.length,
+                  enchant: c.enchant,
+                  maxEnchant: c.maxEnchant,
+                  p2: c.missing.length ? t(' Не хватает: ') + c.missing.map((id) => namer.skill(id).main).join(', ') + '.' : t(' Набор как в гайде.')
+                })}
               >
                 <div className="flex w-full items-center gap-3 text-[13px]">
                   {c.main ? <SkillIcon id={c.main} size={22} /> : <span className="h-[22px] w-[22px]" />}
-                  <span className="w-28 truncate">{c.info?.ru ?? ARCANA_TYPES.find((t) => t.type === c.type)!.ru}</span>
-                  <Pill tone={toneOfShare(wanted, c.desired.length)}>
-                    {wanted} из {c.desired.length}
-                  </Pill>
+                  <span className="w-28 truncate">{c.info ? term(c.info) : term(ARCANA_TYPES.find((x) => x.type === c.type))}</span>
+                  <Pill tone={toneOfShare(wanted, c.desired.length)}>{t('{wanted} из {desiredCount}', { wanted, desiredCount: c.desired.length })}</Pill>
                   <span className={cn('tnum text-xs', c.enchant >= c.maxEnchant ? 'text-good' : 'text-warning')}>
                     +{c.enchant}/{c.maxEnchant}
                   </span>
@@ -275,20 +292,29 @@ function BuildGlance({ ctx }: { ctx: Ctx }) {
           {report.arcana.sets
             .filter((s) => s.count)
             .map((s) => (
-              <Pill key={s.variant} tone={s.active ? 'accent' : 'neutral'} tip={`2 карты: ${s.bonus2}. 4 карты: ${s.bonus4}.`}>
+              <Pill
+                key={s.variant}
+                tone={s.active ? 'accent' : 'neutral'}
+                tip={t('2 карты: {bonus2}. 4 карты: {bonus4}.', { bonus2: s.bonus2, bonus4: s.bonus4 })}
+              >
                 {s.name}: {s.count}/4
               </Pill>
             ))}
         </div>
       </Card>
-      <Card title="Даэванион" hint="Цели гайда по доскам: сколько нужных узлов взято." actions={<GoLink to="/daevanion" />}>
+      <Card title={t('Даэванион')} hint={t('Цели гайда по доскам: сколько нужных узлов взято.')} actions={<GoLink to="/daevanion" />}>
         <div className="space-y-3">
           {report.daevanion.goals.map((g) => (
             <Tooltip
               key={g.goal.id}
               block
               wide
-              content={`${g.goal.description ?? g.goal.name} Взято ${g.done} из ${g.required.length} нужных узлов${g.remainingCost ? `, осталось около ${g.remainingCost} очк.` : '.'}`}
+              content={t('{p} Взято {done} из {requiredCount} нужных узлов{p2}', {
+                p: g.goal.description ?? g.goal.name,
+                done: g.done,
+                requiredCount: g.required.length,
+                p2: g.remainingCost ? t(', осталось около {remainingCost} очк.', { remainingCost: g.remainingCost }) : '.'
+              })}
             >
               <div className="w-full">
                 <div className="mb-1 flex items-center justify-between gap-2 text-[13px]">
@@ -301,34 +327,40 @@ function BuildGlance({ ctx }: { ctx: Ctx }) {
               </div>
             </Tooltip>
           ))}
-          <Tooltip content="Сумма стоимости всех взятых узлов на всех досках.">
-            <p className="text-xs text-ink-3">Вложено очков: {fmt(report.daevanion.spent)}</p>
+          <Tooltip content={t('Сумма стоимости всех взятых узлов на всех досках.')}>
+            <p className="text-xs text-ink-3">{t('Вложено очков: {spent}', { spent: fmt(report.daevanion.spent) })}</p>
           </Tooltip>
         </div>
       </Card>
-      <Card title="Шмот и род" hint="Доля полезных строк на шмоте и в Знании о видах." actions={<GoLink to="/gear" />}>
+      <Card title={t('Шмот и род')} hint={t('Доля полезных строк на шмоте и в Знании о видах.')} actions={<GoLink to="/gear" />}>
         <div className="space-y-3 text-[13px]">
           <Row
-            label="Полезных строк на шмоте"
-            value={`${sum(report.gear.map((g) => g.useful))} из ${sum(report.gear.map((g) => g.total))}`}
-            tip="Строки вещей с важностью 3–5 по гайду (зелёные и жёлтые на странице «Шмот»)."
+            label={t('Полезных строк на шмоте')}
+            value={t('{sum} из {sum2}', { sum: sum(report.gear.map((g) => g.useful)), sum2: sum(report.gear.map((g) => g.total)) })}
+            tip={t('Строки вещей с важностью 3–5 по гайду (зелёные и жёлтые на странице «Шмот»).')}
           />
           <Row
-            label="Строк «менять»"
+            label={t('Строк «менять»')}
             value={String(sum(report.gear.map((g) => g.replace.length)))}
             warn
-            tip="Строки, которые гайд совсем не ценит (красные зачёркнутые), — их стоит перековать."
+            tip={t('Строки, которые гайд совсем не ценит (красные зачёркнутые), — их стоит перековать.')}
           />
           <Row
-            label="Слабых манакамней"
-            tip="Манакамни со статами важностью 0–1 по гайду — их стоит заменить на АТК или Крит. удар."
-            value={`${report.gear.flatMap((g) => g.manastones).filter((m) => m.weight <= 1).length} из ${report.gear.flatMap((g) => g.manastones).length}`}
+            label={t('Слабых манакамней')}
+            tip={t('Манакамни со статами важностью 0–1 по гайду — их стоит заменить на АТК или Крит. удар.')}
+            value={t('{filterCount} из {flatMapCount}', {
+              filterCount: report.gear.flatMap((g) => g.manastones).filter((m) => m.weight <= 1).length,
+              flatMapCount: report.gear.flatMap((g) => g.manastones).length
+            })}
             warn
           />
           <Row
-            label="Ячеек рода под переброс"
-            tip="Ячейки Знания о видах со статами важностью 0–1 по гайду."
-            value={`${sum(report.genus.genuses.map((g) => g.reroll.length))} из ${sum(report.genus.genuses.map((g) => g.slots.length))}`}
+            label={t('Ячеек рода под переброс')}
+            tip={t('Ячейки Знания о видах со статами важностью 0–1 по гайду.')}
+            value={t('{sum} из {sum2}', {
+              sum: sum(report.genus.genuses.map((g) => g.reroll.length)),
+              sum2: sum(report.genus.genuses.map((g) => g.slots.length))
+            })}
             warn
           />
         </div>
@@ -344,9 +376,9 @@ function GrowthCard({ ctx }: { ctx: Ctx }) {
   const first = points[0]
   const delta = first ? char.combatPower - first.cp : 0
   return (
-    <Card title="Рост боевой мощи" hint="Строится по снимкам, которые приложение сохраняет при каждом обновлении данных оверлея.">
+    <Card title={t('Рост боевой мощи')} hint={t('Строится по снимкам, которые приложение сохраняет при каждом обновлении данных оверлея.')}>
       {points.length < 2 ? (
-        <p className="text-[13px] text-ink-3">История копится с первого запуска. Как только оверлей обновит персонажа ещё раз, здесь появится график.</p>
+        <p className="text-[13px] text-ink-3">{t('История копится с первого запуска. Как только оверлей обновит персонажа ещё раз, здесь появится график.')}</p>
       ) : (
         <>
           <div className="mb-2 flex items-center gap-2 text-[13px]">
@@ -355,7 +387,7 @@ function GrowthCard({ ctx }: { ctx: Ctx }) {
               {delta >= 0 ? '+' : ''}
               {fmt(delta)}
             </span>
-            <span className="text-ink-3">с {dateTime(first.t)}</span>
+            <span className="text-ink-3">{t('с {dateTime}', { dateTime: dateTime(first.t) })}</span>
           </div>
           <div className="h-28">
             <ResponsiveContainer>
@@ -365,7 +397,7 @@ function GrowthCard({ ctx }: { ctx: Ctx }) {
                 <ChartTooltip
                   contentStyle={{ background: 'var(--color-surface-3)', border: '1px solid var(--color-line-strong)', borderRadius: 8, fontSize: 12 }}
                   labelFormatter={(t) => dateTime(Number(t))}
-                  formatter={(v) => [fmt(Number(v)), 'Боевая мощь']}
+                  formatter={(v) => [fmt(Number(v)), t('Боевая мощь')]}
                 />
                 <Line type="monotone" dataKey="cp" stroke="var(--color-accent)" strokeWidth={2} dot={false} />
               </LineChart>
@@ -387,9 +419,9 @@ function RecentChanges({ ctx }: { ctx: Ctx }) {
     .filter(({ c }) => c.kind !== 'gearScore')
     .slice(0, 7)
   return (
-    <Card title="Последние изменения" actions={<GoLink to="/history" />}>
+    <Card title={t('Последние изменения')} actions={<GoLink to="/history" />}>
       {recent.length === 0 ? (
-        <p className="text-[13px] text-ink-3">Изменений пока нет — они появятся после следующего обновления оверлея.</p>
+        <p className="text-[13px] text-ink-3">{t('Изменений пока нет — они появятся после следующего обновления оверлея.')}</p>
       ) : (
         <ul className="space-y-2">
           {recent.map(({ at, c }, i) => {
@@ -413,13 +445,13 @@ function NextSteps({ steps, onOpen }: { steps: NextStep[]; onOpen: (s: NextStep)
   const shown = all ? steps : steps.slice(0, 8)
   return (
     <Card
-      title="Что сделать дальше"
-      hint="Список собран из разницы между персонажем и гайдом. Сверху — то, что сильнее всего влияет на билд. Нажмите на пункт, чтобы открыть раздел."
-      actions={<Pill tone={steps.length ? 'accent' : 'good'}>{steps.length ? `${steps.length} шагов` : 'всё по гайду'}</Pill>}
+      title={t('Что сделать дальше')}
+      hint={t('Список собран из разницы между персонажем и гайдом. Сверху — то, что сильнее всего влияет на билд. Нажмите на пункт, чтобы открыть раздел.')}
+      actions={<Pill tone={steps.length ? 'accent' : 'good'}>{steps.length ? t('{stepsCount} шагов', { stepsCount: steps.length }) : t('всё по гайду')}</Pill>}
     >
       {steps.length === 0 ? (
         <div className="flex items-center gap-2 text-[13px] text-good">
-          <CheckCircle2 size={16} /> Персонаж полностью совпадает с гайдом. Самое время выбрать гайд посерьёзнее.
+          <CheckCircle2 size={16} /> {t('Персонаж полностью совпадает с гайдом. Самое время выбрать гайд посерьёзнее.')}
         </div>
       ) : (
         <ul className="-mx-2">
@@ -449,7 +481,7 @@ function NextSteps({ steps, onOpen }: { steps: NextStep[]; onOpen: (s: NextStep)
       )}
       {steps.length > 8 && (
         <Button variant="ghost" size="sm" className="mt-2" onClick={() => setAll((v) => !v)}>
-          {all ? 'Свернуть' : `Показать все (${steps.length})`}
+          {all ? t('Свернуть') : t('Показать все ({stepsCount})', { stepsCount: steps.length })}
         </Button>
       )}
     </Card>
@@ -460,7 +492,7 @@ function GoLink({ to }: { to: string }) {
   const navigate = useNavigate()
   return (
     <button onClick={() => navigate(to)} className="flex items-center gap-1 text-xs text-ink-3 hover:text-accent">
-      подробнее <ArrowRight size={12} />
+      {t('подробнее')} <ArrowRight size={12} />
     </button>
   )
 }
@@ -488,15 +520,15 @@ function DevelopmentStrip({ ctx }: { ctx: NonNullable<ReturnType<typeof useChara
   const main = report.gear.filter((i) => i.group !== 'accessory')
   return (
     <Card
-      title="Обзор развития"
+      title={t('Обзор развития')}
       className="mb-6"
-      hint="Как вкладка «Обзор развития» в окне персонажа: что надето прямо сейчас. Нажмите на блок, чтобы открыть раздел."
+      hint={t('Как вкладка «Обзор развития» в окне персонажа: что надето прямо сейчас. Нажмите на блок, чтобы открыть раздел.')}
     >
       <div className="flex flex-wrap items-stretch gap-x-8 gap-y-5">
         <button onClick={() => navigate('/collections')} className="min-w-0 text-left">
-          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Титулы</div>
+          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{t('Титулы')}</div>
           <div className="flex gap-2">
-            {titles.length === 0 && <span className="text-[13px] text-ink-3">не надеты</span>}
+            {titles.length === 0 && <span className="text-[13px] text-ink-3">{t('не надеты')}</span>}
             {titles.map((s) => (
               <Tooltip key={s.category} content={`${s.ru}: ${titleName(s.equipped!)}`}>
                 <div className="flex w-[92px] flex-col items-center gap-1 rounded-xl border border-line bg-surface-2 px-1.5 pt-2 pb-1.5 transition-colors hover:border-line-strong">
@@ -509,13 +541,15 @@ function DevelopmentStrip({ ctx }: { ctx: NonNullable<ReturnType<typeof useChara
         </button>
 
         <button onClick={() => navigate('/arcana')} className="min-w-0 text-left">
-          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Арканы</div>
+          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{t('Арканы')}</div>
           <div className="flex gap-2">
             {cards.map((c) => (
               <Tooltip
                 key={c.slot}
                 content={
-                  c.item ? `${c.info?.ru ?? ''}: заточка +${c.enchant} из +${c.maxEnchant}` : `${ARCANA_TYPES.find((t) => t.type === c.type)?.ru}: слот пуст`
+                  c.item
+                    ? t('{p}: заточка +{enchant} из +{maxEnchant}', { p: term(c.info), enchant: c.enchant, maxEnchant: c.maxEnchant })
+                    : t('{find}: слот пуст', { find: term(ARCANA_TYPES.find((x) => x.type === c.type)) })
                 }
               >
                 <div className="w-[58px] transition-transform hover:-translate-y-0.5" style={{ fontSize: 11 }}>
@@ -527,7 +561,7 @@ function DevelopmentStrip({ ctx }: { ctx: NonNullable<ReturnType<typeof useChara
         </button>
 
         <button onClick={() => navigate('/gear')} className="min-w-0 flex-1 text-left">
-          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Оружие и броня</div>
+          <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{t('Оружие и броня')}</div>
           <div className="flex flex-wrap gap-1.5">
             {main.map((i) => (
               <Tooltip key={i.slot} content={`${namer.item(i.item.item, i.slot).main} · +${i.item.enchant}`}>

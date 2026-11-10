@@ -9,8 +9,10 @@ import type { Namer } from '@shared/names'
 import { gradeColorVar, PantheonPiece, TitleEmblem } from '@/components/art'
 import { Tooltip } from '@/components/ui/InfoTip'
 import { cn } from '@/lib/format'
+import { lowerInSentence, t } from '@shared/i18n'
+import { activeGameLang, ruName, term } from '@shared/names'
 
-export const titleName = (t: TitleDef) => t.ru ?? t.en
+export const titleName = (ttl: TitleDef) => term(ttl)
 
 function StatLines({ list, namer, className }: { list: [number, number][]; namer: Namer; className?: string }) {
   return (
@@ -27,12 +29,16 @@ function StatLines({ list, namer, className }: { list: [number, number][]; namer
 
 /** Карточка надетого титула — как в окне «Титулы»: эмблема, название цветом грейда, бонусы. */
 export function TitleCard({ slot, namer }: { slot: TitleSlotReport; namer: Namer }) {
-  const t = slot.equipped
-  if (!t) {
+  const ttl = slot.equipped
+  if (!ttl) {
     return (
-      <Tooltip block wide content={`Титул категории «${slot.ru}» не надет. Надеть можно по одному титулу каждой категории — бонус работает, пока титул надет.`}>
+      <Tooltip
+        block
+        wide
+        content={t('Титул категории «{slot}» не надет. Надеть можно по одному титулу каждой категории — бонус работает, пока титул надет.', { slot: slot.ru })}
+      >
         <div className="flex h-full w-full items-center gap-4 rounded-xl border border-dashed border-line-strong bg-surface-2/40 p-4">
-          <span className="text-[13px] text-ink-3">{slot.ru}: титул не надет</span>
+          <span className="text-[13px] text-ink-3">{t('{slot}: титул не надет', { slot: slot.ru })}</span>
         </div>
       </Tooltip>
     )
@@ -40,25 +46,29 @@ export function TitleCard({ slot, namer }: { slot: TitleSlotReport; namer: Namer
   return (
     <div className="flex h-full w-full flex-col rounded-xl border border-line bg-gradient-to-br from-surface-3/60 via-surface-2 to-surface p-4">
       <div className="flex items-start gap-3">
-        <TitleEmblem category={t.category} grade={t.grade} size={58} className="-mt-1 -ml-1" />
+        <TitleEmblem category={ttl.category} grade={ttl.grade} size={58} className="-mt-1 -ml-1" />
         <div className="min-w-0 flex-1">
           <div className="text-[10.5px] font-semibold tracking-wider text-ink-3 uppercase">{slot.ru}</div>
           <Tooltip
-            content={`${GRADES[t.grade].ru} титул${t.source && t.source !== '—' ? `. Где взять: ${t.source}` : ''}${t.ru ? '' : '. Русского названия пока нет — показано английское.'}`}
+            content={t('{GRADES} титул{p}{p2}', {
+              GRADES: term(GRADES[ttl.grade]),
+              p: ttl.source && ttl.source !== '—' ? t('. Где взять: {source}', { source: ttl.source }) : '',
+              p2: ttl.ru || activeGameLang() !== 'ru' ? '' : t('. Русского названия пока нет — показано английское.')
+            })}
           >
-            <div className="mt-0.5 text-[15px] leading-snug font-bold" style={{ color: gradeColorVar(t.grade) }}>
-              {titleName(t)}
+            <div className="mt-0.5 text-[15px] leading-snug font-bold" style={{ color: gradeColorVar(ttl.grade) }}>
+              {titleName(ttl)}
             </div>
           </Tooltip>
         </div>
       </div>
-      <Tooltip block content="Бонус, пока титул надет.">
-        <StatLines list={t.equip} namer={namer} className="mt-3 w-full" />
+      <Tooltip block content={t('Бонус, пока титул надет.')}>
+        <StatLines list={ttl.equip} namer={namer} className="mt-3 w-full" />
       </Tooltip>
-      {t.collection.length > 0 && (
-        <Tooltip block content="«Эффект при наличии»: работает, даже если титул просто лежит в коллекции.">
+      {ttl.collection.length > 0 && (
+        <Tooltip block content={t('«Эффект при наличии»: работает, даже если титул просто лежит в коллекции.')}>
           <div className="mt-2.5 w-full rounded-md bg-bg/50 px-2 py-1">
-            <StatLines list={t.collection} namer={namer} />
+            <StatLines list={ttl.collection} namer={namer} />
           </div>
         </Tooltip>
       )}
@@ -69,11 +79,11 @@ export function TitleCard({ slot, namer }: { slot: TitleSlotReport; namer: Namer
           wide
           content={
             <>
-              <b className="text-ink">{titleName(slot.better.title)}</b> уже есть в коллекции.{' '}
-              {slot.better.reason === 'guide' ? 'Гайд ставит его выше надетого.' : 'По приоритетам гайда его бонусы, похоже, полезнее.'} Даёт:{' '}
-              {statText(slot.better.title.equip, namer)}.
+              <b className="text-ink">{titleName(slot.better.title)}</b> {t('уже есть в коллекции.')}
+              {slot.better.reason === 'guide' ? t('Гайд ставит его выше надетого.') : t('По приоритетам гайда его бонусы, похоже, полезнее.')}{' '}
+              {t('Даёт: {statText}.', { statText: statText(slot.better.title.equip, namer) })}
               {slot.better.reason === 'score' && (
-                <span className="mt-1 block text-ink-3">Оценка помощника: важность статов по гайду с учётом величины бонуса.</span>
+                <span className="mt-1 block text-ink-3">{t('Оценка помощника: важность статов по гайду с учётом величины бонуса.')}</span>
               )}
             </>
           }
@@ -81,7 +91,7 @@ export function TitleCard({ slot, namer }: { slot: TitleSlotReport; namer: Namer
           <div className="mt-3 flex w-full items-center gap-2 rounded-lg border border-warning/35 bg-warning-soft px-2.5 py-1.5 text-[12px] text-warning">
             <TitleEmblem category={slot.better.title.category} grade={slot.better.title.grade} size={20} />
             <span className="min-w-0">
-              {slot.better.reason === 'guide' ? 'Гайд советует надеть' : 'Есть полезнее'}: <b>{titleName(slot.better.title)}</b>
+              {slot.better.reason === 'guide' ? t('Гайд советует надеть') : t('Есть полезнее')}: <b>{titleName(slot.better.title)}</b>
             </span>
           </div>
         </Tooltip>
@@ -104,22 +114,25 @@ function TitleGoal({ slot, namer }: { slot: TitleSlotReport; namer: Namer }) {
         wide
         content={
           <>
-            <b className="text-ink">{titleName(goal)}</b> — лучший титул этой категории по гайду, его пока нет в коллекции. Даёт: {statText(goal.equip, namer)}.
-            {goal.collection.length > 0 && <span className="mt-1 block text-ink-3">При наличии: {statText(goal.collection, namer)}.</span>}
+            <b className="text-ink">{titleName(goal)}</b>{' '}
+            {t('— лучший титул этой категории по гайду, его пока нет в коллекции. Даёт: {statText}.', { statText: statText(goal.equip, namer) })}
+            {goal.collection.length > 0 && (
+              <span className="mt-1 block text-ink-3">{t('При наличии: {statText}.', { statText: statText(goal.collection, namer) })}</span>
+            )}
           </>
         }
       >
         <div className="flex w-full items-center gap-2 text-aether">
           <TitleEmblem category={goal.category} grade={goal.grade} size={20} dim />
           <span className="min-w-0">
-            Цель: <b>{titleName(goal)}</b> — ещё не получен
+            {t('Цель:')} <b>{titleName(goal)}</b> {t('— ещё не получен')}
           </span>
         </div>
       </Tooltip>
-      <div className="mt-1.5 text-[11.5px] leading-relaxed text-ink-2">Даёт: {statText(goal.equip, namer)}.</div>
+      <div className="mt-1.5 text-[11.5px] leading-relaxed text-ink-2">{t('Даёт: {statText}.', { statText: statText(goal.equip, namer) })}</div>
       {how && <div className="mt-1 text-[11.5px] leading-relaxed text-ink-2">{how.ru}</div>}
       {p && how?.track && (
-        <Tooltip block content={`${TRACK_RU[how.track]}: ${p.current} из ${p.goal}.`}>
+        <Tooltip block content={t('{TRACK_RU}: {current} из {goal}.', { TRACK_RU: TRACK_RU[how.track], current: p.current, goal: p.goal })}>
           <div className="mt-1.5 flex w-full items-center gap-2 text-[11px]">
             <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-bg/60">
               <span
@@ -166,7 +179,7 @@ const SPOT: Record<number, [number, number]> = {
 }
 const HALF = 345
 const PIECE_SIZE: Record<PantheonKind, number> = { painting: 0.15, statue: 0.2, colossus: 0.27 }
-const KIND_RU: Record<PantheonKind, string> = { painting: 'картина', statue: 'статуя', colossus: 'колосс' }
+const KIND_RU: Record<PantheonKind, string> = { painting: t('картина'), statue: t('статуя'), colossus: t('колосс') }
 
 /** Круг пантеона, как в игре: колосс в центре, четыре статуи, двенадцать картин по кругу. */
 export function PantheonBoard({ placed, size = 380 }: { placed: Map<number, number>; size?: number }) {
@@ -196,15 +209,17 @@ export function PantheonBoard({ placed, size = 380 }: { placed: Map<number, numb
               content={
                 deco ? (
                   <>
-                    <b style={{ color: art ? gradeColorVar(art.grade) : undefined }}>{art?.ru ?? `Украшение #${deco}`}</b>
+                    <b style={{ color: art ? gradeColorVar(art.grade) : undefined }}>
+                      {art ? ruName(art.ru, t('Украшение пантеона')) : t('Украшение #{deco}', { deco })}
+                    </b>
                     <span className="block text-ink-3">
                       {KIND_RU[kind]}
-                      {art ? ` · ${GRADES[art.grade].ru.toLowerCase()}` : ''}
+                      {art ? ` · ${lowerInSentence(term(GRADES[art.grade]))}` : ''}
                     </span>
-                    <span className="mt-1 block">Даёт статы богов — их сумма видна в игре в «Эффектах размещения».</span>
+                    <span className="mt-1 block">{t('Даёт статы богов — их сумма видна в игре в «Эффектах размещения».')}</span>
                   </>
                 ) : (
-                  `Свободное место: ${KIND_RU[kind]}. Поставьте сюда украшение из шкафа — оно добавит статы богов.`
+                  t('Свободное место: {KIND_RU}. Поставьте сюда украшение из шкафа — оно добавит статы богов.', { KIND_RU: KIND_RU[kind] })
                 )
               }
             >

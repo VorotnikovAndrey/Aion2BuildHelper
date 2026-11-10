@@ -6,10 +6,11 @@ import { TITLE_CATEGORIES, TITLE_HOW, titleDef, TITLES, type TitleDef, type Titl
 import type { Guide } from '../guide/types'
 import type { Character } from '../types'
 import { guideWeights } from './weights'
+import { t } from '../i18n'
 
 /** Лучшее значение каждого стата среди всех титулов — чтобы сравнивать бонусы разной величины. */
 const BEST = new Map<number, number>()
-for (const t of TITLES) for (const [stat, value] of t.equip) BEST.set(stat, Math.max(BEST.get(stat) ?? 0, value))
+for (const td of TITLES) for (const [stat, value] of td.equip) BEST.set(stat, Math.max(BEST.get(stat) ?? 0, value))
 
 export interface TitleSlotReport {
   category: TitleCategory
@@ -41,10 +42,10 @@ export function trackValue(char: Character, track: TitleTrack): number {
   }
 }
 
-function howFor(char: Character, t: TitleDef | null): TitleSlotReport['goalHow'] {
-  if (!t) return null
-  const how = TITLE_HOW[t.id]
-  if (!how) return t.source && t.source !== '—' ? { ru: `Где взять: ${t.source}.` } : null
+function howFor(char: Character, td: TitleDef | null): TitleSlotReport['goalHow'] {
+  if (!td) return null
+  const how = TITLE_HOW[td.id]
+  if (!how) return td.source && td.source !== '—' ? { ru: t('Где взять: {source}.', { source: td.source }) } : null
   return how.track && how.goal ? { ...how, progress: { current: trackValue(char, how.track), goal: how.goal } } : how
 }
 
@@ -61,25 +62,25 @@ export interface TitlesReport {
  * значения этого стата среди всех титулов. «+3% урона в PvE» при лучших 4,5% даёт 5 × 0,67.
  * Это оценка помощника: точный вклад разных статов в урон так не посчитать.
  */
-export function titleScore(t: TitleDef, weight: (stat: number) => number): number {
-  return t.equip.reduce((sum, [stat, value]) => sum + weight(stat) * (value / (BEST.get(stat) || value || 1)), 0)
+export function titleScore(td: TitleDef, weight: (stat: number) => number): number {
+  return td.equip.reduce((sum, [stat, value]) => sum + weight(stat) * (value / (BEST.get(stat) || value || 1)), 0)
 }
 
 export function analyzeTitles(char: Character, guide: Guide | null): TitlesReport {
   const w = guideWeights(guide)
   const weight = (stat: number) => w.stat('arcana', stat)
   const owned = new Set(char.ownedTitles)
-  const equipped = char.titles.map(titleDef).filter((t): t is TitleDef => !!t)
+  const equipped = char.titles.map(titleDef).filter((td): td is TitleDef => !!td)
 
   const slots = TITLE_CATEGORIES.map(({ id, ru }): TitleSlotReport => {
-    const on = equipped.find((t) => t.category === id) ?? null
+    const on = equipped.find((td) => td.category === id) ?? null
     const score = on ? titleScore(on, weight) : 0
-    const list = (guide?.titles?.[id] ?? []).map(titleDef).filter((t): t is TitleDef => !!t)
+    const list = (guide?.titles?.[id] ?? []).map(titleDef).filter((td): td is TitleDef => !!td)
 
     // Гайд назвал титулы — советуем по его списку: первый собранный, который стоит выше надетого.
     if (list.length) {
-      const rank = (t: TitleDef | null) => (t ? list.findIndex((x) => x.id === t.id) : -1)
-      const pick = list.find((t) => owned.has(t.id)) ?? null
+      const rank = (td: TitleDef | null) => (td ? list.findIndex((x) => x.id === td.id) : -1)
+      const pick = list.find((td) => owned.has(td.id)) ?? null
       const onRank = rank(on)
       const better =
         pick && pick.id !== on?.id && (onRank === -1 || rank(pick) < onRank) ? { title: pick, score: titleScore(pick, weight), reason: 'guide' as const } : null
@@ -90,11 +91,11 @@ export function analyzeTitles(char: Character, guide: Guide | null): TitlesRepor
 
     let better: TitleSlotReport['better'] = null
     if (guide) {
-      for (const t of TITLES) {
-        if (t.category !== id || !owned.has(t.id) || t.id === on?.id) continue
-        const s = titleScore(t, weight)
+      for (const td of TITLES) {
+        if (td.category !== id || !owned.has(td.id) || td.id === on?.id) continue
+        const s = titleScore(td, weight)
         // Советуем менять, только если разница заметная: больше балла и больше четверти.
-        if (s >= score + 1 && s >= score * 1.25 && (!better || s > better.score)) better = { title: t, score: s, reason: 'score' }
+        if (s >= score + 1 && s >= score * 1.25 && (!better || s > better.score)) better = { title: td, score: s, reason: 'score' }
       }
     }
     return { category: id, ru, equipped: on, score, better, goal: null, goalHow: null }

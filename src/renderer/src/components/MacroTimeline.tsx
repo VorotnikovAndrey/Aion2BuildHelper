@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { FRAME_60_MS, keyIntervals } from '@shared/analysis/inputMacro'
 import type { InputEvent } from '@shared/guide/types'
 import { cn } from '@/lib/format'
+import { t } from '@shared/i18n'
 
 const ROW = 26
 const SLOWDOWN = 20
@@ -20,34 +21,34 @@ export function MacroTimeline({
   macroKey?: string
   purpose: (key: string) => string
 }) {
-  const t = useMemo(() => keyIntervals(events, repeatMs, 2), [events, repeatMs])
-  if (!t.totalMs) return null
-  const x = (ms: number) => (ms / t.totalMs) * 1000
-  const frames = Array.from({ length: Math.floor(t.totalMs / FRAME_60_MS) }, (_, i) => (i + 1) * FRAME_60_MS)
-  const height = t.keys.length * ROW
+  const tl = useMemo(() => keyIntervals(events, repeatMs, 2), [events, repeatMs])
+  if (!tl.totalMs) return null
+  const x = (ms: number) => (ms / tl.totalMs) * 1000
+  const frames = Array.from({ length: Math.floor(tl.totalMs / FRAME_60_MS) }, (_, i) => (i + 1) * FRAME_60_MS)
+  const height = tl.keys.length * ROW
 
   return (
     <div className="mt-4">
       <div className="flex items-end justify-between gap-3 text-[11px] text-ink-3">
-        <span>Два прогона подряд</span>
+        <span>{t('Два прогона подряд')}</span>
         <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-4 rounded-sm bg-accent" /> клавиша связки зажата
+            <span className="h-2.5 w-4 rounded-sm bg-accent" /> {t('клавиша связки зажата')}
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-4 rounded-sm bg-aether" /> клик
+            <span className="h-2.5 w-4 rounded-sm bg-aether" /> {t('клик')}
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-4 rounded-sm border border-warning" /> короче кадра
+            <span className="h-2.5 w-4 rounded-sm border border-warning" /> {t('короче кадра')}
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-3 w-px bg-ink-3" /> кадр при 60 FPS
+            <span className="h-3 w-px bg-ink-3" /> {t('кадр при 60 FPS')}
           </span>
         </span>
       </div>
       <div className="mt-2 grid grid-cols-[88px_minmax(0,1fr)] gap-x-3">
         <div className="flex flex-col">
-          {t.keys.map((k) => (
+          {tl.keys.map((k) => (
             <div key={k} className="flex items-center gap-1.5 text-[11px] text-ink-2" style={{ height: ROW }}>
               <span className="font-semibold text-ink">{k}</span>
               <span className="truncate text-ink-3">{purpose(k)}</span>
@@ -60,8 +61,8 @@ export function MacroTimeline({
               <line key={f} x1={x(f)} x2={x(f)} y1={0} y2={height} stroke="var(--color-line-strong)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
             ))}
             <line
-              x1={x(t.cycleMs)}
-              x2={x(t.cycleMs)}
+              x1={x(tl.cycleMs)}
+              x2={x(tl.cycleMs)}
               y1={0}
               y2={height}
               stroke="var(--color-ink-3)"
@@ -69,8 +70,8 @@ export function MacroTimeline({
               strokeWidth={1}
               vectorEffect="non-scaling-stroke"
             />
-            {t.intervals.map((iv, i) => {
-              const row = t.keys.indexOf(iv.key)
+            {tl.intervals.map((iv, i) => {
+              const row = tl.keys.indexOf(iv.key)
               const short = iv.end - iv.start < FRAME_60_MS && iv.key !== macroKey
               return (
                 <rect
@@ -91,7 +92,7 @@ export function MacroTimeline({
           {/* Бегунок — только при «Полных» анимациях (fx-ambient). */}
           <span
             className="fx-ambient fx-playhead pointer-events-none absolute top-0 bottom-0 w-0.5 bg-ink/80"
-            style={{ animationDuration: `${t.totalMs * SLOWDOWN}ms` }}
+            style={{ animationDuration: `${tl.totalMs * SLOWDOWN}ms` }}
           />
         </div>
       </div>
@@ -99,8 +100,8 @@ export function MacroTimeline({
         <span />
         <span className="tnum flex justify-between">
           <span>0</span>
-          <span>{Math.round(t.cycleMs)} мс — новый прогон</span>
-          <span>{Math.round(t.totalMs)} мс</span>
+          <span>{t('{cycleMs} мс — новый прогон', { cycleMs: Math.round(tl.cycleMs) })}</span>
+          <span>{t('{totalMs} мс', { totalMs: Math.round(tl.totalMs) })}</span>
         </span>
       </div>
     </div>

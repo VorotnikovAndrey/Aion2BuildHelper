@@ -29,9 +29,17 @@ nsis:
   runAfterFinish: true
   # Настройки, свои гайды и история в %APPDATA%\Aion2 Build Helper при удалении не трогаем.
   deleteAppDataOnUninstall: false
+  # Установщик — на языке системы (те же языки, что у интерфейса, см. shared/i18n).
   installerLanguages:
     - ru_RU
+    - uk_UA
     - en_US
+    - de_DE
+    - fr_FR
+    - es_ES
+    - pt_BR
+    - ja_JP
+    - ko_KR
 # Откуда установленное приложение берёт обновления: выпуски открытого репозитория на GitHub.
 # Ключ нужен только для выкладки (npm run release), приложению — нет.
 publish:

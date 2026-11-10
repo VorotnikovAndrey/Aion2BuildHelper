@@ -14,6 +14,7 @@ import { StatusBadge } from '@/components/StatusBadge'
 import { useAnimate } from '@/lib/motion'
 import { useCharacterContext } from '@/lib/report'
 import { isWebMode, useApp } from '@/lib/store'
+import { t } from '@shared/i18n'
 
 export const CELEBRATE_EVENT = 'a2bh:celebrate'
 
@@ -109,7 +110,7 @@ function Toast({ event, index, onClose }: { event: ProgressEvent; index: number;
           {event.text && <span className="mt-0.5 block text-xs leading-relaxed text-ink-3">{event.text}</span>}
         </span>
       </button>
-      <button onClick={onClose} className="absolute top-2 right-2 p-1 text-ink-3 hover:text-ink" aria-label="Закрыть">
+      <button onClick={onClose} className="absolute top-2 right-2 p-1 text-ink-3 hover:text-ink" aria-label={t('Закрыть')}>
         <X size={13} />
       </button>
     </motion.div>

@@ -4,6 +4,7 @@
 // Формат файла описан в docs/data-sources.md.
 
 import type { Character, ClassKey, GearItem, QuestlogData, RosterEntry } from '../types'
+import { t } from '../i18n'
 
 const CLASS_ALIASES: Record<string, ClassKey> = {
   gladiator: 'gladiator',
@@ -124,7 +125,7 @@ function parseCharacter(key: string, c: Obj, roster?: Obj): Character | null {
 /** Разбирает содержимое characters.json. Бросает ошибку, только если это вообще не похоже на файл оверлея. */
 export function parseQuestlogCharacters(raw: unknown): QuestlogData {
   if (!isObj(raw) || (!isObj(raw.characters) && !isObj(raw.roster))) {
-    throw new Error('Это не файл персонажей Questlog: нет разделов characters и roster')
+    throw new Error(t('Это не файл персонажей Questlog: нет разделов characters и roster'))
   }
   const chars = isObj(raw.characters) ? raw.characters : {}
   const rosterRaw = isObj(raw.roster) ? raw.roster : {}

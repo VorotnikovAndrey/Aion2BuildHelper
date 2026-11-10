@@ -4,6 +4,10 @@
 // стадиями, связанными билдами умений и досками (собраны со страниц questlog.gg во встроенном браузере,
 // см. docs/data-sources.md). Выход — src/shared/guide/builtin/questlog/<класс>.json: по гайду на билд,
 // у каждого — стадии прокачки. Сгенерированные файлы руками не правим.
+//
+// Свои тексты (описание, заметки, названия целей) пишутся не строкой, а ключом перевода: L('Текст {n}', { n })
+// → { "$t": "Текст {n}", "p": { "n": … } }; { "$skill": ID } — название умения, { "$join": [...] } — склейка.
+// Строки на языке интерфейса собирает shared/guide/localize.ts при загрузке; ключи попадают в словари (npm run i18n).
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -31,8 +35,9 @@ function titleId(v) {
   return TITLE_IDS.has(twin) ? twin : undefined
 }
 const skillType = new Map(SKILLS.map((s) => [s.id, s.type]))
-const SKILL_RU = json(join(ROOT, 'src/shared/gamedata/skills-ru.json')).names
-const skillName = (id) => SKILL_RU[String(id)] ?? SKILLS.find((s) => s.id === Number(id))?.en ?? String(id)
+/** Текст на языке интерфейса — см. шапку файла. */
+const L = (key, p) => (p ? { $t: key, p } : { $t: key })
+const SKILL = (id) => ({ $skill: Number(id) })
 
 /** Классы Questlog → наши ключи. */
 const CLASS = {
@@ -79,16 +84,16 @@ const TAG_RU = {
   pve: 'PvE',
   pvp: 'PvP',
   dps: 'DPS',
-  tank: 'Танк',
-  healer: 'Хилер',
-  support: 'Поддержка',
-  dungeon: 'Подземелье',
-  'budget-build': 'Бюджетный',
-  'endgame-build': 'Эндгейм',
-  'beginner-friendly': 'Для новичков',
-  arena: 'Арена',
-  siege: 'Захват',
-  'mass-pvp': 'Массовые бои'
+  tank: L('Танк'),
+  healer: L('Хилер'),
+  support: L('Поддержка'),
+  dungeon: L('Подземелье'),
+  'budget-build': L('Бюджетный'),
+  'endgame-build': L('Эндгейм'),
+  'beginner-friendly': L('Для новичков'),
+  arena: L('Арена'),
+  siege: L('Захват'),
+  'mass-pvp': L('Массовые бои')
 }
 
 const num = (v) => (v === null || v === undefined || v === '' ? null : Number(v))
@@ -164,12 +169,17 @@ function combatOf(sb) {
   if (!macros.length) return undefined
   const [main, ...rest] = macros
   const delays = main.steps.map((s) => num(s.delayMs)).filter((d) => d > 0)
-  const steps = main.steps.map((s, i) => ({ id: `step-${i + 1}`, name: skillName(s.skillId), skills: [Number(s.skillId)] }))
+  const steps = main.steps.map((s, i) => ({ id: `step-${i + 1}`, name: SKILL(s.skillId), skills: [Number(s.skillId)] }))
   return {
     macros: steps,
     delayMs: delays.length ? Math.min(...delays) : undefined,
     notes: rest.length
-      ? `У автора ещё ${rest.length === 1 ? 'связка' : 'связки'}: ${rest.map((m, i) => `${m.name?.trim() || `№${i + 2}`} — ${m.steps.map((s) => skillName(s.skillId)).join(' → ')}`).join('; ')}.`
+      ? L(rest.length === 1 ? 'У автора ещё связка: {list}.' : 'У автора ещё связки: {list}.', {
+          list: {
+            $join: rest.map((m, i) => ({ $join: [m.name?.trim() || `№${i + 2}`, ' — ', { $join: m.steps.map((s) => SKILL(s.skillId)), sep: ' → ' }] })),
+            sep: '; '
+          }
+        })
       : undefined
   }
 }
@@ -245,23 +255,23 @@ function stageTargets(ss, stageName) {
     const id = (k) => statByKey.get(k)
     out.push({
       id: 'stage-accuracy',
-      name: 'Меткость в PvE',
+      name: L('Меткость в PvE'),
       kind: 'stage',
       stats: [id('weaponaccuracy'), id('accuracy'), id('pveaccuracy')],
       goals: [{ value: Math.round(acc + (accBonus ?? 0) + (accPve ?? 0)), label }],
       raise: [id('accuracy'), id('pveaccuracy'), id('weaponaccuracy')],
-      note: 'Меткость + доп. меткость + меткость в PvE на этой стадии у автора билда (по расчёту Questlog).'
+      note: L('Меткость + доп. меткость + меткость в PvE на этой стадии у автора билда (по расчёту Questlog).')
     })
   }
   const crit = get('Осн. показатели', 'Крит. удар')
   if (crit !== null)
     out.push({
       id: 'stage-critical',
-      name: 'Крит. удар',
+      name: L('Крит. удар'),
       kind: 'stage',
       stats: [statByKey.get('critical')],
       goals: [{ value: Math.round(crit), label }],
-      note: 'Крит. удар на этой стадии у автора билда.'
+      note: L('Крит. удар на этой стадии у автора билда.')
     })
   // СКР боя не берём: Questlog показывает итоговую скорость, а оверлей отдаёт только её часть (13% против 41%) — сравнение врёт.
   return out.length ? out : undefined
@@ -331,7 +341,7 @@ function blendWeights(own, cls) {
 
 function guideOf(cls, c, rankIndex) {
   const ch = c.character
-  const author = c.card?.lines?.[c.card.lines.length - 1] ?? 'автор'
+  const author = c.card?.lines?.[c.card.lines.length - 1] ?? 'Questlog'
   const region = (c.card?.lines ?? []).includes('Корея и Тайвань') ? 'korea' : 'global'
   const { skillOfNode, known: knownNodes } = boardsOf(cls)
   const own = ownSkill(cls)
@@ -353,7 +363,7 @@ function guideOf(cls, c, rankIndex) {
         ).filter((n) => knownNodes.has(n))
       : []
     const nodeSkills = uniq(nodes.map((n) => skillOfNode.get(n)).filter(Boolean))
-    const name = (b.name ?? '').trim() || `Стадия ${i + 1}`
+    const name = (b.name ?? '').trim() || `#${i + 1}`
     stages.push({
       id: String(b.id),
       name,
@@ -369,15 +379,20 @@ function guideOf(cls, c, rankIndex) {
                 ? [
                     {
                       id: 'stage-skill-nodes',
-                      name: 'Узлы умений',
-                      description: `Узлы «+1 к уровню» из раскладки автора («${dv.name.trim()}»).`,
+                      name: L('Узлы умений'),
+                      description: L('Узлы «+1 к уровню» из раскладки автора («{layout}»).', { layout: dv.name.trim() }),
                       skills: nodeSkills
                     }
                   ]
                 : []),
-              { id: 'stage-nodes', name: 'Раскладка автора', description: `Все узлы раскладки «${dv.name.trim()}» на этой стадии.`, nodes }
+              {
+                id: 'stage-nodes',
+                name: L('Раскладка автора'),
+                description: L('Все узлы раскладки «{layout}» на этой стадии.', { layout: dv.name.trim() }),
+                nodes
+              }
             ],
-            notes: `Доски — раскладка автора «${dv.name.trim()}».`
+            notes: L('Доски — раскладка автора «{layout}».', { layout: dv.name.trim() })
           }
         : undefined,
       titles: b.titles
@@ -415,7 +430,18 @@ function guideOf(cls, c, rankIndex) {
     cls,
     mode: 'pve',
     builtin: true,
-    description: `Билд с Questlog: №${rankIndex + 1} по популярности у класса (${c.card?.likes ?? 0} лайков), автор ${author}${region === 'korea' ? ', для Кореи и Тайваня' : ''}. Стадий: ${stages.length} — выберите целевую.${desc ? `\n\nОписание автора:\n${desc.slice(0, 1500)}` : ''}`,
+    // Текст автора — после метки «Описание автора:» (её ищет страница «Гайды», см. splitDescription).
+    description: {
+      $join: [
+        L(
+          region === 'korea'
+            ? 'Билд с Questlog: №{rank} по популярности у класса, автор {author}, для Кореи и Тайваня. Стадий: {stages} — выберите целевую.'
+            : 'Билд с Questlog: №{rank} по популярности у класса, автор {author}. Стадий: {stages} — выберите целевую.',
+          { rank: rankIndex + 1, author, stages: stages.length }
+        ),
+        ...(desc ? ['\n\n', L('Описание автора:'), '\n', desc.slice(0, 1500)] : [])
+      ]
+    },
     source: { title: ch.name.trim(), url, author, date, region, kind: 'questlog', likes: c.card?.likes ?? 0 },
     sources: [{ title: ch.name.trim(), url, author, date, region, kind: 'questlog', likes: c.card?.likes ?? 0 }],
     updatedAt: ch.updatedAt ?? new Date().toISOString(),
@@ -425,8 +451,9 @@ function guideOf(cls, c, rankIndex) {
     stats: [],
     gear: {
       skills: [],
-      notes:
+      notes: L(
         'Веса статов и умений на шмоте — по тому, как часто их берут на вещах: 60% — автор этого билда, 40% — пять популярных авторов класса (оценка помощника: сами авторы весов не задают).'
+      )
     },
     manastones: [],
     arcana: final.arcana ?? { attack: [], passive: [], useless: [] },
@@ -436,7 +463,7 @@ function guideOf(cls, c, rankIndex) {
         cls,
         c.builds.flatMap((b) => b.tags ?? [])
       ),
-      notes: 'Приоритеты для Знания о видах — оценка помощника: в билдах Questlog их нет. Урон в PvE важнее защиты.'
+      notes: L('Приоритеты для Знания о видах — оценка помощника: в билдах Questlog их нет. Урон в PvE важнее защиты.')
     },
     titles: final.titles,
     statTargets: final.statTargets,

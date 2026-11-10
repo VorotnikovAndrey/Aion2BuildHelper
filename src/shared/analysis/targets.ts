@@ -5,6 +5,7 @@
 import type { Guide, StatTarget } from '../guide/types'
 import type { Character } from '../types'
 import { guideWeights } from './weights'
+import { t } from '../i18n'
 
 export interface TargetStatus {
   target: StatTarget
@@ -41,16 +42,23 @@ export function stoneWeightFn(guide: Guide | null, statuses: TargetStatus[]): (s
   const w = guideWeights(guide)
   return (stat) => {
     const base = w.stat('manastone', stat)
-    for (const t of statuses) {
-      if (!t.target.raise?.includes(stat)) continue
-      if (t.next) {
+    for (const st of statuses) {
+      if (!st.target.raise?.includes(stat)) continue
+      if (st.next) {
         return {
           weight: 5,
-          reason: `${t.target.name}: ${t.current} из ${t.next.value} (${t.next.label})`,
-          progress: t.current / t.next.value
+          reason: t('{target}: {t} из {next} ({next2})', { target: st.target.name, t: st.current, next: st.next.value, next2: st.next.label }),
+          progress: st.current / st.next.value
         }
       }
-      return { weight: Math.min(base, 2), reason: `${t.target.name}: ${t.current} — порог «${t.reached?.label}» уже взят, сверх него почти не нужно` }
+      return {
+        weight: Math.min(base, 2),
+        reason: t('{target}: {t} — порог «{reached}» уже взят, сверх него почти не нужно', {
+          target: st.target.name,
+          t: st.current,
+          reached: st.reached?.label
+        })
+      }
     }
     return { weight: base }
   }

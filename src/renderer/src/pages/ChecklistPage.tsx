@@ -11,6 +11,8 @@ import { cn } from '@/lib/format'
 import { Tooltip } from '@/components/ui/InfoTip'
 import { useCharacterContext } from '@/lib/report'
 import { useApp, useCharacterPrefs } from '@/lib/store'
+import { t } from '@shared/i18n'
+import { term } from '@shared/names'
 
 export function ChecklistPage() {
   const ctx = useCharacterContext()!
@@ -23,23 +25,31 @@ export function ChecklistPage() {
   const milestones: { id: string; text: string; done: boolean; unsure?: boolean }[] = [
     ...report.skills
       .filter((s) => s.role === 'core' && s.targetLevel)
-      .map((s) => ({ id: `lvl-${s.skill}`, text: `${namer.skill(s.skill).main}: ур. ${s.targetLevel}`, done: s.levelGap === 0 })),
+      .map((s) => ({
+        id: `lvl-${s.skill}`,
+        text: t('{skill}: ур. {targetLevel}', { skill: namer.skill(s.skill).main, targetLevel: s.targetLevel }),
+        done: s.levelGap === 0
+      })),
     ...report.skills
       .filter((s) => s.role === 'core' && s.specs && s.specs.wanted.length)
       .map((s) => ({
         id: `spec-${s.skill}`,
-        text: `${namer.skill(s.skill).main}: специализации ${s.specs!.wanted.join(', ')}`,
+        text: t('{skill}: специализации {wanted}', { skill: namer.skill(s.skill).main, wanted: s.specs!.wanted.join(', ') }),
         done: s.specs!.ok,
         unsure: report.specsUncertain && s.specsSource === 'overlay'
       })),
-    { id: 'stigmas', text: 'Стигмы гайда надеты', done: report.stigmas.missing.length === 0 },
+    { id: 'stigmas', text: t('Стигмы гайда надеты'), done: report.stigmas.missing.length === 0 },
     ...report.daevanion.goals.map((g) => ({
       id: `goal-${g.goal.id}`,
-      text: `Даэванион: ${g.goal.name}`,
+      text: t('Даэванион: {goal}', { goal: g.goal.name }),
       done: g.required.length > 0 && g.done === g.required.length
     })),
-    ...report.arcana.cards.map((c) => ({ id: `arc-${c.slot}`, text: `${c.info?.ru ?? 'Аркана'}: нужный набор и +${c.maxEnchant}`, done: c.done })),
-    { id: 'gear', text: 'На шмоте нет бесполезных строк', done: report.gear.every((g) => g.replace.length === 0) }
+    ...report.arcana.cards.map((c) => ({
+      id: `arc-${c.slot}`,
+      text: t('{p}: нужный набор и +{maxEnchant}', { p: term(c.info ?? undefined, t('Аркана')), maxEnchant: c.maxEnchant }),
+      done: c.done
+    })),
+    { id: 'gear', text: t('На шмоте нет бесполезных строк'), done: report.gear.every((g) => g.replace.length === 0) }
   ]
   const doneCount = milestones.filter((m) => m.done).length
 
@@ -51,14 +61,21 @@ export function ChecklistPage() {
     <>
       <PageHeader
         icon={<ListChecks size={22} />}
-        title="Чек-лист"
-        subtitle="Вехи гайда отмечаются сами по данным персонажа. Разовые дела гайда (макросы, бинды) и свои задачи отмечайте вручную."
+        title={t('Чек-лист')}
+        subtitle={t('Вехи гайда отмечаются сами по данным персонажа. Разовые дела гайда (макросы, бинды) и свои задачи отмечайте вручную.')}
         actions={<GuideSwitcher char={char} />}
       />
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-        <Card title="Вехи гайда" actions={<Pill tone={toneOfShare(doneCount, milestones.length)}>{`${doneCount} из ${milestones.length}`}</Pill>}>
+        <Card
+          title={t('Вехи гайда')}
+          actions={
+            <Pill tone={toneOfShare(doneCount, milestones.length)}>
+              {t('{doneCount} из {milestonesCount}', { doneCount, milestonesCount: milestones.length })}
+            </Pill>
+          }
+        >
           {!guide ? (
-            <p className="text-[13px] text-ink-3">Выберите гайд — и здесь появятся его вехи.</p>
+            <p className="text-[13px] text-ink-3">{t('Выберите гайд — и здесь появятся его вехи.')}</p>
           ) : (
             <ul className="space-y-1.5">
               {milestones.map((m) => (
@@ -67,16 +84,16 @@ export function ChecklistPage() {
                     block
                     content={
                       m.done
-                        ? 'Сделано — проверено по данным персонажа.'
+                        ? t('Сделано — проверено по данным персонажа.')
                         : m.unsure
-                          ? 'Оверлей не знает выбранных специализаций — отметьте их на странице «Умения», и пункт проверится сам.'
-                          : 'Ещё не сделано. Отмечается само, когда данные персонажа совпадут с гайдом.'
+                          ? t('Оверлей не знает выбранных специализаций — отметьте их на странице «Умения», и пункт проверится сам.')
+                          : t('Ещё не сделано. Отмечается само, когда данные персонажа совпадут с гайдом.')
                     }
                   >
                     <div className="flex w-full items-center gap-2.5 text-[13px]">
                       <StatusBadge tone={m.done ? 'ok' : m.unsure ? 'warn' : 'bad'} size={16} />
                       <span className={cn(m.done ? 'text-good' : m.unsure ? 'text-warning' : 'text-critical')}>{m.text}</span>
-                      {m.unsure && !m.done && <Pill tone="warning">проверьте в игре</Pill>}
+                      {m.unsure && !m.done && <Pill tone="warning">{t('проверьте в игре')}</Pill>}
                     </div>
                   </Tooltip>
                 </li>
@@ -87,7 +104,7 @@ export function ChecklistPage() {
 
         <div className="flex flex-col gap-5">
           {guideItems.length > 0 && (
-            <Card title="Разовые дела гайда">
+            <Card title={t('Разовые дела гайда')}>
               <ul className="space-y-1">
                 {guideItems.map((c) => (
                   <li key={c.id}>
@@ -101,7 +118,7 @@ export function ChecklistPage() {
             </Card>
           )}
 
-          <Card title="Мои задачи">
+          <Card title={t('Мои задачи')}>
             <form
               className="mb-3 flex gap-2"
               onSubmit={(e) => {
@@ -114,39 +131,39 @@ export function ChecklistPage() {
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Например: выбить Компас с Градом ударов"
+                placeholder={t('Например: выбить Компас с Градом ударов')}
                 className="h-9 flex-1 rounded-lg border border-line-strong bg-surface-2 px-3 text-[13px] outline-none placeholder:text-ink-3 focus:border-accent"
               />
               <Button type="submit" icon={<Plus size={14} />}>
-                Добавить
+                {t('Добавить')}
               </Button>
             </form>
             <ul className="space-y-1">
-              {tasks.map((t) => (
-                <li key={t.id} className="group flex items-center gap-2.5 rounded-lg px-1 py-1 text-[13px] hover:bg-surface-2">
+              {tasks.map((task) => (
+                <li key={task.id} className="group flex items-center gap-2.5 rounded-lg px-1 py-1 text-[13px] hover:bg-surface-2">
                   <SparkCheckbox
-                    checked={!!t.done}
-                    onChange={(v) => void setPrefs(char.key, { tasks: tasks.map((x) => (x.id === t.id ? { ...x, done: v } : x)) })}
+                    checked={!!task.done}
+                    onChange={(v) => void setPrefs(char.key, { tasks: tasks.map((x) => (x.id === task.id ? { ...x, done: v } : x)) })}
                   />
-                  <span className={cn('flex-1', t.done ? 'text-ink-3 line-through' : 'text-ink-2')}>{t.text}</span>
+                  <span className={cn('flex-1', task.done ? 'text-ink-3 line-through' : 'text-ink-2')}>{task.text}</span>
                   <button
-                    onClick={() => void setPrefs(char.key, { tasks: tasks.filter((x) => x.id !== t.id) })}
+                    onClick={() => void setPrefs(char.key, { tasks: tasks.filter((x) => x.id !== task.id) })}
                     className="text-ink-3 opacity-0 group-hover:opacity-100 hover:text-critical"
-                    aria-label="Удалить задачу"
+                    aria-label={t('Удалить задачу')}
                   >
                     <Trash2 size={13} />
                   </button>
                 </li>
               ))}
-              {tasks.length === 0 && <li className="text-xs text-ink-3">Задач пока нет.</li>}
+              {tasks.length === 0 && <li className="text-xs text-ink-3">{t('Задач пока нет.')}</li>}
             </ul>
           </Card>
 
-          <Card title="Заметки">
+          <Card title={t('Заметки')}>
             <textarea
               defaultValue={prefs.notes ?? ''}
               onBlur={(e) => void setPrefs(char.key, { notes: e.target.value })}
-              placeholder="Что пробовал, что сработало, куда копить кристаллы…"
+              placeholder={t('Что пробовал, что сработало, куда копить кристаллы…')}
               className="min-h-32 w-full rounded-lg border border-line-strong bg-surface-2 px-3 py-2 text-[13px] outline-none placeholder:text-ink-3 focus:border-accent"
             />
           </Card>

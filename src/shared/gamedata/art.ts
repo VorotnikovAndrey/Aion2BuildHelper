@@ -7,6 +7,7 @@ import type { ArcanaType, ArcanaVariant } from './arcana'
 import { gradeOfItem, type ItemGrade } from './slots'
 import artJson from './art.json'
 import itemsJson from './items.json'
+import { t } from '../i18n'
 
 interface ArtJson {
   items: Record<string, { ru: string; icon: string; grade?: ItemGrade }>
@@ -67,7 +68,8 @@ export interface StoneInfo {
   src: string
 }
 
-const QUALITY_RU: Record<StoneQuality, string> = { 1: 'Простой', 2: 'Средний', 3: 'Качественный' }
+// Названия камней на других языках в справочниках нет — качество и вид камня переводим как текст интерфейса.
+const QUALITY_RU: Record<StoneQuality, string> = { 1: t('Простой'), 2: t('Средний'), 3: t('Качественный') }
 
 /**
  * Камень по ID: 5313600Q — камень маны (оружие, броня), 5335600Q — духовный камень (украшения).
@@ -87,7 +89,7 @@ export function stoneInfo(stoneId: number): StoneInfo {
         : quality === 3
           ? ART.stones.manaHigh
           : ART.stones.manaMid
-  return { ru: `${QUALITY_RU[quality]} ${kind === 'soul' ? 'духовный камень' : 'камень маны'}`, quality, kind, src: artFile('stones', path) }
+  return { ru: `${QUALITY_RU[quality]} ${kind === 'soul' ? t('духовный камень') : t('камень маны')}`, quality, kind, src: artFile('stones', path) }
 }
 
 // ───────────── Арканы ─────────────

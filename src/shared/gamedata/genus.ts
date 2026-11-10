@@ -3,6 +3,7 @@
 // Какие статы и в каких пределах бывают в каждой ячейке — genus-ranges.json (таблица клиента с wikily.gg).
 
 import rangesJson from './genus-ranges.json'
+import { t } from '../i18n'
 
 export interface GenusDef {
   key: string
@@ -86,11 +87,11 @@ export const genusLockFrom = (r: { min: number; max: number }): number => Math.c
  * оранжевое — позже». Русские названия — наши.
  */
 export const GENUS_GRADES: Record<number, string> = {
-  1: 'Обычная',
-  2: 'Редкая',
-  3: 'Легендарная',
-  4: 'Уникальная',
-  5: 'Эпическая'
+  1: t('Обычная'),
+  2: t('Редкая'),
+  3: t('Легендарная'),
+  4: t('Уникальная'),
+  5: t('Эпическая')
 }
 
 /** Грейд ячейки → грейд для цвета (те же цвета, что у вещей). */

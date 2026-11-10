@@ -8,6 +8,7 @@ import type { Guide, GuideMacro, GuideManualSkill, StatHint } from '../guide/typ
 import type { Namer } from '../names'
 import type { Character } from '../types'
 import type { SkillReport } from './skills'
+import { t } from '../i18n'
 
 /** ready — изучено (стигма — надета); missing — не изучено; unequipped — стигма изучена, но не надета. */
 export type SkillUse = 'ready' | 'missing' | 'unequipped'
@@ -108,8 +109,13 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
     advice.push({
       id: `macro-${m.macro.id}`,
       tone: 'info',
-      title: now ? `Сейчас подходит «${now.macro.name}»` : `«${m.macro.name}» — позже`,
-      text: `${name(w.skill)} — ур. ${m.whenLevel ?? 0}. С ур. ${w.minLevel} переходите на «${m.macro.name}».`,
+      title: now ? t('Сейчас подходит «{macro}»', { macro: now.macro.name }) : t('«{macro}» — позже', { macro: m.macro.name }),
+      text: t('{name} — ур. {p}. С ур. {minLevel} переходите на «{macro}».', {
+        name: name(w.skill),
+        p: m.whenLevel ?? 0,
+        minLevel: w.minLevel,
+        macro: m.macro.name
+      }),
       skills: [w.skill],
       link: '/skills'
     })
@@ -129,10 +135,13 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
     advice.push({
       id: 'missing',
       tone: inStack ? 'bad' : 'warn',
-      title: `Не изучено: ${list(missing)}`,
+      title: t('Не изучено: {list}', { list: list(missing) }),
       text: inStack
-        ? 'Ротация гайда рассчитана на них: связка пропустит неизученное, и окна урона станут короче.'
-        : `По гайду ${missing.length === 1 ? 'это умение жмут' : 'эти умения жмут'} вручную. Ротация работает и без ${missing.length === 1 ? 'него' : 'них'}, но слабее; стигмы и их уровни — на странице «Умения».`,
+        ? t('Ротация гайда рассчитана на них: связка пропустит неизученное, и окна урона станут короче.')
+        : t('По гайду {p} вручную. Ротация работает и без {p2}, но слабее; стигмы и их уровни — на странице «Умения».', {
+            p: missing.length === 1 ? t('это умение жмут') : t('эти умения жмут'),
+            p2: missing.length === 1 ? t('него') : t('них')
+          }),
       skills: missing,
       link: '/skills'
     })
@@ -141,8 +150,10 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
     advice.push({
       id: 'unequipped',
       tone: 'warn',
-      title: `${unequipped.length === 1 ? 'Стигма не надета' : 'Стигмы не надеты'}: ${list(unequipped)}`,
-      text: `По гайду ${unequipped.length === 1 ? 'она нужна' : 'они нужны'} в ротации. Надеть — в окне умений игры; что надето сейчас, видно на странице «Умения».`,
+      title: `${unequipped.length === 1 ? t('Стигма не надета') : t('Стигмы не надеты')}: ${list(unequipped)}`,
+      text: t('По гайду {p} в ротации. Надеть — в окне умений игры; что надето сейчас, видно на странице «Умения».', {
+        p: unequipped.length === 1 ? t('она нужна') : t('они нужны')
+      }),
       skills: unequipped,
       link: '/skills'
     })
@@ -155,8 +166,8 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
     advice.push({
       id: 'specs',
       tone: 'warn',
-      title: `Специализации не по гайду: ${list(specsOff)}`,
-      text: 'Порядок в ячейках рассчитан на варианты гайда — с другими он работает хуже. Что поменять, видно на странице «Умения».',
+      title: t('Специализации не по гайду: {list}', { list: list(specsOff) }),
+      text: t('Порядок в ячейках рассчитан на варианты гайда — с другими он работает хуже. Что поменять, видно на странице «Умения».'),
       skills: specsOff,
       link: '/skills'
     })
@@ -164,8 +175,8 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
     advice.push({
       id: 'specs-unknown',
       tone: 'info',
-      title: 'Специализации умений из связки неизвестны',
-      text: 'Оверлей не показывает выбранные варианты. Отметьте их на странице «Умения» — тогда помощник проверит и связку.',
+      title: t('Специализации умений из связки неизвестны'),
+      text: t('Оверлей не показывает выбранные варианты. Отметьте их на странице «Умения» — тогда помощник проверит и связку.'),
       link: '/skills'
     })
   }
@@ -177,7 +188,7 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
     advice.push({
       id: `stat-${m.entry.skill}`,
       tone: 'info',
-      title: `${name(m.entry.skill)}: у вас ${namer.stat(stat).main} ${formatStatValue(stat, m.statHint.value)}`,
+      title: t('{name}: у вас {stat} {stat2}', { name: name(m.entry.skill), stat: namer.stat(stat).main, stat2: formatStatValue(stat, m.statHint.value) }),
       text: m.statHint.text,
       skills: [m.entry.skill]
     })
@@ -187,8 +198,8 @@ export function analyzeRotation(char: Character, guide: Guide | null, skills: Sk
     advice.unshift({
       id: 'ready',
       tone: 'ok',
-      title: 'Всё для ротации на месте',
-      text: 'Умения из связки и ручные изучены, стигмы надеты. Дальше — уровни и специализации на странице «Умения».'
+      title: t('Всё для ротации на месте'),
+      text: t('Умения из связки и ручные изучены, стигмы надеты. Дальше — уровни и специализации на странице «Умения».')
     })
   }
   return { macros, manual, opener, advice }

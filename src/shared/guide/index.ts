@@ -20,6 +20,8 @@ import {
   type SkillTarget,
   type StatWeight
 } from './types'
+import { t } from '../i18n'
+import { localizeTexts } from './localize'
 
 export * from './types'
 
@@ -46,10 +48,10 @@ const MODES: GuideMode[] = ['pve', 'pvp', 'leveling', 'other']
  * Бросает понятную ошибку, если это не гайд.
  */
 export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
-  if (!isObj(raw)) throw new Error('Файл гайда должен содержать JSON-объект')
+  if (!isObj(raw)) throw new Error(t('Файл гайда должен содержать JSON-объект'))
   const cls = toClassKey(raw.cls)
-  if (!cls || !classInfo(cls)) throw new Error('В гайде не указан класс (поле cls, например "templar")')
-  if (typeof raw.name !== 'string' || !raw.name.trim()) throw new Error('У гайда нет названия (поле name)')
+  if (!cls || !classInfo(cls)) throw new Error(t('В гайде не указан класс (поле cls, например "templar")'))
+  if (typeof raw.name !== 'string' || !raw.name.trim()) throw new Error(t('У гайда нет названия (поле name)'))
 
   const toSkills = (v: unknown): SkillTarget[] =>
     (Array.isArray(v) ? v : []).filter(isObj).flatMap((s) => {
@@ -105,7 +107,7 @@ export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
     return {
       goals: (Array.isArray(daev.goals) ? daev.goals : []).filter(isObj).map((g, i) => ({
         id: str(g.id) ?? `goal-${i + 1}`,
-        name: str(g.name) ?? `Цель ${i + 1}`,
+        name: str(g.name) ?? t('Цель {p}', { p: i + 1 }),
         description: str(g.description),
         skills: nums(g.skills).length ? nums(g.skills) : undefined,
         boards: nums(g.boards).length ? nums(g.boards) : undefined,
@@ -116,21 +118,21 @@ export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
   }
   const toStatTargets = (v: unknown): StatTarget[] | undefined =>
     Array.isArray(v)
-      ? v.filter(isObj).flatMap((t, i): StatTarget[] => {
-          const goals = (Array.isArray(t.goals) ? t.goals : [])
+      ? v.filter(isObj).flatMap((tv, i): StatTarget[] => {
+          const goals = (Array.isArray(tv.goals) ? tv.goals : [])
             .filter(isObj)
             .flatMap((g) => (typeof g.value === 'number' ? [{ value: g.value, label: str(g.label) ?? String(g.value) }] : []))
             .sort((a, b) => a.value - b.value)
-          if (!nums(t.stats).length || !goals.length) return []
+          if (!nums(tv.stats).length || !goals.length) return []
           return [
             {
-              id: str(t.id) ?? `target-${i + 1}`,
-              name: str(t.name) ?? `Порог ${i + 1}`,
-              stats: nums(t.stats),
+              id: str(tv.id) ?? `target-${i + 1}`,
+              name: str(tv.name) ?? t('Порог {p}', { p: i + 1 }),
+              stats: nums(tv.stats),
               goals,
-              raise: nums(t.raise).length ? nums(t.raise) : undefined,
-              kind: t.kind === 'top' ? 'top' : t.kind === 'stage' ? 'stage' : 'content',
-              note: str(t.note)
+              raise: nums(tv.raise).length ? nums(tv.raise) : undefined,
+              kind: tv.kind === 'top' ? 'top' : tv.kind === 'stage' ? 'stage' : 'content',
+              note: str(tv.note)
             }
           ]
         })
@@ -211,7 +213,7 @@ export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
     rotation: Array.isArray(raw.rotation) ? raw.rotation.filter((x): x is string => typeof x === 'string') : undefined,
     combat: normalizeCombat(raw.combat),
     tips: Array.isArray(raw.tips)
-      ? raw.tips.filter(isObj).flatMap((t) => (typeof t.title === 'string' && typeof t.text === 'string' ? [{ title: t.title, text: t.text }] : []))
+      ? raw.tips.filter(isObj).flatMap((tv) => (typeof tv.title === 'string' && typeof tv.text === 'string' ? [{ title: tv.title, text: tv.text }] : []))
       : undefined,
     checklist: Array.isArray(raw.checklist)
       ? raw.checklist.filter(isObj).flatMap((c, i) => (typeof c.text === 'string' ? [{ id: str(c.id) ?? `item-${i + 1}`, text: c.text }] : []))
@@ -252,7 +254,7 @@ function normalizeCombat(v: unknown): GuideCombat | undefined {
     return [
       {
         id: optStr(m.id) ?? `macro-${i + 1}`,
-        name: optStr(m.name) ?? `Макрос ${i + 1}`,
+        name: optStr(m.name) ?? t('Макрос {p}', { p: i + 1 }),
         skills,
         key: optStr(m.key),
         when: when
@@ -301,4 +303,4 @@ const fileClass = (file: string) => CLASS_ORDER.indexOf(file.match(/(\w+)\.json$
 
 export const BUILTIN_GUIDES: Guide[] = Object.entries(QUESTLOG_FILES)
   .sort(([a], [b]) => fileClass(a) - fileClass(b))
-  .flatMap(([file, data]) => data.guides.map((g, i) => ({ ...normalizeGuide(g, `${file}-${i}`), builtin: true })))
+  .flatMap(([file, data]) => data.guides.map((g, i) => ({ ...normalizeGuide(localizeTexts(g), `${file}-${i}`), builtin: true })))

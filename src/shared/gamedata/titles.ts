@@ -5,6 +5,7 @@
 import type { TitleCategory } from './art'
 import type { ItemGrade } from './slots'
 import titlesJson from './generated/titles.json'
+import { t } from '../i18n'
 
 export interface TitleDef {
   id: number
@@ -21,9 +22,9 @@ export interface TitleDef {
 }
 
 export const TITLE_CATEGORIES: { id: TitleCategory; ru: string }[] = [
-  { id: 'attack', ru: 'Атака' },
-  { id: 'defense', ru: 'Защита' },
-  { id: 'utility', ru: 'Другое' }
+  { id: 'attack', ru: t('Атака') },
+  { id: 'defense', ru: t('Защита') },
+  { id: 'utility', ru: t('Другое') }
 ]
 
 /**
@@ -85,43 +86,43 @@ export interface TitleHow {
 export const TITLE_HOW: Record<number, TitleHow> = {
   13010021: {
     achievement: 'Genus Genius',
-    ru: 'Достижение «Genus Genius»: поднять все пять родов Знания о видах до ур. 10 (5 ступеней). Награда — титул и 20 000 кинара.',
+    ru: t('Достижение «Genus Genius»: поднять все пять родов Знания о видах до ур. 10 (5 ступеней). Награда — титул и 20 000 кинара.'),
     track: 'genusMin',
     goal: 10
   },
   13050017: {
     achievement: 'Tailor-Made V',
-    ru: 'Достижение «Tailor-Made V»: заточить уникальную вещь до +15.',
+    ru: t('Достижение «Tailor-Made V»: заточить уникальную вещь до +15.'),
     track: 'uniqueEnchant',
     goal: 15
   },
-  12030003: { ru: 'Награда монолитов (раздел «Монолиты» в игре) — за Элийцев.' },
-  22030003: { ru: 'Награда монолитов (раздел «Монолиты» в игре) — за Асмодиан.' },
+  12030003: { ru: t('Награда монолитов (раздел «Монолиты» в игре) — за Элийцев.') },
+  22030003: { ru: t('Награда монолитов (раздел «Монолиты» в игре) — за Асмодиан.') },
   13050011: {
     achievement: 'Veteran Wing Collector V',
-    ru: 'Достижение «Veteran Wing Collector V»: собрать 25 крыльев.',
+    ru: t('Достижение «Veteran Wing Collector V»: собрать 25 крыльев.'),
     track: 'wings',
     goal: 25
   },
   13010025: {
     achievement: 'My Reliable Friends VII',
-    ru: 'Достижение «My Reliable Friends VII»: собрать 200 питомцев (ступени 3, 10, 30, 50, 100, 150, 200 — на каждой свой титул).',
+    ru: t('Достижение «My Reliable Friends VII»: собрать 200 питомцев (ступени 3, 10, 30, 50, 100, 150, 200 — на каждой свой титул).'),
     track: 'pets',
     goal: 200
   },
   13050009: {
     achievement: 'Fashionista VII',
-    ru: 'Достижение «Fashionista VII»: собрать 700 обликов.',
+    ru: t('Достижение «Fashionista VII»: собрать 700 обликов.'),
     track: 'skins',
     goal: 700
   },
-  12010061: { ru: 'Титул приключений; способ получения в справочнике не указан.' }
+  12010061: { ru: t('Титул приключений; способ получения в справочнике не указан.') }
 }
 
 export const TRACK_RU: Record<TitleTrack, string> = {
-  genusMin: 'самый низкий род Знания о видах',
-  pets: 'питомцев собрано',
-  wings: 'крыльев собрано',
-  skins: 'обликов собрано',
-  uniqueEnchant: 'лучшая заточка уникальной вещи'
+  genusMin: t('самый низкий род Знания о видах'),
+  pets: t('питомцев собрано'),
+  wings: t('крыльев собрано'),
+  skins: t('обликов собрано'),
+  uniqueEnchant: t('лучшая заточка уникальной вещи')
 }

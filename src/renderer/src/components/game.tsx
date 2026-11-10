@@ -11,6 +11,8 @@ import type { ClassKey } from '@shared/types'
 import { cn } from '@/lib/format'
 import { Pill } from './ui/Pill'
 import { Tooltip } from './ui/InfoTip'
+import { t } from '@shared/i18n'
+import { term } from '@shared/names'
 
 /** Название с английским вариантом мелко (режим «оба названия»). */
 export function Name({ label, className, altClassName, inline }: { label: Label; className?: string; altClassName?: string; inline?: boolean }) {
@@ -31,10 +33,10 @@ const VERDICT: Record<Verdict, string> = {
 }
 
 export const VERDICT_TEXT: Record<Verdict, string> = {
-  great: 'нужно по гайду',
-  good: 'приемлемо',
-  weak: 'слабо — при случае заменить',
-  bad: 'не по гайду — менять'
+  great: t('нужно по гайду'),
+  good: t('приемлемо'),
+  weak: t('слабо — при случае заменить'),
+  bad: t('не по гайду — менять')
 }
 
 /** Строка вещи / ячейка рода / манакамень, окрашенные по пользе. */
@@ -70,7 +72,7 @@ const GRADE_COLOR: Record<ItemGrade, string> = {
 
 export function GradeText({ grade, children, className }: { grade: ItemGrade; children: ReactNode; className?: string }) {
   return (
-    <Tooltip content={grade !== 'unknown' ? `Грейд: ${GRADES[grade].ru}` : null}>
+    <Tooltip content={grade !== 'unknown' ? t('Грейд: {GRADES}', { GRADES: term(GRADES[grade]) }) : null}>
       <span className={cn(GRADE_COLOR[grade], className)}>{children}</span>
     </Tooltip>
   )
@@ -89,9 +91,9 @@ export const gradeBorder = (grade: ItemGrade) =>
   })[grade]
 
 const IMPACT: Record<Impact, { tone: 'critical' | 'warning' | 'neutral'; text: string; tip: string }> = {
-  high: { tone: 'critical', text: 'Важно', tip: 'Сильно влияет на билд: ключевые умения, специализации, дешёвые узлы досок. Делать в первую очередь.' },
-  medium: { tone: 'warning', text: 'Стоит', tip: 'Заметно улучшит билд, но не горит: заточка аркан, перековка строк, вторичные умения.' },
-  low: { tone: 'neutral', text: 'Мелочь', tip: 'Небольшая польза: манакамни, ячейки рода, поиск карты лучше. Когда будет время и ресурсы.' }
+  high: { tone: 'critical', text: t('Важно'), tip: t('Сильно влияет на билд: ключевые умения, специализации, дешёвые узлы досок. Делать в первую очередь.') },
+  medium: { tone: 'warning', text: t('Стоит'), tip: t('Заметно улучшит билд, но не горит: заточка аркан, перековка строк, вторичные умения.') },
+  low: { tone: 'neutral', text: t('Мелочь'), tip: t('Небольшая польза: манакамни, ячейки рода, поиск карты лучше. Когда будет время и ресурсы.') }
 }
 
 export function ImpactPill({ impact }: { impact: Impact }) {
@@ -135,7 +137,9 @@ export function ClassIcon({ cls, size = 16, className }: { cls: ClassKey | null;
 /** Вес из гайда точками: ●●●○○. */
 export function WeightDots({ weight, className }: { weight: number; className?: string }) {
   return (
-    <Tooltip content={weight ? `Важность по гайду: ${weight} из 5 (5 — главное, 1 — лучше, чем ничего).` : 'Гайд этот стат не ценит (важность 0).'}>
+    <Tooltip
+      content={weight ? t('Важность по гайду: {weight} из 5 (5 — главное, 1 — лучше, чем ничего).', { weight }) : t('Гайд этот стат не ценит (важность 0).')}
+    >
       <span className={cn('inline-flex gap-0.5', className)}>
         {[1, 2, 3, 4, 5].map((i) => (
           <span key={i} className={cn('h-1.5 w-1.5 rounded-full', i <= weight ? 'bg-accent' : 'bg-surface-3')} />

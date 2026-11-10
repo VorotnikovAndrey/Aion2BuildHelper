@@ -6,6 +6,7 @@ import { skillIconSrc } from '@shared/gamedata/art'
 import { skillDef } from '@shared/gamedata/skills'
 import type { Tone } from '@/lib/status'
 import { cn } from '@/lib/format'
+import { term } from '@shared/names'
 
 const RING: Record<Tone, string> = {
   ok: 'ring-2 ring-good/80',
@@ -38,7 +39,7 @@ export function SkillIcon({
         className={cn('inline-flex shrink-0 items-center justify-center bg-surface-3 font-semibold text-ink-3', radius, tone && RING[tone], className)}
         style={{ width: size, height: size, fontSize: size * 0.4 }}
       >
-        {(def?.ru ?? def?.en ?? '?').slice(0, 1)}
+        {(def ? term(def) : '?').slice(0, 1)}
       </span>
     )
   }

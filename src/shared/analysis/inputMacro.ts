@@ -4,6 +4,7 @@
 // не заметить, а каждое отпускание клавиши связки её останавливает.
 
 import type { GuideOneButton, InputEvent } from '../guide/types'
+import { t } from '../i18n'
 
 /** Кадр при 60 FPS, мс: нажатие короче может уместиться между двумя кадрами. */
 export const FRAME_60_MS = 1000 / 60
@@ -12,7 +13,7 @@ export const FRAME_60_MS = 1000 / 60
 export const SAFE_HOLD_MS = 20
 
 /** Клавиша связки по умолчанию, если гайд её не задаёт (в билдах Questlog клавиш нет). */
-export const DEFAULT_MACRO_KEY = 'ПКМ'
+export const DEFAULT_MACRO_KEY = t('ПКМ')
 
 /**
  * «Одна кнопка» по умолчанию — макрос мыши владельца (сверен 9 ноября 2026): ПКМ — связка, ЛКМ — умение
@@ -20,13 +21,15 @@ export const DEFAULT_MACRO_KEY = 'ПКМ'
  */
 export const DEFAULT_ONE_BUTTON: GuideOneButton = {
   events: [
-    { key: 'ПКМ', down: true, waitMs: 10 },
-    { key: 'ЛКМ', down: true, waitMs: 20 },
-    { key: 'ЛКМ', down: false, waitMs: 35 },
-    { key: 'ПКМ', down: false, waitMs: 0 }
+    { key: t('ПКМ'), down: true, waitMs: 10 },
+    { key: t('ЛКМ'), down: true, waitMs: 20 },
+    { key: t('ЛКМ'), down: false, waitMs: 35 },
+    { key: t('ПКМ'), down: false, waitMs: 0 }
   ],
   repeatMs: 10,
-  note: 'Тайминги — ваш макрос мыши, не из гайда: в билдах Questlog клавиш нет. Боковая кнопка мыши запускает его в ПО мыши (SteelSeries GG, Razer Synapse, G Hub) с автоповтором, пока она зажата: ПКМ — клавиша связки, ЛКМ — умение, которое вы держите на левой кнопке. Клик ЛКМ 20 мс и пауза 35 мс — значения с запасом: клики по 10 мс игра иногда теряет.'
+  note: t(
+    'Тайминги — ваш макрос мыши, не из гайда: в билдах Questlog клавиш нет. Боковая кнопка мыши запускает его в ПО мыши (SteelSeries GG, Razer Synapse, G Hub) с автоповтором, пока она зажата: ПКМ — клавиша связки, ЛКМ — умение, которое вы держите на левой кнопке. Клик ЛКМ 20 мс и пауза 35 мс — значения с запасом: клики по 10 мс игра иногда теряет.'
+  )
 }
 
 export interface KeyTiming {
@@ -55,19 +58,19 @@ export interface InputMacroReport {
   warnings: InputWarning[]
 }
 
-const ms = (v: number) => `${Math.round(v * 10) / 10} мс`
-const perSec = (v: number) => `${Math.round(v)} раз в секунду`
+const ms = (v: number) => t('{p} мс', { p: Math.round(v * 10) / 10 })
+const perSec = (v: number) => t('{v} раз в секунду', { v: Math.round(v) })
 
 export function analyzeInputMacro(events: InputEvent[], repeatMs: number, macroKey?: string): InputMacroReport {
   const cycleMs = events.reduce((sum, e) => sum + e.waitMs, 0) + repeatMs
   // Моменты нажатий и отпусканий каждой клавиши внутри цикла.
   const marks = new Map<string, { t: number; down: boolean }[]>()
-  let t = 0
+  let tm = 0
   for (const e of events) {
     const list = marks.get(e.key) ?? []
-    list.push({ t, down: e.down })
+    list.push({ t: tm, down: e.down })
     marks.set(e.key, list)
-    t += e.waitMs
+    tm += e.waitMs
   }
 
   const keys: KeyTiming[] = []
@@ -95,7 +98,11 @@ export function analyzeInputMacro(events: InputEvent[], repeatMs: number, macroK
   const warnings: InputWarning[] = []
   for (const k of keys) {
     if (k.stuck) {
-      warnings.push({ key: k.key, kind: 'stuck', text: `${k.key} нажимается, но не отпускается — после отпускания кнопки мыши клавиша может «залипнуть».` })
+      warnings.push({
+        key: k.key,
+        kind: 'stuck',
+        text: t('{key} нажимается, но не отпускается — после отпускания кнопки мыши клавиша может «залипнуть».', { key: k.key })
+      })
       continue
     }
     if (k.key === macroKey) {
@@ -103,7 +110,10 @@ export function analyzeInputMacro(events: InputEvent[], repeatMs: number, macroK
         warnings.push({
           key: k.key,
           kind: 'macro-release',
-          text: `${k.key} (клавиша связки) отпускается ${perSec(k.pressesPerSec)} на ${ms(k.gapMs)}. Связка работает, только пока клавиша зажата, — при каждом отпускании она может начинать заново с первого шага. Поэтому ячейку с заполнителем (всегда готовым умением) ставьте в связке последней: шаги после неё не дойдут.`
+          text: t(
+            '{key} (клавиша связки) отпускается {perSec} на {ms}. Связка работает, только пока клавиша зажата, — при каждом отпускании она может начинать заново с первого шага. Поэтому ячейку с заполнителем (всегда готовым умением) ставьте в связке последней: шаги после неё не дойдут.',
+            { key: k.key, perSec: perSec(k.pressesPerSec), ms: ms(k.gapMs) }
+          )
         })
       }
       continue
@@ -112,7 +122,12 @@ export function analyzeInputMacro(events: InputEvent[], repeatMs: number, macroK
       warnings.push({
         key: k.key,
         kind: 'short-hold',
-        text: `${k.key} зажимается на ${ms(k.holdMs)}${k.holdMs < FRAME_60_MS ? ` — меньше одного кадра при 60 FPS (${ms(FRAME_60_MS)})` : ''}. С резервом умений такие клики игра иногда теряет; надёжно — от ${SAFE_HOLD_MS} мс.`
+        text: t('{key} зажимается на {ms}{p}. С резервом умений такие клики игра иногда теряет; надёжно — от {SAFE_HOLD_MS} мс.', {
+          key: k.key,
+          ms: ms(k.holdMs),
+          p: k.holdMs < FRAME_60_MS ? t(' — меньше одного кадра при 60 FPS ({ms})', { ms: ms(FRAME_60_MS) }) : '',
+          SAFE_HOLD_MS
+        })
       })
     }
   }
@@ -138,15 +153,15 @@ export function keyIntervals(
   const intervals: KeyInterval[] = []
   const open = new Map<string, number>()
   for (let c = 0; c < cycles; c++) {
-    let t = c * cycleMs
+    let tm = c * cycleMs
     for (const e of events) {
       if (e.down) {
-        if (!open.has(e.key)) open.set(e.key, t)
+        if (!open.has(e.key)) open.set(e.key, tm)
       } else if (open.has(e.key)) {
-        intervals.push({ key: e.key, start: open.get(e.key)!, end: t })
+        intervals.push({ key: e.key, start: open.get(e.key)!, end: tm })
         open.delete(e.key)
       }
-      t += e.waitMs
+      tm += e.waitMs
     }
   }
   // Не отпущенная к концу клавиша — держится до края схемы.

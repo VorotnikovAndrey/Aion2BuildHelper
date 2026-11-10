@@ -7,6 +7,7 @@ import { currentSnapshot, diffGamedata, GAMEDATA_BUILT_AT, type GamedataSnapshot
 import statsJson from '@shared/gamedata/generated/stats.json'
 import type { ClassKey } from '@shared/types'
 import { linesOf, parseArcanaPools, parseDaevanion, parseGodstones, parseSkills, parseSpecs, parseTitles, parseTop } from '../../scripts/gamedata/parsers.mjs'
+import { t } from '@shared/i18n'
 
 const BASE = 'https://metabot.gg/en/aion-2'
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36'
@@ -25,7 +26,7 @@ async function get(path: string): Promise<string> {
 }
 
 export async function checkGamedata(cls: ClassKey, onProgress: (p: { done: number; total: number; label: string }) => void): Promise<GamedataCheckResult> {
-  if (running) throw new Error('Проверка уже идёт')
+  if (running) throw new Error(t('Проверка уже идёт'))
   running = true
   const errors: string[] = []
   try {
@@ -44,15 +45,15 @@ export async function checkGamedata(cls: ClassKey, onProgress: (p: { done: numbe
       }
     }
 
-    const skills = await step('Умения', '/skills', parseSkills, [])
+    const skills = await step(t('Умения'), '/skills', parseSkills, [])
     const classSkills = skills.filter((s) => s.cls === cls && s.type !== 'passive')
     total += classSkills.length
-    const boards = await step('Доски Даэваниона', `/daevanion/${cls}`, parseDaevanion, [])
-    const arcanaPools = await step('Арканы', '/arcana', (h) => parseArcanaPools(h, skills), {})
-    const titles = await step('Титулы', '/titles', (h) => parseTitles(h, statsJson as { id: number; en: string }[]), [])
-    const godstones = await step('Священные камни', '/godstones', parseGodstones, [])
+    const boards = await step(t('Доски Даэваниона'), `/daevanion/${cls}`, parseDaevanion, [])
+    const arcanaPools = await step(t('Арканы'), '/arcana', (h) => parseArcanaPools(h, skills), {})
+    const titles = await step(t('Титулы'), '/titles', (h) => parseTitles(h, statsJson as { id: number; en: string }[]), [])
+    const godstones = await step(t('Священные камни'), '/godstones', parseGodstones, [])
     const topRaw = await step(
-      'Топ-игроки',
+      t('Топ-игроки'),
       `/classes/${cls}/build`,
       (h) =>
         parseTop(linesOf(h), {
@@ -64,7 +65,7 @@ export async function checkGamedata(cls: ClassKey, onProgress: (p: { done: numbe
     )
     const specs: GamedataSnapshot['specs'] = {}
     for (const s of classSkills) {
-      const list = await step(`Специализации: ${s.en}`, `/skills/${s.slug}`, parseSpecs, [])
+      const list = await step(t('Специализации: {s}', { s: s.en }), `/skills/${s.slug}`, parseSpecs, [])
       if (list.length) specs[s.id] = list
     }
 
@@ -78,7 +79,7 @@ export async function checkGamedata(cls: ClassKey, onProgress: (p: { done: numbe
       godstones: godstones.length ? godstones : cur.godstones,
       top: (topRaw as GamedataSnapshot['top']) ?? cur.top
     }
-    onProgress({ done: total, total, label: 'Сравнение' })
+    onProgress({ done: total, total, label: t('Сравнение') })
     return { checkedAt: new Date().toISOString(), builtAt: GAMEDATA_BUILT_AT, changes: diffGamedata(cur, fresh, cls), errors }
   } finally {
     running = false

@@ -1,3 +1,4 @@
+import { isLocale, t, type Locale } from './i18n'
 // Темы оформления и масштаб интерфейса.
 // Тема = основа (фон и поверхности) + акцентный цвет. Применяет их src/renderer/src/lib/theme.ts
 // через CSS-переменные — все классы Tailwind (bg-surface, text-accent…) перекрашиваются сразу.
@@ -16,12 +17,12 @@ export interface ThemeBase {
 }
 
 export const THEME_BASES: ThemeBase[] = [
-  { id: 'abyss', label: 'Бездна', bg: '#0f1117', sidebar: '#0b0d12', surface: '#161a23', surface2: '#1c212c', surface3: '#262c3a' },
-  { id: 'elyos', label: 'Элиос', bg: '#1a1d23', sidebar: '#15181d', surface: '#21252c', surface2: '#282d35', surface3: '#323843' },
-  { id: 'asmodae', label: 'Асмодея', bg: '#15121b', sidebar: '#100d15', surface: '#1d1925', surface2: '#25202f', surface3: '#2f293b' },
-  { id: 'warm', label: 'Тёплый графит', bg: '#1f1e1d', sidebar: '#191817', surface: '#262624', surface2: '#2e2d2a', surface3: '#383733' },
-  { id: 'neutral', label: 'Нейтральный', bg: '#1c1c1c', sidebar: '#161616', surface: '#242424', surface2: '#2c2c2c', surface3: '#363636' },
-  { id: 'oled', label: 'Чёрный OLED', bg: '#0a0a0a', sidebar: '#000000', surface: '#141414', surface2: '#1c1c1c', surface3: '#262626' }
+  { id: 'abyss', label: t('Бездна'), bg: '#0f1117', sidebar: '#0b0d12', surface: '#161a23', surface2: '#1c212c', surface3: '#262c3a' },
+  { id: 'elyos', label: t('Элиос'), bg: '#1a1d23', sidebar: '#15181d', surface: '#21252c', surface2: '#282d35', surface3: '#323843' },
+  { id: 'asmodae', label: t('Асмодея'), bg: '#15121b', sidebar: '#100d15', surface: '#1d1925', surface2: '#25202f', surface3: '#2f293b' },
+  { id: 'warm', label: t('Тёплый графит'), bg: '#1f1e1d', sidebar: '#191817', surface: '#262624', surface2: '#2e2d2a', surface3: '#383733' },
+  { id: 'neutral', label: t('Нейтральный'), bg: '#1c1c1c', sidebar: '#161616', surface: '#242424', surface2: '#2c2c2c', surface3: '#363636' },
+  { id: 'oled', label: t('Чёрный OLED'), bg: '#0a0a0a', sidebar: '#000000', surface: '#141414', surface2: '#1c1c1c', surface3: '#262626' }
 ]
 
 export interface ThemePreset {
@@ -32,16 +33,16 @@ export interface ThemePreset {
 }
 
 export const THEME_PRESETS: ThemePreset[] = [
-  { id: 'gold', label: 'Золото Элиоса', base: 'abyss', accent: '#d9a441' },
-  { id: 'aether', label: 'Эфир', base: 'abyss', accent: '#55c7ec' },
-  { id: 'crimson', label: 'Багрянец Асмодеи', base: 'asmodae', accent: '#e0525e' },
-  { id: 'amethyst', label: 'Аметист', base: 'asmodae', accent: '#a78bfa' },
-  { id: 'ocean', label: 'Океан', base: 'elyos', accent: '#4f9cf0' },
-  { id: 'sakura', label: 'Сакура', base: 'elyos', accent: '#f472b6' },
-  { id: 'emerald', label: 'Изумруд', base: 'neutral', accent: '#34c38f' },
-  { id: 'silver', label: 'Серебро', base: 'neutral', accent: '#d4d4d4' },
-  { id: 'terracotta', label: 'Терракота', base: 'warm', accent: '#d97757' },
-  { id: 'lime', label: 'Лайм', base: 'oled', accent: '#a3e635' }
+  { id: 'gold', label: t('Золото Элиоса'), base: 'abyss', accent: '#d9a441' },
+  { id: 'aether', label: t('Эфир'), base: 'abyss', accent: '#55c7ec' },
+  { id: 'crimson', label: t('Багрянец Асмодеи'), base: 'asmodae', accent: '#e0525e' },
+  { id: 'amethyst', label: t('Аметист'), base: 'asmodae', accent: '#a78bfa' },
+  { id: 'ocean', label: t('Океан'), base: 'elyos', accent: '#4f9cf0' },
+  { id: 'sakura', label: t('Сакура'), base: 'elyos', accent: '#f472b6' },
+  { id: 'emerald', label: t('Изумруд'), base: 'neutral', accent: '#34c38f' },
+  { id: 'silver', label: t('Серебро'), base: 'neutral', accent: '#d4d4d4' },
+  { id: 'terracotta', label: t('Терракота'), base: 'warm', accent: '#d97757' },
+  { id: 'lime', label: t('Лайм'), base: 'oled', accent: '#a3e635' }
 ]
 
 /** Палитра для своего акцента. */
@@ -71,9 +72,9 @@ export const ACCENT_SWATCHES = [
 export type MotionLevel = 'full' | 'calm' | 'off'
 
 export const MOTION_LEVELS: { id: MotionLevel; label: string; hint: string }[] = [
-  { id: 'full', label: 'Полные', hint: 'Появление карточек, счётчики, блеск редких вещей, эфир на фоне, искры при отметке в чек-листе.' },
-  { id: 'calm', label: 'Спокойные', hint: 'Только короткие переходы и счётчики — без блеска, эфира на фоне и искр.' },
-  { id: 'off', label: 'Выключены', hint: 'Всё появляется сразу, ничего не движется.' }
+  { id: 'full', label: t('Полные'), hint: t('Появление карточек, счётчики, блеск редких вещей, эфир на фоне, искры при отметке в чек-листе.') },
+  { id: 'calm', label: t('Спокойные'), hint: t('Только короткие переходы и счётчики — без блеска, эфира на фоне и искр.') },
+  { id: 'off', label: t('Выключены'), hint: t('Всё появляется сразу, ничего не движется.') }
 ]
 
 export interface UiPrefs {
@@ -86,9 +87,12 @@ export interface UiPrefs {
   motion: MotionLevel
   /** Заставка с анимацией значка при запуске. */
   splash: boolean
+  /** Язык интерфейса. Смена перезагружает окно (см. shared/i18n). */
+  lang: Locale
 }
 
-export const DEFAULT_UI: UiPrefs = { themeId: 'gold', base: 'abyss', accent: '#d9a441', zoom: 1, motion: 'full', splash: true }
+// Язык по умолчанию — русский: так было до появления переводов. Новая установка берёт язык системы (main/storage.ts).
+export const DEFAULT_UI: UiPrefs = { themeId: 'gold', base: 'abyss', accent: '#d9a441', zoom: 1, motion: 'full', splash: true, lang: 'ru' }
 
 export const ZOOM_STEPS = [0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2]
 export const ZOOM_MIN = ZOOM_STEPS[0]
@@ -118,7 +122,8 @@ export function normalizeUi(raw: unknown): UiPrefs {
     accent,
     zoom: clampZoom(typeof r.zoom === 'number' ? r.zoom : 1),
     motion: MOTION_LEVELS.some((m) => m.id === r.motion) ? (r.motion as MotionLevel) : DEFAULT_UI.motion,
-    splash: r.splash !== false
+    splash: r.splash !== false,
+    lang: isLocale(r.lang) ? r.lang : DEFAULT_UI.lang
   }
 }
 

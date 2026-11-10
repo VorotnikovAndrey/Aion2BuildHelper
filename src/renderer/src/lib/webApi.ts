@@ -7,6 +7,7 @@ import { normalizeGuide } from '@shared/guide'
 import type { Guide } from '@shared/guide/types'
 import { parseQuestlogCharacters } from '@shared/questlog/parse'
 import { normalizeUi } from '@shared/theme'
+import { t } from '@shared/i18n'
 
 const LS_SETTINGS = 'a2bh.settings'
 const LS_GUIDES = 'a2bh.guides'
@@ -137,7 +138,7 @@ export function createWebApi(): AppApi {
     gamedata: {
       // В браузере чужой сайт не отдаст страницы (CORS) — проверка только в приложении.
       check: async () => {
-        throw new Error('Проверка справочников работает только в приложении')
+        throw new Error(t('Проверка справочников работает только в приложении'))
       },
       onProgress: () => () => undefined
     },

@@ -12,6 +12,7 @@ import { PageHeader, Segmented } from '@/components/ui/misc'
 import { cn } from '@/lib/format'
 import { Tooltip } from '@/components/ui/InfoTip'
 import { useCharacterContext } from '@/lib/report'
+import { intlLocale, t } from '@shared/i18n'
 
 type Filter = 'all' | 'guide'
 
@@ -42,7 +43,7 @@ export function StatsPage() {
       .filter((s) => !used.has(s.stat) && s.value !== 0)
       .map((s) => statDef(s.stat))
       .filter((d): d is NonNullable<typeof d> => !!d)
-    out.push({ id: 'other', title: 'Прочее', rows: rest })
+    out.push({ id: 'other', title: t('Прочее'), rows: rest })
     return out
   }, [char.stats, values])
 
@@ -58,38 +59,47 @@ export function StatsPage() {
     <>
       <PageHeader
         icon={<Gem size={22} />}
-        title="Статы"
-        subtitle="Итоговые характеристики персонажа, как их видит оверлей. Точки справа — насколько стат важен по гайду; плюс — сколько дают доски Даэваниона."
+        title={t('Статы')}
+        subtitle={t(
+          'Итоговые характеристики персонажа, как их видит оверлей. Точки справа — насколько стат важен по гайду; плюс — сколько дают доски Даэваниона.'
+        )}
         actions={<GuideSwitcher char={char} />}
       />
       <Card
-        title="Показатели персонажа"
+        title={t('Показатели персонажа')}
         className="mb-5"
-        hint="Как окно «Показатели персонажа» в игре: шесть характеристик в центре, вокруг — статы богов. Рамка круга: зелёная — не ниже среднего у топ-игроков класса, жёлтая — ниже. Наведите на любой круг — там пояснение."
+        hint={t(
+          'Как окно «Показатели персонажа» в игре: шесть характеристик в центре, вокруг — статы богов. Рамка круга: зелёная — не ниже среднего у топ-игроков класса, жёлтая — ниже. Наведите на любой круг — там пояснение.'
+        )}
       >
         <CharacterSheet values={values} fromBoards={report.daevanion.stats} namer={namer} refs={refs} />
       </Card>
 
       {report.statTargets.length > 0 && (
         <Card
-          title="Где хватает и к чему стремиться"
+          title={t('Где хватает и к чему стремиться')}
           className="mb-5"
           hint={
             top.length
-              ? `Пороги — сколько нужно для контента или сколько у автора гайда на целевой стадии. Ориентиры — сколько в среднем у ${topData(char.cls)?.players.toLocaleString('ru-RU') ?? ''} топ-игроков класса (metabot.gg). Отметка на шкале — цель; зелёное — хватает, жёлтое — не хватает.`
-              : 'Пороги — сколько нужно для контента или сколько у автора гайда на целевой стадии (по расчёту Questlog). Отметка на шкале — цель; зелёное — хватает, жёлтое — не хватает.'
+              ? t(
+                  'Пороги — сколько нужно для контента или сколько у автора гайда на целевой стадии. Ориентиры — сколько в среднем у {p} топ-игроков класса (metabot.gg). Отметка на шкале — цель; зелёное — хватает, жёлтое — не хватает.',
+                  { p: topData(char.cls)?.players.toLocaleString(intlLocale()) ?? '' }
+                )
+              : t(
+                  'Пороги — сколько нужно для контента или сколько у автора гайда на целевой стадии (по расчёту Questlog). Отметка на шкале — цель; зелёное — хватает, жёлтое — не хватает.'
+                )
           }
         >
           <div className={cn('grid grid-cols-1 gap-6', top.length > 0 && 'xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]')}>
             <div className={cn('space-y-4', !top.length && 'max-w-xl')}>
-              <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Для контента (PvE)</div>
+              <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{t('Для контента (PvE)')}</div>
               {content.map((t) => (
                 <TargetBar key={t.target.id} t={t} />
               ))}
             </div>
             {top.length > 0 && (
               <div className="space-y-4">
-                <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Ориентир: в среднем у топ-игроков класса</div>
+                <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{t('Ориентир: в среднем у топ-игроков класса')}</div>
                 <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
                   {top.map((t) => (
                     <TargetBar key={t.target.id} t={t} compact />
@@ -107,7 +117,7 @@ export function StatsPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Найти стат…"
+            placeholder={t('Найти стат…')}
             className="h-9 w-64 rounded-lg border border-line-strong bg-surface pr-3 pl-9 text-[13px] outline-none placeholder:text-ink-3 focus:border-accent"
           />
         </div>
@@ -115,8 +125,8 @@ export function StatsPage() {
           value={filter}
           onChange={setFilter}
           items={[
-            { id: 'all', label: 'Все' },
-            { id: 'guide', label: 'Важные по гайду' }
+            { id: 'all', label: t('Все') },
+            { id: 'guide', label: t('Важные по гайду') }
           ]}
         />
       </div>
@@ -134,12 +144,12 @@ export function StatsPage() {
                     key={d.id}
                     block
                     wide
-                    content={`${namer.stat(d.id).main}${namer.stat(d.id).alt ? ` (${namer.stat(d.id).alt})` : ''}: ${formatStatValue(d.id, values.get(d.id) ?? 0)}.${fromBoards ? ` Из них от досок Даэваниона: ${formatStatValue(d.id, fromBoards, { sign: true })}.` : ''} ${weight ? `Важность по гайду: ${weight} из 5.` : 'Гайд этот стат не ценит.'}`}
+                    content={`${namer.stat(d.id).main}${namer.stat(d.id).alt ? ` (${namer.stat(d.id).alt})` : ''}: ${formatStatValue(d.id, values.get(d.id) ?? 0)}.${fromBoards ? t(' Из них от досок Даэваниона: {id}.', { id: formatStatValue(d.id, fromBoards, { sign: true }) }) : ''} ${weight ? t('Важность по гайду: {weight} из 5.', { weight }) : t('Гайд этот стат не ценит.')}`}
                   >
                     <div className="flex w-full items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-surface-2">
                       <Name label={namer.stat(d.id)} className={cn('min-w-0 flex-1 text-[13px]', weight >= 4 ? 'text-ink' : 'text-ink-2')} />
                       {fromBoards ? (
-                        <span className="tnum shrink-0 text-[10.5px] text-ink-3" title="Из них — от досок Даэваниона">
+                        <span className="tnum shrink-0 text-[10.5px] text-ink-3" title={t('Из них — от досок Даэваниона')}>
                           {formatStatValue(d.id, fromBoards, { sign: true })}
                         </span>
                       ) : null}

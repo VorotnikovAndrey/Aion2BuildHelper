@@ -10,6 +10,7 @@ import { startWatching, stopWatching } from './questlog'
 import { getSettings } from './storage'
 import { loadWindowState, trackWindowState } from './windowState'
 import { attachZoom } from './zoom'
+import { setLocale, type Locale } from '@shared/i18n'
 import { themeBase } from '@shared/theme'
 
 app.setName('Aion2 Build Helper')
@@ -28,7 +29,7 @@ app.on('second-instance', () => {
   win.focus()
 })
 
-function createWindow(background: string): BrowserWindow {
+function createWindow(background: string, lang: Locale): BrowserWindow {
   const iconPath = join(__dirname, '../../build/icon.png')
   const min = { width: 1100, height: 700 }
   const saved = loadWindowState(min)
@@ -66,9 +67,10 @@ function createWindow(background: string): BrowserWindow {
     }
   })
 
-  // В режиме скриншотов — без анимаций (?static), чтобы кадр не ловился на середине появления.
-  const search = shotsEnabled() ? 'static' : undefined
-  if (process.env.ELECTRON_RENDERER_URL) void win.loadURL(process.env.ELECTRON_RENDERER_URL + (search ? `?${search}` : ''))
+  // Язык интерфейса — в адресе (?lang=): интерфейс узнаёт его до загрузки настроек (см. shared/i18n).
+  // В режиме скриншотов — ещё и без анимаций (?static), чтобы кадр не ловился на середине появления.
+  const search = [`lang=${lang}`, shotsEnabled() && 'static'].filter(Boolean).join('&')
+  if (process.env.ELECTRON_RENDERER_URL) void win.loadURL(`${process.env.ELECTRON_RENDERER_URL}?${search}`)
   else void win.loadFile(join(__dirname, '../renderer/index.html'), { search })
   return win
 }
@@ -77,13 +79,17 @@ app.whenReady().then(async () => {
   registerIpc()
   registerUpdaterIpc()
   // Фон окна до загрузки интерфейса — в цвет сохранённой темы, чтобы ничего не мигало.
-  const background = themeBase((await getSettings()).ui.base).bg
-  const win = createWindow(background)
+  const { ui } = await getSettings()
+  const background = themeBase(ui.base).bg
+  // Тексты main-процесса (уведомления, ошибки) — на языке интерфейса; смена языка перезагружает окно,
+  // а main подхватит новый язык при следующем запуске.
+  setLocale(ui.lang)
+  const win = createWindow(background, ui.lang)
   if (shotsEnabled()) win.webContents.once('did-finish-load', () => void runShots(win))
   await startWatching()
   void startUpdater()
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow(background)
+    if (BrowserWindow.getAllWindows().length === 0) createWindow(background, ui.lang)
   })
 })
 

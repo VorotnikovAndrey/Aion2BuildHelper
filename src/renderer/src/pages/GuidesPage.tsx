@@ -18,6 +18,8 @@ import { Pill } from '@/components/ui/Pill'
 import { cn } from '@/lib/format'
 import { useNamer } from '@/lib/report'
 import { api, useActiveGuide, useApp, useCharacter, useCharacterPrefs, useGuides } from '@/lib/store'
+import { intlLocale, t } from '@shared/i18n'
+import { term } from '@shared/names'
 
 export function GuidesPage() {
   const guides = useGuides()
@@ -43,7 +45,7 @@ export function GuidesPage() {
   const [confirmDelete, setConfirmDelete] = useState<Guide | null>(null)
 
   const duplicate = async (g: Guide) => {
-    const copy = await saveGuide({ ...g, id: `guide-${Date.now()}`, name: `${g.name} (моя версия)`, builtin: undefined })
+    const copy = await saveGuide({ ...g, id: `guide-${Date.now()}`, name: t('{g} (моя версия)', { g: g.name }), builtin: undefined })
     navigate(`/guides/${copy.id}/edit`)
   }
   const create = async () => {
@@ -67,22 +69,24 @@ export function GuidesPage() {
     <>
       <PageHeader
         icon={<BookOpen size={22} />}
-        title="Гайды"
-        subtitle="Гайд — это цель, с которой приложение сравнивает персонажа: нужные умения и специализации, приоритеты статов, арканы, узлы досок. Формат свой и не зависит от сайта: можно взять встроенный, скопировать и поправить, собрать с нуля или импортировать файл."
+        title={t('Гайды')}
+        subtitle={t(
+          'Гайд — это цель, с которой приложение сравнивает персонажа: нужные умения и специализации, приоритеты статов, арканы, узлы досок. Формат свой и не зависит от сайта: можно взять встроенный, скопировать и поправить, собрать с нуля или импортировать файл.'
+        )}
         actions={
           <>
             <Button icon={<Upload size={14} />} onClick={() => void doImport()}>
-              Импорт
+              {t('Импорт')}
             </Button>
             <Button variant="primary" icon={<Plus size={14} />} onClick={() => void create()}>
-              Новый гайд
+              {t('Новый гайд')}
             </Button>
           </>
         }
       />
       {error && (
         <div className="mb-4 rounded-xl border border-critical/30 bg-critical-soft px-4 py-3 text-[13px] text-critical">
-          Не получилось импортировать: {error}
+          {t('Не получилось импортировать: {error}', { error })}
         </div>
       )}
 
@@ -101,8 +105,8 @@ export function GuidesPage() {
               )}
             >
               <ClassIcon cls={c.key} size={18} />
-              <span className="font-medium">{c.ru}</span>
-              {mine && <span className="text-[10.5px] text-ink-3">ваш</span>}
+              <span className="font-medium">{term(c)}</span>
+              {mine && <span className="text-[10.5px] text-ink-3">{t('ваш')}</span>}
               <span className="tnum rounded-full bg-surface-3 px-1.5 text-[10.5px] text-ink-2">{n}</span>
             </button>
           )
@@ -112,13 +116,16 @@ export function GuidesPage() {
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[340px_1fr]">
         <div className="space-y-5">
           {builtin.length > 0 && (
-            <GuideGroup title="Билды Questlog" hint="Пять самых популярных билдов класса на questlog.gg (по лайкам). По умолчанию персонажа ведёт первый.">
+            <GuideGroup
+              title={t('Билды Questlog')}
+              hint={t('Пять самых популярных билдов класса на questlog.gg (по лайкам). По умолчанию персонажа ведёт первый.')}
+            >
               {builtin.map((g, i) => (
                 <GuideRow key={g.id} guide={g} rank={i + 1} selected={selected?.id === g.id} active={active?.id === g.id} onClick={() => setSelectedId(g.id)} />
               ))}
             </GuideGroup>
           )}
-          <GuideGroup title="Свои" hint="Ваши гайды: копии встроенных, собранные в редакторе или импортированные из файла.">
+          <GuideGroup title={t('Свои')} hint={t('Ваши гайды: копии встроенных, собранные в редакторе или импортированные из файла.')}>
             {custom.map((g) => (
               <GuideRow key={g.id} guide={g} selected={selected?.id === g.id} active={active?.id === g.id} onClick={() => setSelectedId(g.id)} />
             ))}
@@ -127,7 +134,7 @@ export function GuidesPage() {
                 onClick={() => void create()}
                 className="flex w-full items-center gap-2 rounded-xl border border-dashed border-line px-3.5 py-3 text-left text-[12.5px] text-ink-3 hover:border-line-strong hover:text-ink-2"
               >
-                <Plus size={14} /> Своих гайдов для класса «{classInfo(cls)?.ru}» нет — собрать с нуля
+                <Plus size={14} /> {t('Своих гайдов для класса «{classInfo}» нет — собрать с нуля', { classInfo: term(classInfo(cls)) })}
               </button>
             )}
           </GuideGroup>
@@ -150,11 +157,13 @@ export function GuidesPage() {
         )}
       </div>
 
-      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="Удалить гайд?">
-        <p className="text-[13px] text-ink-2">«{confirmDelete?.name}» удалится из приложения. Если он ещё нужен — сначала сделайте экспорт в файл.</p>
+      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title={t('Удалить гайд?')}>
+        <p className="text-[13px] text-ink-2">
+          {t('«{confirmDelete}» удалится из приложения. Если он ещё нужен — сначала сделайте экспорт в файл.', { confirmDelete: confirmDelete?.name })}
+        </p>
         <div className="mt-5 flex justify-end gap-2">
           <Button variant="ghost" onClick={() => setConfirmDelete(null)}>
-            Отмена
+            {t('Отмена')}
           </Button>
           <Button
             variant="danger"
@@ -165,7 +174,7 @@ export function GuidesPage() {
               setSelectedId(null)
             }}
           >
-            Удалить
+            {t('Удалить')}
           </Button>
         </div>
       </Modal>
@@ -217,16 +226,17 @@ function GuideRow({ guide, rank, selected, active, onClick }: { guide: Guide; ra
                   <Flag size={10} /> {guide.stages.length}
                 </span>
               ) : null}
-              {src?.region === 'korea' && <span className="text-warning">Корея</span>}
+              {src?.region === 'korea' && <span className="text-warning">{t('Корея')}</span>}
             </>
           ) : (
             <span>
-              {MODE_LABEL[guide.mode]} · свой{guide.stages?.length ? ` · стадий: ${guide.stages.length}` : ''}
+              {t('{MODE_LABEL} · свой', { MODE_LABEL: MODE_LABEL[guide.mode] })}
+              {guide.stages?.length ? t(' · стадий: {stagesCount}', { stagesCount: guide.stages.length }) : ''}
             </span>
           )}
         </span>
       </span>
-      {active && <Pill tone="good">ведёт</Pill>}
+      {active && <Pill tone="good">{t('ведёт')}</Pill>}
     </button>
   )
 }
@@ -274,7 +284,7 @@ function GuideDetail({
             <h2 className="text-xl font-semibold">{questlog ? (base.source?.title ?? base.name) : base.name}</h2>
             <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-3">
               <span>
-                {classInfo(base.cls)?.ru} · {MODE_LABEL[base.mode]}
+                {term(classInfo(base.cls))} · {MODE_LABEL[base.mode]}
                 {base.source?.author ? ` · ${base.source.author}` : ''}
                 {base.source?.date ? ` · ${base.source.date}` : ''}
               </span>
@@ -293,28 +303,28 @@ function GuideDetail({
           <div className="flex flex-wrap gap-2">
             {isActive ? (
               <Pill tone="good" icon={<Check size={12} />}>
-                ведёт персонажа
+                {t('ведёт персонажа')}
               </Pill>
             ) : (
-              <Button variant="primary" size="sm" disabled={!canActivate} onClick={onActivate} title={canActivate ? undefined : 'Гайд для другого класса'}>
-                Следовать этому гайду
+              <Button variant="primary" size="sm" disabled={!canActivate} onClick={onActivate} title={canActivate ? undefined : t('Гайд для другого класса')}>
+                {t('Следовать этому гайду')}
               </Button>
             )}
             {guide.builtin ? (
               <Button size="sm" icon={<Copy size={13} />} onClick={onDuplicate}>
-                Скопировать и править
+                {t('Скопировать и править')}
               </Button>
             ) : (
               <Button size="sm" icon={<Pencil size={13} />} onClick={onEdit}>
-                Изменить
+                {t('Изменить')}
               </Button>
             )}
             <Button size="sm" variant="ghost" icon={<Download size={13} />} onClick={onExport}>
-              Экспорт
+              {t('Экспорт')}
             </Button>
             {!guide.builtin && (
               <Button size="sm" variant="ghost" icon={<Trash2 size={13} />} onClick={onDelete}>
-                Удалить
+                {t('Удалить')}
               </Button>
             )}
           </div>
@@ -326,7 +336,7 @@ function GuideDetail({
             onClick={() => void api.app.openExternal(base.source!.url!)}
             className="mt-3 inline-flex items-center gap-1.5 text-xs text-accent hover:underline"
           >
-            {questlog ? 'Открыть билд на Questlog' : (base.source.title ?? base.source.url)} <ExternalLink size={12} />
+            {questlog ? t('Открыть билд на Questlog') : (base.source.title ?? base.source.url)} <ExternalLink size={12} />
           </button>
         )}
         {base.sources && base.sources.length > 1 && <SourceList sources={base.sources} />}
@@ -334,8 +344,10 @@ function GuideDetail({
 
       {stages.length > 0 && (
         <Card
-          title={`Стадии прокачки · ${stages.length}`}
-          hint="Стадии билда по уровню снаряжения. Нажмите на стадию — ниже покажутся её умения, титулы и цели досок. Целевую стадию для персонажа выбирают здесь или рядом с выбором гайда на страницах билда."
+          title={t('Стадии прокачки · {stagesCount}', { stagesCount: stages.length })}
+          hint={t(
+            'Стадии билда по уровню снаряжения. Нажмите на стадию — ниже покажутся её умения, титулы и цели досок. Целевую стадию для персонажа выбирают здесь или рядом с выбором гайда на страницах билда.'
+          )}
         >
           <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
             {stages.map((st) => {
@@ -353,24 +365,24 @@ function GuideDetail({
                   <button onClick={() => setPreviewId(st.id)} className="min-w-0 flex-1 text-left">
                     <span className="flex items-center gap-1.5">
                       {st.gearScore ? (
-                        <span className="tnum shrink-0 text-[11px] font-semibold text-accent-2">{st.gearScore.toLocaleString('ru-RU')} GS</span>
+                        <span className="tnum shrink-0 text-[11px] font-semibold text-accent-2">{st.gearScore.toLocaleString(intlLocale())} GS</span>
                       ) : null}
                       {isTarget && <Flag size={11} className="shrink-0 text-accent" />}
                     </span>
                     <span className="mt-0.5 line-clamp-2 block text-[12.5px] leading-snug">{st.name}</span>
                     <span className="mt-0.5 block text-[10.5px] text-ink-3">
-                      {[...(st.tags ?? []), done ? 'пройдена по GS' : ''].filter(Boolean).join(' · ')}
+                      {[...(st.tags ?? []), done ? t('пройдена по GS') : ''].filter(Boolean).join(' · ')}
                     </span>
                   </button>
                   {isActive &&
                     (isTarget ? (
-                      <Pill tone="accent" tip="С этой стадией сейчас сравнивается персонаж.">
-                        цель
+                      <Pill tone="accent" tip={t('С этой стадией сейчас сравнивается персонаж.')}>
+                        {t('цель')}
                       </Pill>
                     ) : (
-                      <Tooltip content="Сравнивать персонажа с этой стадией.">
+                      <Tooltip content={t('Сравнивать персонажа с этой стадией.')}>
                         <button onClick={() => makeTarget(st)} className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-accent hover:bg-surface-3">
-                          сделать целью
+                          {t('сделать целью')}
                         </button>
                       </Tooltip>
                     ))}
@@ -382,7 +394,7 @@ function GuideDetail({
       )}
 
       <div className="grid grid-cols-1 gap-5 2xl:grid-cols-2">
-        <Card title={preview ? `Умения · ${preview.name}` : 'Умения'}>
+        <Card title={preview ? t('Умения · {preview}', { preview: preview.name }) : t('Умения')}>
           {(['core', 'support', 'stigma', 'passive'] as const).map((role) =>
             by(role).length ? (
               <div key={role} className="mb-3 last:mb-0">
@@ -396,8 +408,8 @@ function GuideDetail({
                       tip={s.note ?? n.skill(s.skill).alt}
                     >
                       {n.skill(s.skill).main}
-                      {s.level ? ` · ур. ${s.level}` : ''}
-                      {s.specs?.length ? ` · спец. ${s.specs.join(', ')}` : ''}
+                      {s.level ? t(' · ур. {level}', { level: s.level }) : ''}
+                      {s.specs?.length ? t(' · спец. {specs}', { specs: s.specs.join(', ') }) : ''}
                     </Pill>
                   ))}
                 </div>
@@ -405,7 +417,7 @@ function GuideDetail({
             ) : null
           )}
         </Card>
-        <Card title="Главные статы">
+        <Card title={t('Главные статы')}>
           <div className="flex flex-wrap gap-1.5">
             {guide.stats
               .filter((s) => s.weight >= 4)
@@ -418,7 +430,7 @@ function GuideDetail({
           {guide.stats.some((s) => s.note) && <p className="mt-3 text-xs text-ink-3">{guide.stats.find((s) => s.note)?.note}</p>}
         </Card>
         {guide.rotation && guide.rotation.length > 0 && (
-          <Card title="Ротация">
+          <Card title={t('Ротация')}>
             <ol className="space-y-1.5 text-[13px] text-ink-2">
               {guide.rotation.map((r, i) => (
                 <li key={i} className="flex gap-2">
@@ -430,7 +442,7 @@ function GuideDetail({
           </Card>
         )}
         {guide.tips && guide.tips.length > 0 && (
-          <Card title="Советы">
+          <Card title={t('Советы')}>
             <div className="space-y-3">
               {guide.tips.map((t, i) => (
                 <div key={i}>
@@ -442,13 +454,16 @@ function GuideDetail({
           </Card>
         )}
         {guide.titles && (
-          <Card title="Титулы" hint="Какие титулы надевать — по порядку предпочтения. На странице «Питомцы и коллекции» видно, какие из них уже собраны.">
+          <Card
+            title={t('Титулы')}
+            hint={t('Какие титулы надевать — по порядку предпочтения. На странице «Питомцы и коллекции» видно, какие из них уже собраны.')}
+          >
             <div className="space-y-3">
               {(
                 [
-                  ['attack', 'Атака'],
-                  ['defense', 'Защита'],
-                  ['utility', 'Другое']
+                  ['attack', t('Атака')],
+                  ['defense', t('Защита')],
+                  ['utility', t('Другое')]
                 ] as const
               ).map(([key, ru]) =>
                 guide.titles?.[key]?.length ? (
@@ -476,7 +491,7 @@ function GuideDetail({
           </Card>
         )}
         {guide.daevanion.goals.length > 0 && (
-          <Card title="Цели Даэваниона">
+          <Card title={t('Цели Даэваниона')}>
             <div className="space-y-2.5">
               {guide.daevanion.goals.map((g) => (
                 <div key={g.id}>
@@ -493,16 +508,22 @@ function GuideDetail({
 }
 
 const REGION: Record<NonNullable<GuideSource['region']>, { ru: string; tip: string; tone: 'good' | 'warning' | 'neutral' }> = {
-  global: { ru: 'глобальная', tip: 'Писался для глобальной версии — как у вас.', tone: 'good' },
-  korea: { ru: 'Корея / Тайвань', tip: 'Основан на корейской или тайваньской версии: числа и набор стигм могут отличаться от глобальной.', tone: 'warning' },
-  mixed: { ru: 'смешанно', tip: 'Собран из источников разных версий игры.', tone: 'neutral' }
+  global: { ru: t('глобальная'), tip: t('Писался для глобальной версии — как у вас.'), tone: 'good' },
+  korea: {
+    ru: t('Корея / Тайвань'),
+    tip: t('Основан на корейской или тайваньской версии: числа и набор стигм могут отличаться от глобальной.'),
+    tone: 'warning'
+  },
+  mixed: { ru: t('смешанно'), tip: t('Собран из источников разных версий игры.'), tone: 'neutral' }
 }
 
 /** Источники сводного гайда: откуда что взято и для какой версии игры. */
 function SourceList({ sources }: { sources: GuideSource[] }) {
   return (
     <div className="mt-4 border-t border-line pt-3">
-      <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Источники ({sources.length})</div>
+      <div className="mb-2 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">
+        {t('Источники ({sourcesCount})', { sourcesCount: sources.length })}
+      </div>
       <div className="space-y-1">
         {sources.map((src, i) => (
           <div key={i} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
@@ -515,8 +536,8 @@ function SourceList({ sources }: { sources: GuideSource[] }) {
             )}
             {src.date && <span className="tnum text-ink-3">{src.date}</span>}
             {src.kind === 'data' && (
-              <Pill tone="aether" tip="Не статья, а статистика: что реально носят игроки.">
-                данные игроков
+              <Pill tone="aether" tip={t('Не статья, а статистика: что реально носят игроки.')}>
+                {t('данные игроков')}
               </Pill>
             )}
             {src.region && (
@@ -526,7 +547,7 @@ function SourceList({ sources }: { sources: GuideSource[] }) {
             )}
             {src.note && (
               <Tooltip content={src.note}>
-                <span className="text-ink-3 underline decoration-dotted underline-offset-2">заметка</span>
+                <span className="text-ink-3 underline decoration-dotted underline-offset-2">{t('заметка')}</span>
               </Tooltip>
             )}
           </div>
@@ -539,11 +560,12 @@ function SourceList({ sources }: { sources: GuideSource[] }) {
 /** Описание встроенного гайда: наша строка сверху, текст автора после «Описание автора:». */
 function splitDescription(text?: string): [string | undefined, string | undefined] {
   if (!text) return [undefined, undefined]
-  const i = text.indexOf('Описание автора:')
+  const mark = t('Описание автора:')
+  const i = text.indexOf(mark)
   if (i < 0) return [text, undefined]
   // Пустые строки между абзацами автора — лишние в свёрнутом виде
   const author = text
-    .slice(i + 'Описание автора:'.length)
+    .slice(i + mark.length)
     .replace(/\n\s*\n+/g, '\n')
     .trim()
   return [text.slice(0, i).trim() || undefined, author || undefined]
@@ -555,11 +577,11 @@ function AuthorText({ text }: { text: string }) {
   const long = text.length > 280
   return (
     <div className="mt-3 rounded-xl border border-line bg-surface-2/40 px-3.5 py-3">
-      <div className="mb-1 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">Описание автора</div>
+      <div className="mb-1 text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{t('Описание автора')}</div>
       <p className={cn('text-[12.5px] leading-relaxed whitespace-pre-line text-ink-2', !open && long && 'line-clamp-4')}>{text}</p>
       {long && (
         <button onClick={() => setOpen((v) => !v)} className="mt-1.5 inline-flex items-center gap-1 text-xs text-accent hover:underline">
-          {open ? 'Свернуть' : 'Показать полностью'}
+          {open ? t('Свернуть') : t('Показать полностью')}
           <ChevronDown size={12} className={cn('transition-transform', open && 'rotate-180')} />
         </button>
       )}

@@ -36,7 +36,8 @@ writeFileSync(resolve(root, 'build', 'release-notes.md'), notes + '\n', 'utf8')
 
 // Выпуск должен соответствовать коду на GitHub: тег ставится на текущий коммит, и он должен быть отправлен.
 const git = (...args) => spawnSync('git', args, { cwd: root, encoding: 'utf8' })
-if (git('status', '--porcelain').stdout?.trim()) fail('В рабочей папке есть незакоммиченные изменения. Закоммитьте и отправьте их (git push), затем запустите снова.')
+if (git('status', '--porcelain').stdout?.trim())
+  fail('В рабочей папке есть незакоммиченные изменения. Закоммитьте и отправьте их (git push), затем запустите снова.')
 const head = git('rev-parse', 'HEAD').stdout.trim()
 git('fetch', '--quiet', 'origin')
 if (!git('branch', '-r', '--contains', head).stdout.trim()) fail('Текущий коммит ещё не на GitHub. Отправьте его (git push) и запустите снова.')
@@ -101,7 +102,11 @@ if (release && !release.draft) {
   release = undefined
 }
 if (release) {
-  release = await api(`/releases/${release.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: version, body: notes }) })
+  release = await api(`/releases/${release.id}`, {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ name: version, body: notes })
+  })
   for (const a of release.assets) await api(`/releases/assets/${a.id}`, { method: 'DELETE' })
 } else {
   release = await api('/releases', {
@@ -116,15 +121,25 @@ for (const name of assets) {
   console.log(`[release] Загружаю ${name} (${Math.round(data.length / 1024 / 1024)} МБ)…`)
   const res = await fetch(`https://uploads.github.com/repos/${owner}/${repo}/releases/${release.id}/assets?name=${encodeURIComponent(name)}`, {
     method: 'POST',
-    headers: { authorization: `Bearer ${token}`, accept: 'application/vnd.github+json', 'user-agent': 'aion2buildhelper-release', 'content-type': 'application/octet-stream' },
+    headers: {
+      authorization: `Bearer ${token}`,
+      accept: 'application/vnd.github+json',
+      'user-agent': 'aion2buildhelper-release',
+      'content-type': 'application/octet-stream'
+    },
     body: data
   }).catch((err) => fail(`Не удалось загрузить ${name}: ${err.message}. Запустите снова — черновик выпуска доделается.`))
   if (!res.ok) fail(`GitHub не принял ${name} (${res.status}): ${(await res.text()).slice(0, 300)}. Запустите снова — черновик выпуска доделается.`)
 }
 
-await api(`/releases/${release.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ draft: false, make_latest: 'true' }) })
+await api(`/releases/${release.id}`, {
+  method: 'PATCH',
+  headers: { 'content-type': 'application/json' },
+  body: JSON.stringify({ draft: false, make_latest: 'true' })
+})
 const published = await findRelease()
-if (!published || published.draft || !isComplete(published)) fail(`Выпуск ${tag} опубликован не полностью — проверьте страницу выпусков на GitHub и запустите снова.`)
+if (!published || published.draft || !isComplete(published))
+  fail(`Выпуск ${tag} опубликован не полностью — проверьте страницу выпусков на GitHub и запустите снова.`)
 
 console.log(`\n[release] Версия ${version} выпущена: https://github.com/${owner}/${repo}/releases/tag/${tag}`)
 console.log('[release] Установленные копии найдут её сами (при запуске или в течение 4 часов). Новым людям дайте ссылку на страницу выпусков.')

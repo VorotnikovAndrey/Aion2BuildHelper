@@ -1,23 +1,23 @@
-// Настройки → «Названия»: режим (русские / английские / оба), свои названия умений любого класса
-// и список переименованных вещей. Свои названия хранятся по игровому ID — у каждого класса свои умения.
+// Настройки → «Названия»: свои названия умений любого класса и список переименованных вещей
+// (язык официальных названий — во вкладке «Язык», LanguageSection). Свои названия хранятся по игровому ID — у каждого класса свои умения.
 
 import { useMemo, useState } from 'react'
 import { RotateCcw, Search, X } from 'lucide-react'
 import { CLASSES } from '@shared/gamedata/classes'
 import { itemArt } from '@shared/gamedata/art'
 import { classSkills, type SkillDef, type SkillType } from '@shared/gamedata/skills'
-import type { NameMode } from '@shared/names'
 import type { ClassKey } from '@shared/types'
 import { ItemIcon } from '@/components/art'
 import { ClassIcon } from '@/components/game'
 import { SkillIcon } from '@/components/icons'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { Segmented } from '@/components/ui/misc'
 import { cn } from '@/lib/format'
 import { useApp, useCharacter } from '@/lib/store'
+import { t } from '@shared/i18n'
+import { term } from '@shared/names'
 
-const TYPE_RU: Record<SkillType, string> = { active: 'Активные', passive: 'Пассивные', stigma: 'Стигмы' }
+const TYPE_RU: Record<SkillType, string> = { active: t('Активные'), passive: t('Пассивные'), stigma: t('Стигмы') }
 const input = 'h-8 min-w-0 flex-1 rounded-md border border-line bg-surface-2 px-2 text-[13px] outline-none placeholder:text-ink-3 focus:border-accent'
 
 export function NamesSection() {
@@ -59,32 +59,14 @@ export function NamesSection() {
   return (
     <div className="space-y-5">
       <Card
-        title="Как называть"
-        hint="Английские названия — официальные из клиента игры, русские — из русского клиента (база Questlog). Любое можно заменить своим ниже."
-      >
-        <Segmented<NameMode>
-          value={settings.nameMode}
-          onChange={(nameMode) => void update({ nameMode })}
-          items={[
-            { id: 'both', label: 'Русские + английские' },
-            { id: 'ru', label: 'Только русские' },
-            { id: 'en', label: 'Только английские' }
-          ]}
-        />
-        <p className="mt-3 text-xs leading-relaxed text-ink-3">
-          Пример: {settings.nameMode === 'en' ? 'Judgment' : 'Суд'}
-          {settings.nameMode === 'both' && <span className="ml-1 text-[11px]">(Judgment)</span>} — английский вариант удобен, когда сверяетесь с англоязычным
-          гайдом.
-        </p>
-      </Card>
-
-      <Card
-        title="Свои названия умений"
-        hint="Если в вашем клиенте умение называется иначе или вам привычнее своё — впишите его. Пустое поле — официальное название. Названия хранятся для каждого умения отдельно, поэтому можно настроить любой класс, не только свой."
+        title={t('Свои названия умений')}
+        hint={t(
+          'Если в вашем клиенте умение называется иначе или вам привычнее своё — впишите его. Пустое поле — официальное название. Названия хранятся для каждого умения отдельно, поэтому можно настроить любой класс, не только свой.'
+        )}
         actions={
           renamed > 0 ? (
             <Button size="sm" variant="ghost" icon={<RotateCcw size={13} />} onClick={resetClass}>
-              Сбросить у класса ({renamed})
+              {t('Сбросить у класса ({renamed})', { renamed })}
             </Button>
           ) : null
         }
@@ -103,8 +85,8 @@ export function NamesSection() {
                 )}
               >
                 <ClassIcon cls={c.key} size={18} />
-                {c.ru}
-                {mine && <span className="text-[10.5px] text-ink-3">ваш</span>}
+                {term(c)}
+                {mine && <span className="text-[10.5px] text-ink-3">{t('ваш')}</span>}
                 {n > 0 && <span className="tnum rounded-full bg-surface-3 px-1.5 text-[10.5px] text-ink-2">{n}</span>}
               </button>
             )
@@ -116,7 +98,7 @@ export function NamesSection() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Найти умение…"
+            placeholder={t('Найти умение…')}
             className="h-9 w-full rounded-lg border border-line-strong bg-surface pr-3 pl-9 text-[13px] outline-none placeholder:text-ink-3 focus:border-accent"
           />
         </div>
@@ -132,16 +114,18 @@ export function NamesSection() {
               </div>
             </div>
           ))}
-          {groups.length === 0 && <p className="text-[13px] text-ink-3">Ничего не нашлось.</p>}
+          {groups.length === 0 && <p className="text-[13px] text-ink-3">{t('Ничего не нашлось.')}</p>}
         </div>
       </Card>
 
       <Card
-        title="Свои названия вещей"
-        hint="Переименовать вещь можно на странице «Шмот» — нажмите на её название. Здесь — список всех переименованных вещей: поправить или вернуть название из игры."
+        title={t('Свои названия вещей')}
+        hint={t(
+          'Переименовать вещь можно на странице «Шмот» — нажмите на её название. Здесь — список всех переименованных вещей: поправить или вернуть название из игры.'
+        )}
       >
         {Object.keys(itemNames).length === 0 ? (
-          <p className="text-[13px] text-ink-3">Своих названий вещей пока нет. Нажмите на название вещи на странице «Шмот», чтобы дать своё.</p>
+          <p className="text-[13px] text-ink-3">{t('Своих названий вещей пока нет. Нажмите на название вещи на странице «Шмот», чтобы дать своё.')}</p>
         ) : (
           <div className="grid grid-cols-1 gap-x-6 gap-y-1.5 lg:grid-cols-2">
             {Object.entries(itemNames).map(([id, name]) => {
@@ -153,7 +137,7 @@ export function NamesSection() {
                     {art?.ru ?? `ID ${id}`}
                   </span>
                   <input key={name} defaultValue={name} placeholder={art?.ru ?? ''} onBlur={(e) => setItem(id, e.target.value)} className={input} />
-                  <button onClick={() => setItem(id, '')} className="p-1 text-ink-3 hover:text-critical" aria-label="Вернуть название из игры">
+                  <button onClick={() => setItem(id, '')} className="p-1 text-ink-3 hover:text-critical" aria-label={t('Вернуть название из игры')}>
                     <X size={14} />
                   </button>
                 </div>
@@ -176,7 +160,7 @@ function SkillRow({ s, custom, onSave }: { s: SkillDef; custom?: string; onSave:
       <input
         key={custom ?? ''}
         defaultValue={custom ?? ''}
-        placeholder={s.ru ?? s.en}
+        placeholder={term(s)}
         onBlur={(e) => e.target.value.trim() !== (custom ?? '') && onSave(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
         className={cn(input, custom && 'border-accent/50')}
@@ -185,7 +169,7 @@ function SkillRow({ s, custom, onSave }: { s: SkillDef; custom?: string; onSave:
         onClick={() => onSave('')}
         disabled={!custom}
         className="p-1 text-ink-3 hover:text-critical disabled:invisible"
-        aria-label="Вернуть официальное название"
+        aria-label={t('Вернуть официальное название')}
       >
         <X size={14} />
       </button>

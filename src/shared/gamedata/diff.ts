@@ -11,6 +11,7 @@ import titlesJson from './generated/titles.json'
 import { BOARD_RU } from './daevanion'
 import { skillDef } from './skills'
 import { topData } from './top'
+import { intlLocale, t } from '../i18n'
 
 export interface GamedataSnapshot {
   skills: { id: number; en: string; cls: string; type: string; unlock: number | null }[]
@@ -32,13 +33,13 @@ export interface GamedataChange {
 }
 
 export const AREA_RU: Record<GamedataArea, string> = {
-  skills: 'Умения',
-  specs: 'Специализации',
-  daevanion: 'Доски Даэваниона',
-  arcana: 'Арканы',
-  titles: 'Титулы',
-  godstones: 'Священные камни',
-  top: 'Топ-игроки'
+  skills: t('Умения'),
+  specs: t('Специализации'),
+  daevanion: t('Доски Даэваниона'),
+  arcana: t('Арканы'),
+  titles: t('Титулы'),
+  godstones: t('Священные камни'),
+  top: t('Топ-игроки')
 }
 
 /** Когда собраны справочники приложения. */
@@ -62,7 +63,7 @@ export function currentSnapshot(cls: ClassKey): GamedataSnapshot {
 }
 
 const short = (s: string, n = 70) => (s.length > n ? `${s.slice(0, n - 1)}…` : s)
-const num = (v: number) => v.toLocaleString('ru-RU')
+const num = (v: number) => v.toLocaleString(intlLocale())
 
 export function diffGamedata(cur: GamedataSnapshot, fresh: GamedataSnapshot, cls: ClassKey): GamedataChange[] {
   const out: GamedataChange[] = []
@@ -74,14 +75,15 @@ export function diffGamedata(cur: GamedataSnapshot, fresh: GamedataSnapshot, cls
   const newSkills = new Map(fresh.skills.filter((s) => s.cls === cls).map((s) => [s.id, s]))
   for (const [id, s] of newSkills) {
     const was = curSkills.get(id)
-    if (!was) add('skills', `Новое умение: ${s.en}`)
+    if (!was) add('skills', t('Новое умение: {s}', { s: s.en }))
     else {
-      if (was.en !== s.en) add('skills', `${name(id, was.en)}: английское название «${was.en}» → «${s.en}»`)
-      if (was.type !== s.type) add('skills', `${name(id, s.en)}: тип умения изменился`)
-      if (was.unlock !== s.unlock) add('skills', `${name(id, s.en)}: открывается на ур. ${was.unlock ?? '—'} → ${s.unlock ?? '—'}`)
+      if (was.en !== s.en) add('skills', t('{name}: английское название «{was}» → «{s}»', { name: name(id, was.en), was: was.en, s: s.en }))
+      if (was.type !== s.type) add('skills', t('{name}: тип умения изменился', { name: name(id, s.en) }))
+      if (was.unlock !== s.unlock)
+        add('skills', t('{name}: открывается на ур. {p} → {p2}', { name: name(id, s.en), p: was.unlock ?? '—', p2: s.unlock ?? '—' }))
     }
   }
-  for (const [id, s] of curSkills) if (!newSkills.has(id)) add('skills', `Умение пропало: ${name(id, s.en)}`)
+  for (const [id, s] of curSkills) if (!newSkills.has(id)) add('skills', t('Умение пропало: {name}', { name: name(id, s.en) }))
 
   // Специализации — только у умений класса, которые есть в обоих.
   for (const id of newSkills.keys()) {
@@ -90,13 +92,14 @@ export function diffGamedata(cur: GamedataSnapshot, fresh: GamedataSnapshot, cls
     if (!a || !b) continue
     for (const sp of b) {
       const was = a.find((x) => x.n === sp.n)
-      if (!was) add('specs', `${name(id)}: новый вариант ${sp.n} — «${short(sp.en)}»`)
+      if (!was) add('specs', t('{name}: новый вариант {n} — «{short}»', { name: name(id), n: sp.n, short: short(sp.en) }))
       else {
-        if (was.en !== sp.en) add('specs', `${name(id)}: вариант ${sp.n} изменился — «${short(sp.en)}»`)
-        if (was.level !== sp.level) add('specs', `${name(id)}: вариант ${sp.n} открывается на ур. ${was.level ?? '—'} → ${sp.level ?? '—'}`)
+        if (was.en !== sp.en) add('specs', t('{name}: вариант {n} изменился — «{short}»', { name: name(id), n: sp.n, short: short(sp.en) }))
+        if (was.level !== sp.level)
+          add('specs', t('{name}: вариант {n} открывается на ур. {p} → {p2}', { name: name(id), n: sp.n, p: was.level ?? '—', p2: sp.level ?? '—' }))
       }
     }
-    for (const sp of a) if (!b.some((x) => x.n === sp.n)) add('specs', `${name(id)}: вариант ${sp.n} убран`)
+    for (const sp of a) if (!b.some((x) => x.n === sp.n)) add('specs', t('{name}: вариант {n} убран', { name: name(id), n: sp.n }))
   }
 
   // Доски: число узлов и узлы умений.
@@ -104,15 +107,16 @@ export function diffGamedata(cur: GamedataSnapshot, fresh: GamedataSnapshot, cls
     const was = cur.boards.find((b) => b.id === board.id)
     const ru = BOARD_RU[board.en] ?? board.en
     if (!was) {
-      add('daevanion', `Новая доска: ${ru}`)
+      add('daevanion', t('Новая доска: {ru}', { ru }))
       continue
     }
-    if (was.nodes.length !== board.nodes.length) add('daevanion', `${ru}: узлов ${was.nodes.length} → ${board.nodes.length}`)
+    if (was.nodes.length !== board.nodes.length)
+      add('daevanion', t('{ru}: узлов {nodesCount} → {nodesCount2}', { ru, nodesCount: was.nodes.length, nodesCount2: board.nodes.length }))
     const oldNodes = new Map(was.nodes.map((n) => [n.id, n]))
     for (const n of board.nodes) {
       const o = oldNodes.get(n.id)
       if (n.skill && (!o || o.skill !== n.skill || o.levels !== n.levels)) {
-        add('daevanion', `${ru}: узел «${name(n.skill)} +${n.levels ?? 1}»${o ? ' изменился' : ' добавлен'}`)
+        add('daevanion', t('{ru}: узел «{name} +{p}»{p2}', { ru, name: name(n.skill), p: n.levels ?? 1, p2: o ? t(' изменился') : t(' добавлен') }))
       }
     }
   }
@@ -125,8 +129,8 @@ export function diffGamedata(cur: GamedataSnapshot, fresh: GamedataSnapshot, cls
     const now = new Set(list)
     const added = list.filter((id) => !was.has(id))
     const removed = [...was].filter((id) => !now.has(id))
-    if (added.length) add('arcana', `Карта ${card}: добавлены ${added.map((id) => name(id)).join(', ')}`)
-    if (removed.length) add('arcana', `Карта ${card}: убраны ${removed.map((id) => name(id)).join(', ')}`)
+    if (added.length) add('arcana', t('Карта {card}: добавлены {map}', { card, map: added.map((id) => name(id)).join(', ') }))
+    if (removed.length) add('arcana', t('Карта {card}: убраны {map}', { card, map: removed.map((id) => name(id)).join(', ') }))
   }
 
   // Титулы и священные камни: новые — списком (первые 5).
@@ -134,39 +138,47 @@ export function diffGamedata(cur: GamedataSnapshot, fresh: GamedataSnapshot, cls
   if (newTitles.length)
     add(
       'titles',
-      `Новых титулов: ${newTitles.length} — ${newTitles
-        .slice(0, 5)
-        .map((t) => t.en)
-        .join(', ')}${newTitles.length > 5 ? '…' : ''}`,
+      t('Новых титулов: {newTitlesCount} — {map}{p}', {
+        newTitlesCount: newTitles.length,
+        map: newTitles
+          .slice(0, 5)
+          .map((t) => t.en)
+          .join(', '),
+        p: newTitles.length > 5 ? '…' : ''
+      }),
       false
     )
   const newStones = fresh.godstones.filter((g) => !cur.godstones.some((x) => x.id === g.id))
   if (newStones.length)
     add(
       'godstones',
-      `Новых священных камней: ${newStones.length} — ${newStones
-        .slice(0, 5)
-        .map((g) => g.en)
-        .join(', ')}`,
+      t('Новых священных камней: {newStonesCount} — {map}', {
+        newStonesCount: newStones.length,
+        map: newStones
+          .slice(0, 5)
+          .map((g) => g.en)
+          .join(', ')
+      }),
       false
     )
   const changedStones = fresh.godstones.filter((g) => cur.godstones.some((x) => x.id === g.id && x.effect !== g.effect))
-  if (changedStones.length) add('godstones', `Изменился эффект: ${changedStones.map((g) => g.en).join(', ')}`)
+  if (changedStones.length) add('godstones', t('Изменился эффект: {map}', { map: changedStones.map((g) => g.en).join(', ') }))
 
   // Топ-игроки: меняется каждый день — только заметные сдвиги.
   if (cur.top && fresh.top) {
     const a = cur.top
     const b = fresh.top
     if (Math.abs(b.medianCp - a.medianCp) / Math.max(1, a.medianCp) >= 0.03)
-      add('top', `Медиана боевой мощи топа: ${num(a.medianCp)} → ${num(b.medianCp)}`, false)
+      add('top', t('Медиана боевой мощи топа: {num} → {num2}', { num: num(a.medianCp), num2: num(b.medianCp) }), false)
     for (const s of b.skills) {
       const was = a.skills.find((x) => x.skill === s.skill)
       if (was && Math.abs(s.avgLevel - was.avgLevel) >= 0.5)
-        add('top', `${name(s.skill)}: средний уровень у топа ${num(was.avgLevel)} → ${num(s.avgLevel)}`, false)
+        add('top', t('{name}: средний уровень у топа {num} → {num2}', { name: name(s.skill), num: num(was.avgLevel), num2: num(s.avgLevel) }), false)
     }
     for (const s of b.stigmas) {
       const was = a.stigmas.find((x) => x.skill === s.skill)
-      if (was && Math.abs(s.share - was.share) >= 5) add('top', `${name(s.skill)}: носят ${num(was.share)}% → ${num(s.share)}% топа`, false)
+      if (was && Math.abs(s.share - was.share) >= 5)
+        add('top', t('{name}: носят {num}% → {num2}% топа', { name: name(s.skill), num: num(was.share), num2: num(s.share) }), false)
     }
   }
   return out

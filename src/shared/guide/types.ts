@@ -4,6 +4,7 @@
 // Подробное описание с примерами — docs/guides.md.
 
 import type { ClassKey } from '../types'
+import { t } from '../i18n'
 
 export const GUIDE_SCHEMA = 1
 
@@ -252,23 +253,23 @@ export interface Guide {
 export const MODE_LABEL: Record<GuideMode, string> = {
   pve: 'PvE',
   pvp: 'PvP',
-  leveling: 'Прокачка',
-  other: 'Другое'
+  leveling: t('Прокачка'),
+  other: t('Другое')
 }
 
 export const ROLE_LABEL: Record<SkillRole, string> = {
-  core: 'Главное',
-  support: 'Поддержка',
-  passive: 'Пассивное',
-  stigma: 'Стигма',
-  situational: 'По ситуации'
+  core: t('Главное'),
+  support: t('Поддержка'),
+  passive: t('Пассивное'),
+  stigma: t('Стигма'),
+  situational: t('По ситуации')
 }
 
 export function emptyGuide(cls: ClassKey, id: string): Guide {
   return {
     schema: GUIDE_SCHEMA,
     id,
-    name: 'Новый гайд',
+    name: t('Новый гайд'),
     cls,
     mode: 'pve',
     updatedAt: new Date().toISOString(),

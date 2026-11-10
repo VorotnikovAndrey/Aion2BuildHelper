@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { HelpCircle, X } from 'lucide-react'
 import { cn } from '@/lib/format'
 import { Tooltip } from './InfoTip'
+import { t } from '@shared/i18n'
 
 export function PageHeader({ title, subtitle, actions, icon }: { title: ReactNode; subtitle?: ReactNode; actions?: ReactNode; icon?: ReactNode }) {
   return (
@@ -168,7 +169,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
           >
             <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
               <h2 className="text-[15px] font-semibold">{title}</h2>
-              <button onClick={onClose} className="rounded-md p-1 text-ink-3 hover:bg-surface-2 hover:text-ink" aria-label="Закрыть">
+              <button onClick={onClose} className="rounded-md p-1 text-ink-3 hover:bg-surface-2 hover:text-ink" aria-label={t('Закрыть')}>
                 <X size={16} />
               </button>
             </div>

@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import { analyzeBuild, type BuildReport } from '@shared/analysis/build'
 import { learnGearOptions } from '@shared/gamedata/gearOptions'
-import { createNamer, type Namer } from '@shared/names'
+import { createNamer, setGameNames, type Namer } from '@shared/names'
 import { applyStage } from '@shared/guide/stages'
 import type { Guide, GuideStage } from '@shared/guide/types'
 import type { Character } from '@shared/types'
@@ -12,7 +12,11 @@ import { useActiveGuide, useActiveStage, useApp, useCharacter, useCharacterPrefs
 export function useNamer(): Namer {
   const mode = useApp((s) => s.settings.nameMode)
   const names = useApp((s) => s.settings.names)
-  return useMemo(() => createNamer(mode, names), [mode, names])
+  return useMemo(() => {
+    // term() и названия во встроенных текстах берут язык игровых названий отсюда.
+    setGameNames(mode)
+    return createNamer(mode, names)
+  }, [mode, names])
 }
 
 export interface CharacterContext {

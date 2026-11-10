@@ -4,6 +4,7 @@
 // Пользователь может переименовать любой стат в настройках — см. lib/names в интерфейсе.
 
 import statsJson from './generated/stats.json'
+import { intlLocale, t } from '../i18n'
 
 export interface StatDef {
   id: number
@@ -202,16 +203,16 @@ export function formatStatValue(id: number, value: number, opts: { sign?: boolea
   const sign = opts.sign && value > 0 ? '+' : ''
   if (def?.percent) {
     const v = value / 100
-    return sign + v.toLocaleString('ru-RU', { maximumFractionDigits: 2 }) + '%'
+    return sign + v.toLocaleString(intlLocale(), { maximumFractionDigits: 2 }) + '%'
   }
-  return sign + value.toLocaleString('ru-RU')
+  return sign + value.toLocaleString(intlLocale())
 }
 
 /** Группы статов для экрана «Статы». Порядок — от того, что важнее в бою. */
 export const STAT_GROUPS: { id: string; ru: string; keys: string[] }[] = [
   {
     id: 'attack',
-    ru: 'Атака',
+    ru: t('Атака'),
     keys: [
       'weaponfixingdamage',
       'fixingdamage',
@@ -228,12 +229,12 @@ export const STAT_GROUPS: { id: string; ru: string; keys: string[] }[] = [
   },
   {
     id: 'critical',
-    ru: 'Крит',
+    ru: t('Крит'),
     keys: ['critical', 'criticaladddamage', 'amplifycriticaldamage', 'criticalratio', 'frontattackcritical', 'backattackcritical']
   },
   {
     id: 'pve',
-    ru: 'PvE и боссы',
+    ru: t('PvE и боссы'),
     keys: [
       'pveadddamage',
       'pveamplifydamage',
@@ -250,7 +251,7 @@ export const STAT_GROUPS: { id: string; ru: string; keys: string[] }[] = [
   },
   {
     id: 'special',
-    ru: 'Особые удары',
+    ru: t('Особые удары'),
     keys: [
       'perfect',
       'hardhit',
@@ -266,12 +267,12 @@ export const STAT_GROUPS: { id: string; ru: string; keys: string[] }[] = [
   },
   {
     id: 'accuracy',
-    ru: 'Меткость',
+    ru: t('Меткость'),
     keys: ['weaponaccuracy', 'accuracy', 'accuracyratio', 'blockpierce', 'abnormalaccuracy', 'shockpropertyaccuracy']
   },
   {
     id: 'defense',
-    ru: 'Защита',
+    ru: t('Защита'),
     keys: [
       'hpmax',
       'maxhpratio',
@@ -296,7 +297,7 @@ export const STAT_GROUPS: { id: string; ru: string; keys: string[] }[] = [
   },
   {
     id: 'pvp',
-    ru: 'PvP',
+    ru: t('PvP'),
     keys: [
       'pvpadddamage',
       'pvpamplifydamage',
@@ -311,7 +312,7 @@ export const STAT_GROUPS: { id: string; ru: string; keys: string[] }[] = [
   },
   {
     id: 'resource',
-    ru: 'Ресурсы и восстановление',
+    ru: t('Ресурсы и восстановление'),
     keys: [
       'mpmax',
       'maxmpratio',
@@ -328,7 +329,7 @@ export const STAT_GROUPS: { id: string; ru: string; keys: string[] }[] = [
   },
   {
     id: 'main',
-    ru: 'Основные и божества',
+    ru: t('Основные и божества'),
     keys: [
       'str',
       'dex',

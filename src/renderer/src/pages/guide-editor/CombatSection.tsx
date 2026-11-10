@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { cn } from '@/lib/format'
 import { useNamer } from '@/lib/report'
+import { t } from '@shared/i18n'
 
 const input = 'w-full rounded-lg border border-line-strong bg-surface-2 px-3 py-2 text-[13px] outline-none placeholder:text-ink-3 focus:border-accent'
 const small = 'rounded-lg border border-line-strong bg-surface-2 px-2 py-1.5 text-[13px] outline-none focus:border-accent'
@@ -34,13 +35,13 @@ function Label({ children }: { children: ReactNode }) {
 function RowTools({ i, n, onMove, onDelete }: { i: number; n: number; onMove: (d: number) => void; onDelete: () => void }) {
   return (
     <span className="flex shrink-0 items-center gap-1">
-      <button disabled={i === 0} onClick={() => onMove(-1)} className="p-0.5 text-ink-3 hover:text-ink disabled:opacity-30" aria-label="Выше">
+      <button disabled={i === 0} onClick={() => onMove(-1)} className="p-0.5 text-ink-3 hover:text-ink disabled:opacity-30" aria-label={t('Выше')}>
         <ArrowUp size={13} />
       </button>
-      <button disabled={i === n - 1} onClick={() => onMove(1)} className="p-0.5 text-ink-3 hover:text-ink disabled:opacity-30" aria-label="Ниже">
+      <button disabled={i === n - 1} onClick={() => onMove(1)} className="p-0.5 text-ink-3 hover:text-ink disabled:opacity-30" aria-label={t('Ниже')}>
         <ArrowDown size={13} />
       </button>
-      <button onClick={onDelete} className="p-0.5 text-ink-3 hover:text-critical" aria-label="Удалить">
+      <button onClick={onDelete} className="p-0.5 text-ink-3 hover:text-critical" aria-label={t('Удалить')}>
         <X size={13} />
       </button>
     </span>
@@ -57,7 +58,7 @@ function AddSkillChips({ pool, onAdd }: { pool: number[]; onAdd: (id: number) =>
       value=""
       onChange={(e) => e.target.value && onAdd(Number(e.target.value))}
     >
-      <option value="">+ Добавить умение…</option>
+      <option value="">{t('+ Добавить умение…')}</option>
       {pool.map((id) => (
         <option key={id} value={id}>
           {namer.skill(id).main}
@@ -95,16 +96,18 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
   return (
     <div className="space-y-5">
       <Card
-        title="Связка"
-        hint="Связка — макрос игры (окно «Умения» → «Связки»): пока клавиша зажата, идёт по шагам сверху вниз и по кругу. Каждый шаг — ячейка панели: до 4 умений, игра применяет первое готовое, ряд 0 — главный. Ячейку с всегда готовым умением ставьте последней."
+        title={t('Связка')}
+        hint={t(
+          'Связка — макрос игры (окно «Умения» → «Связки»): пока клавиша зажата, идёт по шагам сверху вниз и по кругу. Каждый шаг — ячейка панели: до 4 умений, игра применяет первое готовое, ряд 0 — главный. Ячейку с всегда готовым умением ставьте последней.'
+        )}
       >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-[140px_140px_minmax(0,1fr)]">
           <label className="block">
-            <Label>Клавиша связки</Label>
-            <input className={input} value={c.macroKey ?? ''} placeholder="ПКМ" onChange={(e) => setCombat({ macroKey: e.target.value || undefined })} />
+            <Label>{t('Клавиша связки')}</Label>
+            <input className={input} value={c.macroKey ?? ''} placeholder={t('ПКМ')} onChange={(e) => setCombat({ macroKey: e.target.value || undefined })} />
           </label>
           <label className="block">
-            <Label>Задержка, мс</Label>
+            <Label>{t('Задержка, мс')}</Label>
             <input
               className={input}
               inputMode="numeric"
@@ -114,7 +117,7 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
             />
           </label>
           <label className="block">
-            <Label>Пояснение к связке</Label>
+            <Label>{t('Пояснение к связке')}</Label>
             <input className={input} value={c.delayNote ?? ''} onChange={(e) => setCombat({ delayNote: e.target.value || undefined })} />
           </label>
         </div>
@@ -125,7 +128,9 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
             return (
               <div key={m.id} className="rounded-xl border border-line-strong bg-surface-2/50 p-3.5">
                 <div className="flex items-center gap-2">
-                  <span className="rounded-md bg-accent-soft px-1.5 py-0.5 text-[11px] font-semibold text-accent-2">Шаг {i + 1}</span>
+                  <span className="rounded-md bg-accent-soft px-1.5 py-0.5 text-[11px] font-semibold text-accent-2">
+                    {t('Шаг')} {i + 1}
+                  </span>
                   <input className={cn(small, 'min-w-0 flex-1')} value={m.name} onChange={(e) => patchMacro(i, { name: e.target.value })} />
                   <RowTools
                     i={i}
@@ -138,7 +143,9 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
                 <div className="mt-3 flex flex-col-reverse gap-1">
                   {m.skills.map((id, r) => (
                     <div key={id} className="flex items-center gap-2 rounded-lg bg-surface px-2 py-1">
-                      <span className={cn('tnum w-11 shrink-0 text-[10.5px]', r === 0 ? 'font-semibold text-accent' : 'text-ink-3')}>ряд {r}</span>
+                      <span className={cn('tnum w-11 shrink-0 text-[10.5px]', r === 0 ? 'font-semibold text-accent' : 'text-ink-3')}>
+                        {t('ряд {r}', { r })}
+                      </span>
                       <SkillIcon id={id} size={24} />
                       <span className="min-w-0 flex-1 truncate text-[13px]">{namer.skill(id).main}</span>
                       {/* «Ниже» в игре — меньший ряд, то есть главнее. */}
@@ -154,17 +161,17 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
                 {m.skills.length < 4 ? (
                   <AddSkillChips pool={free} onAdd={(id) => patchMacro(i, { skills: [...m.skills, id] })} />
                 ) : (
-                  <p className="mt-2 text-[11px] text-ink-3">В ячейке не больше 4 умений.</p>
+                  <p className="mt-2 text-[11px] text-ink-3">{t('В ячейке не больше 4 умений.')}</p>
                 )}
                 <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_88px_88px]">
                   <label className="block">
-                    <Label>Подходит по уровню умения</Label>
+                    <Label>{t('Подходит по уровню умения')}</Label>
                     <select
                       className={cn(small, 'w-full')}
                       value={m.when?.skill ?? ''}
                       onChange={(e) => patchMacro(i, { when: e.target.value ? { ...m.when, skill: Number(e.target.value) } : undefined })}
                     >
-                      <option value="">всегда</option>
+                      <option value="">{t('всегда')}</option>
                       {pressable.map((id) => (
                         <option key={id} value={id}>
                           {namer.skill(id).main}
@@ -173,7 +180,7 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
                     </select>
                   </label>
                   <label className="block">
-                    <Label>с ур.</Label>
+                    <Label>{t('с ур.')}</Label>
                     <input
                       className={cn(small, 'w-full')}
                       disabled={!m.when}
@@ -183,7 +190,7 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
                     />
                   </label>
                   <label className="block">
-                    <Label>до ур.</Label>
+                    <Label>{t('до ур.')}</Label>
                     <input
                       className={cn(small, 'w-full')}
                       disabled={!m.when}
@@ -195,7 +202,7 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
                 </div>
                 <textarea
                   className={cn(input, 'mt-2 min-h-14')}
-                  placeholder="Зачем такой порядок"
+                  placeholder={t('Зачем такой порядок')}
                   value={m.note ?? ''}
                   onChange={(e) => patchMacro(i, { note: e.target.value || undefined })}
                 />
@@ -206,13 +213,16 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
         <Button
           className="mt-3"
           icon={<Plus size={14} />}
-          onClick={() => writeMacros([...macros, { id: `cell-${Date.now()}`, name: `Ячейка ${macros.length + 1}`, skills: [] }])}
+          onClick={() => writeMacros([...macros, { id: `cell-${Date.now()}`, name: t('Ячейка {p}', { p: macros.length + 1 }), skills: [] }])}
         >
-          Добавить шаг
+          {t('Добавить шаг')}
         </Button>
       </Card>
 
-      <Card title="Вручную" hint="Умения на отдельных клавишах — когда их жать. «Запасная» — стигма на замену: если не надета, приложение не ругается.">
+      <Card
+        title={t('Вручную')}
+        hint={t('Умения на отдельных клавишах — когда их жать. «Запасная» — стигма на замену: если не надета, приложение не ругается.')}
+      >
         <div className="space-y-2">
           {manual.map((m, i) => (
             <div key={`${m.skill}-${i}`} className="flex flex-wrap items-start gap-2 rounded-xl border border-line bg-surface-2/50 p-2.5">
@@ -222,7 +232,7 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
                   <span className="text-[13px] font-medium">{namer.skill(m.skill).main}</span>
                   <input
                     className={cn(small, 'w-20')}
-                    placeholder="клавиша"
+                    placeholder={t('клавиша')}
                     value={m.key ?? ''}
                     onChange={(e) => patchManual(i, { key: e.target.value || undefined })}
                   />
@@ -233,11 +243,11 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
                       onChange={(e) => patchManual(i, { optional: e.target.checked || undefined })}
                       className="accent-[var(--color-accent)]"
                     />
-                    запасная
+                    {t('запасная')}
                   </label>
-                  {m.byStat && <span className="text-[11px] text-ink-3">+ подсказка по стату (из файла гайда)</span>}
+                  {m.byStat && <span className="text-[11px] text-ink-3">{t('+ подсказка по стату (из файла гайда)')}</span>}
                 </div>
-                <input className={input} placeholder="Когда жать" value={m.when} onChange={(e) => patchManual(i, { when: e.target.value })} />
+                <input className={input} placeholder={t('Когда жать')} value={m.when} onChange={(e) => patchManual(i, { when: e.target.value })} />
               </div>
               <RowTools
                 i={i}
@@ -251,7 +261,7 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
         <AddSkillChips pool={pressable.filter((id) => !manual.some((m) => m.skill === id))} onAdd={(id) => writeManual([...manual, { skill: id, when: '' }])} />
       </Card>
 
-      <Card title="Начало боя" hint="Порядок первых умений боя. Одно умение может повторяться (например, Суд после каждого открытия окна).">
+      <Card title={t('Начало боя')} hint={t('Порядок первых умений боя. Одно умение может повторяться (например, Суд после каждого открытия окна).')}>
         <ol className="space-y-1.5">
           {opener.map((o, i) => (
             <li key={i} className="flex items-center gap-2 rounded-lg bg-surface-2 px-2 py-1">
@@ -260,7 +270,7 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
               <span className="w-40 shrink-0 truncate text-[13px]">{namer.skill(o.skill).main}</span>
               <input
                 className={cn(small, 'min-w-0 flex-1')}
-                placeholder="пояснение (необязательно)"
+                placeholder={t('пояснение (необязательно)')}
                 value={o.note ?? ''}
                 onChange={(e) => writeOpener(opener.map((x, j) => (j === i ? { ...x, note: e.target.value || undefined } : x)))}
               />
@@ -277,8 +287,10 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
       </Card>
 
       <Card
-        title="Одна кнопка"
-        hint="Макрос в ПО мыши (SteelSeries GG, Razer Synapse, G Hub): события по порядку — клавиша нажата или отпущена, затем пауза; потом автоповтор. Ниже — схема и предупреждения, как на странице «Ротация»."
+        title={t('Одна кнопка')}
+        hint={t(
+          'Макрос в ПО мыши (SteelSeries GG, Razer Synapse, G Hub): события по порядку — клавиша нажата или отпущена, затем пауза; потом автоповтор. Ниже — схема и предупреждения, как на странице «Ротация».'
+        )}
       >
         <div className="space-y-1.5">
           {events.map((e, i) => (
@@ -287,7 +299,7 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
               <input
                 className={cn(small, 'w-24')}
                 value={e.key}
-                placeholder="ПКМ"
+                placeholder={t('ПКМ')}
                 onChange={(ev) => writeEvents(events.map((x, j) => (j === i ? { ...x, key: ev.target.value } : x)))}
               />
               <select
@@ -295,17 +307,17 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
                 value={e.down ? 'down' : 'up'}
                 onChange={(ev) => writeEvents(events.map((x, j) => (j === i ? { ...x, down: ev.target.value === 'down' } : x)))}
               >
-                <option value="down">нажать ↓</option>
-                <option value="up">отпустить ↑</option>
+                <option value="down">{t('нажать ↓')}</option>
+                <option value="up">{t('отпустить ↑')}</option>
               </select>
-              <span className="text-xs text-ink-3">затем</span>
+              <span className="text-xs text-ink-3">{t('затем')}</span>
               <input
                 className={cn(small, 'w-20')}
                 inputMode="numeric"
                 value={e.waitMs}
                 onChange={(ev) => writeEvents(events.map((x, j) => (j === i ? { ...x, waitMs: num(ev.target.value) ?? 0 } : x)))}
               />
-              <span className="text-xs text-ink-3">мс</span>
+              <span className="text-xs text-ink-3">{t('мс')}</span>
               <RowTools
                 i={i}
                 n={events.length}
@@ -316,28 +328,28 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
           ))}
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Button size="sm" icon={<Plus size={13} />} onClick={() => writeEvents([...events, { key: c.macroKey ?? 'ПКМ', down: true, waitMs: 10 }])}>
-            Добавить событие
+          <Button size="sm" icon={<Plus size={13} />} onClick={() => writeEvents([...events, { key: c.macroKey ?? t('ПКМ'), down: true, waitMs: 10 }])}>
+            {t('Добавить событие')}
           </Button>
           {ob && (
             <>
-              <span className="ml-3 text-xs text-ink-3">автоповтор</span>
+              <span className="ml-3 text-xs text-ink-3">{t('автоповтор')}</span>
               <input
                 className={cn(small, 'w-20')}
                 inputMode="numeric"
                 value={ob.repeatMs}
                 onChange={(e) => setCombat({ oneButton: { ...ob, repeatMs: num(e.target.value) ?? 0 } })}
               />
-              <span className="text-xs text-ink-3">мс</span>
+              <span className="text-xs text-ink-3">{t('мс')}</span>
               <Button size="sm" variant="ghost" icon={<Trash2 size={13} />} onClick={() => setCombat({ oneButton: undefined })}>
-                Убрать макрос
+                {t('Убрать макрос')}
               </Button>
             </>
           )}
         </div>
         {ob && ob.events.length > 0 && (
           <>
-            <MacroTimeline events={ob.events} repeatMs={ob.repeatMs} macroKey={c.macroKey} purpose={(k) => (k === c.macroKey ? 'связка' : '')} />
+            <MacroTimeline events={ob.events} repeatMs={ob.repeatMs} macroKey={c.macroKey} purpose={(k) => (k === c.macroKey ? t('связка') : '')} />
             {analysis && analysis.warnings.length > 0 && (
               <ul className="mt-3 space-y-1.5">
                 {analysis.warnings.map((w) => (
@@ -350,7 +362,7 @@ export function CombatSection({ g, set }: { g: Guide; set: (patch: Partial<Guide
             )}
             <textarea
               className={cn(input, 'mt-3 min-h-14')}
-              placeholder="Пояснение к макросу"
+              placeholder={t('Пояснение к макросу')}
               value={ob.note ?? ''}
               onChange={(e) => setCombat({ oneButton: { ...ob, note: e.target.value || undefined } })}
             />

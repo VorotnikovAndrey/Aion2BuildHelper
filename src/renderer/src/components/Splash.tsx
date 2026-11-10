@@ -10,6 +10,7 @@ import { cn } from '@/lib/format'
 import { useApp } from '@/lib/store'
 import { effectiveMotion } from '@/lib/theme'
 import './splash.css'
+import { t } from '@shared/i18n'
 
 const SEEN_KEY = 'a2bh-splash-seen'
 let launchDecision: boolean | undefined
@@ -79,7 +80,7 @@ export function Splash() {
           <BrandMark size="100%" className="a2-splash__mark" />
         </div>
         <Wordmark />
-        <div className="a2-splash__tagline">помощник по билду</div>
+        <div className="a2-splash__tagline">{t('помощник по билду')}</div>
       </div>
     </div>
   )

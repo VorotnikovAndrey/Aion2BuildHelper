@@ -11,6 +11,7 @@ import { join } from 'node:path'
 import { DEFAULT_SETTINGS, type Settings } from '@shared/api'
 import type { HistoryEntry } from '@shared/analysis/history'
 import type { Guide } from '@shared/guide/types'
+import { systemLocale } from '@shared/i18n'
 import { normalizeUi, type UiPrefs } from '@shared/theme'
 import type { Character } from '@shared/types'
 
@@ -45,7 +46,9 @@ let settingsCache: Settings | null = null
 
 export async function getSettings(): Promise<Settings> {
   if (!settingsCache) {
-    const saved = (await readJson<Partial<Settings>>(settingsFile())) ?? {}
+    const file = await readJson<Partial<Settings>>(settingsFile())
+    // Первый запуск — язык системы (если он есть в приложении, иначе английский). У старых настроек без поля — русский.
+    const saved = file ?? { ui: { ...DEFAULT_SETTINGS.ui, lang: systemLocale(app.getPreferredSystemLanguages()) } }
     // Оформление чиним по полям: в старом файле его может не быть совсем, в чужом — быть криво.
     settingsCache = { ...DEFAULT_SETTINGS, ...saved, ui: normalizeUi(saved.ui) }
   }
