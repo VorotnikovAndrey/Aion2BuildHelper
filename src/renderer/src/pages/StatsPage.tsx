@@ -92,7 +92,9 @@ export function StatsPage() {
         >
           <div className={cn('grid grid-cols-1 gap-6', top.length > 0 && 'xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]')}>
             <div className={cn('space-y-4', !top.length && 'max-w-xl')}>
-              <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">{t('Для контента (PvE)')}</div>
+              <div className="text-[11px] font-semibold tracking-wider text-ink-3 uppercase">
+                {guide?.mode === 'pvp' ? t('Для PvP — как у автора') : t('Для контента (PvE)')}
+              </div>
               {content.map((t) => (
                 <TargetBar key={t.target.id} t={t} />
               ))}

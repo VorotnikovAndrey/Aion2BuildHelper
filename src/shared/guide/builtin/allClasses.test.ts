@@ -7,7 +7,7 @@ import { compareWithTop } from '../../analysis/top'
 import { CLASSES, classInfo, classOfSkill } from '../../gamedata/classes'
 import { classBoards, findNode } from '../../gamedata/daevanion'
 import { classSkills, skillDef, skillSpecs } from '../../gamedata/skills'
-import { statDef } from '../../gamedata/stats'
+import { statByKey, statDef } from '../../gamedata/stats'
 import { titleDef } from '../../gamedata/titles'
 import { topData } from '../../gamedata/top'
 import { createNamer } from '../../names'
@@ -63,17 +63,41 @@ describe.each(CLASSES.map((c) => [c.ru, c.key] as const))('%s', (_ru, cls) => {
     expect(missing).toEqual([])
   })
 
-  it('встроенные гайды — 5 популярных билдов Questlog, по убыванию лайков, со стадиями', () => {
-    const guides = byClass(cls)
-    expect(guides.length).toBe(5)
-    const likes = guides.map((g) => g.source?.likes ?? 0)
-    expect(likes).toEqual([...likes].sort((a, b) => b - a))
-    for (const g of guides) {
+  it('встроенные гайды — 5 популярных билдов Questlog для PvE и до 5 для PvP, по убыванию лайков, со стадиями', () => {
+    const all = byClass(cls)
+    const pve = all.filter((g) => g.mode === 'pve')
+    const pvp = all.filter((g) => g.mode === 'pvp')
+    expect(pve.length).toBe(5)
+    expect(pvp.length).toBeGreaterThan(0)
+    expect(pvp.length).toBeLessThanOrEqual(5)
+    expect(all.length).toBe(pve.length + pvp.length)
+    // PvE — первыми: первый подходящий гайд класса — гайд по умолчанию.
+    expect(all[0].mode).toBe('pve')
+    for (const guides of [pve, pvp]) {
+      const likes = guides.map((g) => g.source?.likes ?? 0)
+      expect(likes).toEqual([...likes].sort((a, b) => b - a))
+    }
+    expect(new Set(all.map((g) => g.id)).size).toBe(all.length)
+    for (const g of all) {
       expect(g.builtin).toBe(true)
       expect(g.source?.kind).toBe('questlog')
       expect(g.source?.url).toMatch(/^https:\/\/questlog\.gg\/aion-2\//)
       expect(g.stages?.length, g.name).toBeGreaterThan(0)
+      // Советы автора — с текстом и ссылками только на стадии этого гайда.
+      const ids = new Set(g.stages?.map((s) => s.id))
+      for (const tip of g.tips ?? []) {
+        expect(tip.text.trim().length, g.name).toBeGreaterThan(0)
+        for (const st of tip.stages ?? []) expect(ids.has(st), `${g.name}: совет к стадии ${st}`).toBe(true)
+      }
     }
+  })
+
+  it('PvP-гайды берут ориентир меткости в PvP, а не в PvE', () => {
+    for (const g of byClass(cls).filter((x) => x.mode === 'pvp'))
+      for (const st of g.stages ?? []) {
+        const acc = st.statTargets?.find((x) => x.id === 'stage-accuracy')
+        if (acc) expect(acc.stats).toContain(statByKey('pvpaccuracy')!.id)
+      }
   })
 
   it('гайды ссылаются только на существующие умения своего класса, специализации, статы, титулы и узлы', () => {

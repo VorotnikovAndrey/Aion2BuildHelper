@@ -117,6 +117,7 @@ function GuidePicker({ char }: { char: Character }) {
           className="flex items-center gap-2 rounded-lg border border-line-strong bg-surface px-3 py-1.5 text-left transition-colors hover:bg-surface-2"
         >
           <BookOpen size={14} className="text-accent" />
+          {active?.mode === 'pvp' && <span className="rounded bg-surface-3 px-1.5 py-px text-[10.5px] font-semibold text-ink">PvP</span>}
           <span className="max-w-72 truncate text-[13px]">{active ? active.name : t('Без гайда')}</span>
           <ChevronDown size={14} className="text-ink-3" />
         </button>
@@ -137,11 +138,11 @@ function GuidePicker({ char }: { char: Character }) {
               <span className="block truncate text-[13px]">{g.name}</span>
               <span className="block text-[11px] text-ink-3">
                 {g.source?.kind === 'questlog'
-                  ? t('Questlog · {p} лайков · стадий: {p2}{p3}', {
+                  ? `${g.mode === 'pvp' ? 'PvP · ' : ''}${t('Questlog · {p} лайков · стадий: {p2}{p3}', {
                       p: g.source.likes ?? 0,
                       p2: g.stages?.length ?? 0,
                       p3: g.source.region === 'korea' ? t(' · Корея') : ''
-                    })
+                    })}`
                   : `${MODE_LABEL[g.mode]} · ${g.builtin ? t('встроенный') : t('свой')}${g.source?.title ? ` · ${g.source.title}` : ''}`}
               </span>
             </span>

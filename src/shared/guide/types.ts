@@ -91,9 +91,19 @@ export interface GuideTitles {
   notes?: string
 }
 
+/** О чём совет автора: build — о билде целиком, stage — заметка стадии, skills — к умениям и ротации, boards — к доскам. */
+export type GuideTipKind = 'build' | 'stage' | 'skills' | 'boards'
+
+/**
+ * Совет гайда. У своих гайдов — заголовок и текст; у билдов Questlog — тексты автора (обычно по-английски)
+ * с видом и стадиями, к которым они относятся (нет stages — ко всему гайду).
+ */
 export interface GuideTip {
+  id?: string
+  kind?: GuideTipKind
   title: string
   text: string
+  stages?: string[]
 }
 
 /**

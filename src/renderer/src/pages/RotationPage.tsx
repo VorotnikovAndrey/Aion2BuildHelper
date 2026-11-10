@@ -1,6 +1,6 @@
 import { Fragment, useMemo, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
-import { ArrowDown, ArrowRight, ArrowUp, BookOpen, Check, ChevronRight, Info, Lightbulb, MousePointerClick, Repeat } from 'lucide-react'
+import { ArrowDown, ArrowRight, ArrowUp, BookOpen, Check, ChevronRight, Info, MousePointerClick, Repeat } from 'lucide-react'
 import { analyzeInputMacro, DEFAULT_MACRO_KEY, DEFAULT_ONE_BUTTON } from '@shared/analysis/inputMacro'
 import { MacroTimeline } from '@/components/MacroTimeline'
 import type { AdviceTone, MacroReport, ManualReport, RotationAdvice, RotationSkill, SkillUse } from '@shared/analysis/rotation'
@@ -9,6 +9,7 @@ import type { Namer } from '@shared/names'
 import { formatStatValue } from '@shared/gamedata/stats'
 import { StatusBadge } from '@/components/art'
 import { GuideSwitcher } from '@/components/GuideSwitcher'
+import { TipItem, tipsFor } from '@/components/GuideTips'
 import { SkillIcon } from '@/components/icons'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -27,6 +28,32 @@ export function RotationPage() {
   const rot = report.rotation
   const combat = guide?.combat
   const principles = guide?.rotation ?? []
+  // Комментарии автора к умениям и ротации на целевой стадии + советы своего гайда (без вида).
+  const authorTips = tipsFor(ctx.baseGuide, ctx.stage, ['skills'])
+  const ownTips = (guide?.tips ?? []).filter((x) => !x.kind)
+  const otherTips = (ctx.baseGuide?.tips?.length ?? 0) > authorTips.length + ownTips.length
+  const tipsCard = (authorTips.length > 0 || ownTips.length > 0 || combat?.notes) && (
+    <Card
+      title={authorTips.length ? t('Комментарий автора') : t('Советы гайда')}
+      hint={t('Что автор гайда пишет об умениях, ротации и связке на целевой стадии — его словами. Все советы — на странице «Советы автора».')}
+      delay={0.1}
+    >
+      <div className="space-y-4">
+        {authorTips.map((x, i) => (
+          <TipItem key={x.id ?? i} tip={x} />
+        ))}
+        {ownTips.map((x, i) => (
+          <TipItem key={`own-${i}`} tip={x} clamp={false} />
+        ))}
+      </div>
+      {combat?.notes && <p className="mt-4 border-t border-line pt-3 text-xs leading-relaxed text-ink-3">{combat.notes}</p>}
+      {otherTips && (
+        <button onClick={() => navigate('/tips')} className="mt-3 inline-flex items-center gap-1 text-[12px] text-accent hover:underline">
+          {t('Все советы автора')} <ChevronRight size={13} />
+        </button>
+      )}
+    </Card>
+  )
 
   const header = (
     <PageHeader
@@ -40,6 +67,14 @@ export function RotationPage() {
   )
 
   if (!guide || (!rot && !principles.length)) {
+    // Связок нет, но автор написал о ротации — показываем его слова.
+    if (guide && tipsCard)
+      return (
+        <>
+          {header}
+          <div className="max-w-3xl">{tipsCard}</div>
+        </>
+      )
     return (
       <>
         {header}
@@ -154,22 +189,7 @@ export function RotationPage() {
         <div className="min-w-0 space-y-5">
           {rot && <AdviceCard advice={rot.advice} onOpen={(to) => navigate(to)} />}
           {rot && combat && <KeyMapCard guide={guide} macros={rot.macros} manual={rot.manual} namer={namer} />}
-          {guide.tips && guide.tips.length > 0 && (
-            <Card title={t('Советы гайда')} hint={t('Заметки гайда о ротации, макросе и том, где источники расходятся.')} delay={0.1}>
-              <div className="space-y-3.5">
-                {guide.tips.map((t, i) => (
-                  <div key={i} className="flex gap-2.5">
-                    <Lightbulb size={15} className="mt-0.5 shrink-0 text-accent" />
-                    <div className="min-w-0">
-                      <div className="text-[13px] font-medium">{t.title}</div>
-                      <p className="mt-0.5 text-xs leading-relaxed text-ink-3">{t.text}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {combat?.notes && <p className="mt-4 border-t border-line pt-3 text-xs leading-relaxed text-ink-3">{combat.notes}</p>}
-            </Card>
-          )}
+          {tipsCard}
         </div>
       </div>
     </>

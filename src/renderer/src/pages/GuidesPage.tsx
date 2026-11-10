@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { BookOpen, Check, ChevronDown, Copy, Download, ExternalLink, Flag, Heart, Pencil, Plus, Trash2, Upload } from 'lucide-react'
+import { BookOpen, Check, ChevronDown, Copy, Download, ExternalLink, Flag, Heart, Pencil, Plus, Trash2, Upload, Lightbulb } from 'lucide-react'
 import { CLASSES, classInfo } from '@shared/gamedata/classes'
 import { applyStage, pickStage, sortedStages } from '@shared/guide/stages'
 import { titleDef } from '@shared/gamedata/titles'
@@ -15,6 +15,7 @@ import { Card } from '@/components/ui/Card'
 import { Modal, PageHeader } from '@/components/ui/misc'
 import { Tooltip } from '@/components/ui/InfoTip'
 import { Pill } from '@/components/ui/Pill'
+import { TipItem } from '@/components/GuideTips'
 import { cn } from '@/lib/format'
 import { useNamer } from '@/lib/report'
 import { api, useActiveGuide, useApp, useCharacter, useCharacterPrefs, useGuides } from '@/lib/store'
@@ -28,6 +29,8 @@ export function GuidesPage() {
   const [cls, setCls] = useState<ClassKey>(char?.cls ?? guides[0]?.cls ?? 'templar')
   const ofClass = useMemo(() => guides.filter((g) => g.cls === cls), [guides, cls])
   const builtin = ofClass.filter((g) => g.builtin)
+  const builtinPve = builtin.filter((g) => g.mode !== 'pvp')
+  const builtinPvp = builtin.filter((g) => g.mode === 'pvp')
   const custom = ofClass.filter((g) => !g.builtin)
   const [selectedId, setSelectedId] = useState<string | null>(active?.id ?? null)
   const selected = ofClass.find((g) => g.id === selectedId) ?? (active?.cls === cls ? active : undefined) ?? ofClass[0]
@@ -115,12 +118,24 @@ export function GuidesPage() {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[340px_1fr]">
         <div className="space-y-5">
-          {builtin.length > 0 && (
+          {builtinPve.length > 0 && (
             <GuideGroup
-              title={t('Билды Questlog')}
+              title={t('Билды Questlog · PvE')}
               hint={t('Пять самых популярных билдов класса на questlog.gg (по лайкам). По умолчанию персонажа ведёт первый.')}
             >
-              {builtin.map((g, i) => (
+              {builtinPve.map((g, i) => (
+                <GuideRow key={g.id} guide={g} rank={i + 1} selected={selected?.id === g.id} active={active?.id === g.id} onClick={() => setSelectedId(g.id)} />
+              ))}
+            </GuideGroup>
+          )}
+          {builtinPvp.length > 0 && (
+            <GuideGroup
+              title={t('Билды Questlog · PvP')}
+              hint={t(
+                'До пяти самых популярных PvP-билдов класса на questlog.gg (фильтр «PvP», по лайкам; копии чужих билдов и билды без лайков не берём). Из билда — только его PvP-стадии. Выберите такой гайд, чтобы разбор шёл по PvP: веса статов, ориентир меткости в PvP, умения и связка автора.'
+              )}
+            >
+              {builtinPvp.map((g, i) => (
                 <GuideRow key={g.id} guide={g} rank={i + 1} selected={selected?.id === g.id} active={active?.id === g.id} onClick={() => setSelectedId(g.id)} />
               ))}
             </GuideGroup>
@@ -226,6 +241,11 @@ function GuideRow({ guide, rank, selected, active, onClick }: { guide: Guide; ra
                   <Flag size={10} /> {guide.stages.length}
                 </span>
               ) : null}
+              {guide.tips?.length ? (
+                <span className="inline-flex items-center gap-0.5" title={t('Советов автора: {n}', { n: guide.tips.length })}>
+                  <Lightbulb size={10} /> {guide.tips.length}
+                </span>
+              ) : null}
               {src?.region === 'korea' && <span className="text-warning">{t('Корея')}</span>}
             </>
           ) : (
@@ -264,6 +284,7 @@ function GuideDetail({
   onExport: () => void
   onDelete: () => void
 }) {
+  const tips = (base.tips ?? []).filter((x) => x.kind !== 'build')
   const n = useNamer()
   const prefs = useCharacterPrefs(charKey)
   const setPrefs = useApp((s) => s.updateCharacterPrefs)
@@ -441,14 +462,17 @@ function GuideDetail({
             </ol>
           </Card>
         )}
-        {guide.tips && guide.tips.length > 0 && (
-          <Card title={t('Советы')}>
-            <div className="space-y-3">
-              {guide.tips.map((t, i) => (
-                <div key={i}>
-                  <div className="text-[13px] font-medium">{t.title}</div>
-                  <p className="mt-0.5 text-xs leading-relaxed text-ink-3">{t.text}</p>
-                </div>
+        {/* Описание билда автора уже показано выше («Описание автора») — здесь остальные его тексты. */}
+        {tips.length > 0 && (
+          <Card
+            title={t('Советы автора')}
+            hint={t(
+              'Что автор пишет словами о стадиях, умениях и ротации, досках — его текстом. У гайда, который ведёт персонажа, они же — на странице «Советы автора».'
+            )}
+          >
+            <div className="space-y-4">
+              {tips.map((tip, i) => (
+                <TipItem key={tip.id ?? i} tip={tip} stages={base.stages} />
               ))}
             </div>
           </Card>

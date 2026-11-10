@@ -85,3 +85,78 @@
 | 3 | [dimach](https://questlog.gg/aion-2/ru/character-builder/SacredJuniorOfTheFlame) | dimach | 59 | глобальная | 2: 3863, 3863 |
 | 4 | [Season 1 Global PvE Gear Progression by Aragon](https://questlog.gg/aion-2/ru/character-builder/ConsumablesOfTheFrost) | aragon0319 | 47 | глобальная | 20: 1329, 1440, 1471, 1694, 1704, 1862, 1867, 2261, 2267, 2470, 2528, 2544, 2666, 2698, 2873, 3479, 3483, 3553, 3585, 3665 |
 | 5 | [Dezing The Button Smasher](https://questlog.gg/aion-2/ru/character-builder/SereneMorphPlunderPurity) | desko.dragneel | 39 | глобальная | 2: 2664, 3109 |
+
+## PvP-билды (10 ноября 2026)
+
+С 0.19 к пяти PvE-билдам на класс добавлены PvP-гайды: до 5 самых популярных билдов из списка класса с фильтром Questlog «PvP» (`character-builder?class=<класс>&tag=pvp`, по лайкам). Не берём копии чужих билдов (в названии «(Clone)») и билды без лайков — поэтому у некоторых классов PvP-гайдов меньше пяти: PvP-билдов на Questlog пока немного. Из билда — только его PvP-стадии (тег «PvP» или «PvP» в названии); если автор стадии не пометил — все. Тот же билд может быть и в PvE-списке (например, «Block Tank PvP/PvE» стража): там — его PvE-стадии, здесь — PvP.
+
+### Страж
+
+| № | Билд | Автор | Лайки | Регион | PvP-стадии | Советов автора |
+|---|---|---|---|---|---|---|
+| 1 | [Block Tank PvP/PvE - Includes Builds For Every Stage of The Game - Sulla / Astolfo / Magi Ranni](https://questlog.gg/aion-2/ru/character-builder/WanderingOfTheExtraMagic) | riderastolfo | 45 | глобальная | 2 | 2 |
+| 2 | [SolAshur Templar Builds](https://questlog.gg/aion-2/ru/character-builder/QuickCobraLifeBanish) | ashurasol | 29 | Корея и Тайвань | 3 | 1 |
+| 3 | [TRUE BERSERK TEMPLAR](https://questlog.gg/aion-2/ru/character-builder/TheCrystalOfTheQuickJudgement) | ashurasol | 1 | глобальная | 1 | 0 |
+| 4 | [Templar PvP](https://questlog.gg/aion-2/ru/character-builder/SharpWaveAndTheLethalMoonlight) | akkag57 | 1 | глобальная | 4 | 1 |
+
+### Гладиатор
+
+| № | Билд | Автор | Лайки | Регион | PvP-стадии | Советов автора |
+|---|---|---|---|---|---|---|
+| 1 | [LittleFatty Glad](https://questlog.gg/aion-2/ru/character-builder/LegacyOfTheUnshakeableMagician) | littlefatty | 8 | глобальная | 1 | 0 |
+| 2 | [Paulo - Gladiator PvP](https://questlog.gg/aion-2/ru/character-builder/FuriousFlameAndTheInfernalTime) | paulincria1 | 7 | глобальная | 4 | 6 |
+| 3 | [Varka](https://questlog.gg/aion-2/ru/character-builder/EnragedDungeonUnderTheRage) | effciatm | 4 | глобальная | 1 | 1 |
+| 4 | [Gladiator PVP Endgame](https://questlog.gg/aion-2/ru/character-builder/BrutalArmoredCraftDefend) | zhaolute | 1 | Корея и Тайвань | 3 | 0 |
+
+### Убийца
+
+| № | Билд | Автор | Лайки | Регион | PvP-стадии | Советов автора |
+|---|---|---|---|---|---|---|
+| 1 | [Sin S1 Endgame](https://questlog.gg/aion-2/ru/character-builder/LethalHighTalismanChange) | bakariaa | 6 | глобальная | 1 | 1 |
+| 2 | [malpia - PvE/PvP - Join sin Discord!](https://questlog.gg/aion-2/ru/character-builder/BloodySilverAndTheLowEvasion) | malpia | 4 | глобальная | 2 | 3 |
+| 3 | [Syabaraba](https://questlog.gg/aion-2/ru/character-builder/TheBeastOfTheDiabolicalCommand) | .syabaraba.jp | 1 | глобальная | 1 | 0 |
+| 4 | [Paulo - Assassin PvP](https://questlog.gg/aion-2/ru/character-builder/NaturalEssentialsFortify) | paulincria1 | 1 | глобальная | 4 | 6 |
+| 5 | [Hive - Sin S1 Endgame](https://questlog.gg/aion-2/ru/character-builder/FocusedRuinChannel) | fthivemind | 1 | глобальная | 1 | 1 |
+
+### Стрелок
+
+| № | Билд | Автор | Лайки | Регион | PvP-стадии | Советов автора |
+|---|---|---|---|---|---|---|
+| 1 | [j0eitv's GLOBAL Ranger](https://questlog.gg/aion-2/ru/character-builder/ExplosiveCoupleAndTop) | j0ei | 178 | глобальная | 5 | 1 |
+| 2 | [Zeref - twitch.tv/o_zeref](https://questlog.gg/aion-2/ru/character-builder/DarkUpgradeOfTheBase) | niitsz | 43 | глобальная | 1 | 0 |
+| 3 | [Ranger Global Starter (UPDATED AFTER STRESSTEST)](https://questlog.gg/aion-2/ru/character-builder/TaxWithTheDarkForesight) | thor.m | 19 | Корея и Тайвань | 1 | 1 |
+| 4 | [j0ei's Global Ranger Builds](https://questlog.gg/aion-2/ru/character-builder/CobraPursuitOfVictory) | j0ei | 8 | Корея и Тайвань | 2 | 0 |
+| 5 | [Clover PvP](https://questlog.gg/aion-2/ru/character-builder/TheSurvivalOfTheCuneiformMind) | asterism_na1 | 4 | глобальная | 1 | 0 |
+
+### Волшебник
+
+| № | Билд | Автор | Лайки | Регион | PvP-стадии | Советов автора |
+|---|---|---|---|---|---|---|
+| 1 | [SORCERER THE GOAT](https://questlog.gg/aion-2/ru/character-builder/PerceptionOfTheVictory) | shr1kn | 1039 | глобальная | 10 | 4 |
+| 2 | [SORC AsianBoy Build](https://questlog.gg/aion-2/ru/character-builder/TheGrandEvasionAndLeavesOfHeart) | asianboyxone3d | 13 | глобальная | 2 | 2 |
+| 3 | [Hexenschuss](https://questlog.gg/aion-2/ru/character-builder/YouthWithTheRighteousFury) | bassboost1981 | 3 | глобальная | 5 | 3 |
+| 4 | [Gonix](https://questlog.gg/aion-2/ru/character-builder/ExplosiveMushroomOfTwilight) | gonix5993 | 1 | глобальная | 1 | 2 |
+
+### Заклинатель
+
+| № | Билд | Автор | Лайки | Регион | PvP-стадии | Советов автора |
+|---|---|---|---|---|---|---|
+| 1 | [init  Summoner endgame builds (theory)](https://questlog.gg/aion-2/ru/character-builder/BloodyGlovesJumpOrigin) | init.rb | 421 | глобальная | 2 | 2 |
+| 2 | [menshiki](https://questlog.gg/aion-2/ru/character-builder/TheBloodlustAkiduAndOrigin) | menshiki | 3 | глобальная | 1 | 0 |
+| 3 | [ShineDawn](https://questlog.gg/aion-2/ru/character-builder/TheTormentWriterAndDestructionOfRuin) | ishinedawn | 1 | глобальная | 1 | 1 |
+
+### Целитель
+
+| № | Билд | Автор | Лайки | Регион | PvP-стадии | Советов автора |
+|---|---|---|---|---|---|---|
+| 1 | [MrRosaPony PVE&PVP Ultimate Cleric Guide](https://questlog.gg/aion-2/ru/character-builder/HighBlessingOfCleaver) | mrrosapony | 1200 | глобальная | 2 | 2 |
+| 2 | [Cleric PvP/PvE Heal-Dps Global FR/EU [F2P] - Alwera](https://questlog.gg/aion-2/ru/character-builder/InfernalSealPillageProvidence) | marx0310 | 108 | глобальная | 3 | 3 |
+| 3 | [Season 1 Cleric Guide [F2P, P2W, PVP]](https://questlog.gg/aion-2/ru/character-builder/IronFootOfTheFortune) | w.h.o_doctor | 28 | глобальная | 1 | 1 |
+| 4 | [Seraph Eternal - Unkillable Healer Cleric (45 to Endgame)](https://questlog.gg/aion-2/ru/character-builder/EdgeMysteryOfStamina) | softpetalflower | 14 | глобальная | 1 | 2 |
+| 5 | [Vanta](https://questlog.gg/aion-2/ru/character-builder/TheExtraGlovesAndDestiny) | carrypidi | 2 | глобальная | 2 | 0 |
+
+### Чародей
+
+| № | Билд | Автор | Лайки | Регион | PvP-стадии | Советов автора |
+|---|---|---|---|---|---|---|
+| 1 | [Dezing The Button Smasher](https://questlog.gg/aion-2/ru/character-builder/SereneMorphPlunderPurity) | desko.dragneel | 40 | глобальная | 1 | 0 |

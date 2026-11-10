@@ -46,10 +46,11 @@ const ROUTES: [string, string][] = [
   ['11-top', '/top'],
   ['12-guides', '/guides'],
   ['13-checklist', '/checklist'],
-  ['14-settings', '/settings'],
-  ['15-language', '/settings?tab=language'],
-  ['16-names', '/settings?tab=names'],
-  ['17-appearance', '/settings?tab=appearance']
+  ['14-tips', '/tips'],
+  ['15-settings', '/settings'],
+  ['16-language', '/settings?tab=language'],
+  ['17-names', '/settings?tab=names'],
+  ['18-appearance', '/settings?tab=appearance']
 ]
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))

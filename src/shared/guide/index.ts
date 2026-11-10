@@ -10,6 +10,8 @@ import {
   type GuideOneButton,
   type GuideStage,
   type GuideStageItem,
+  type GuideTip,
+  type GuideTipKind,
   type GuideTitles,
   type GuideManualSkill,
   type GuideMode,
@@ -42,6 +44,7 @@ const clampWeight = (w: number) => Math.max(0, Math.min(5, Math.round(w)))
 
 const ROLES: SkillRole[] = ['core', 'support', 'passive', 'stigma', 'situational']
 const MODES: GuideMode[] = ['pve', 'pvp', 'leveling', 'other']
+const TIP_KINDS: GuideTipKind[] = ['build', 'stage', 'skills', 'boards']
 
 /**
  * Приводит JSON гайда (из файла или старой версии) к актуальному виду.
@@ -213,7 +216,13 @@ export function normalizeGuide(raw: unknown, fallbackId: string): Guide {
     rotation: Array.isArray(raw.rotation) ? raw.rotation.filter((x): x is string => typeof x === 'string') : undefined,
     combat: normalizeCombat(raw.combat),
     tips: Array.isArray(raw.tips)
-      ? raw.tips.filter(isObj).flatMap((tv) => (typeof tv.title === 'string' && typeof tv.text === 'string' ? [{ title: tv.title, text: tv.text }] : []))
+      ? raw.tips.filter(isObj).flatMap((tv): GuideTip[] => {
+          const text = str(tv.text)
+          if (!text) return []
+          const kind = TIP_KINDS.includes(tv.kind as GuideTipKind) ? (tv.kind as GuideTipKind) : undefined
+          const stages = Array.isArray(tv.stages) ? tv.stages.filter((x): x is string => typeof x === 'string') : []
+          return [{ id: str(tv.id), kind, title: typeof tv.title === 'string' ? tv.title : '', text, stages: stages.length ? stages : undefined }]
+        })
       : undefined,
     checklist: Array.isArray(raw.checklist)
       ? raw.checklist.filter(isObj).flatMap((c, i) => (typeof c.text === 'string' ? [{ id: str(c.id) ?? `item-${i + 1}`, text: c.text }] : []))

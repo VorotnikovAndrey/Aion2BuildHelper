@@ -21,6 +21,7 @@ import { GuidesPage } from './pages/GuidesPage'
 import { GuideEditorPage } from './pages/GuideEditorPage'
 import { ChecklistPage } from './pages/ChecklistPage'
 import { SettingsPage } from './pages/SettingsPage'
+import { TipsPage } from './pages/TipsPage'
 import { useCharacter } from './lib/store'
 import { subscribeUpdates } from './lib/updates'
 
@@ -65,6 +66,7 @@ function Shell() {
                   <Route path="/history" element={<HistoryPage />} />
                   <Route path="/top" element={<TopPage />} />
                   <Route path="/checklist" element={<ChecklistPage />} />
+                  <Route path="/tips" element={<TipsPage />} />
                 </>
               ) : (
                 <Route path="*" element={<NoData />} />

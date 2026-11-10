@@ -19,6 +19,7 @@ import {
   Swords,
   Trophy,
   Waypoints,
+  Lightbulb,
   type LucideIcon
 } from 'lucide-react'
 import { classInfo } from '@shared/gamedata/classes'
@@ -42,6 +43,8 @@ interface NavItem {
   /** Что в разделе — подсказка при наведении. */
   tip: string
   score?: (s: NonNullable<ReturnType<typeof useCharacterContext>>['report']['scores']) => number
+  /** Показывать ли пункт (например, «Советы» — только если они есть в гайде). */
+  show?: (ctx: NonNullable<ReturnType<typeof useCharacterContext>>) => boolean
 }
 
 const NAV: { title?: string; items: NavItem[] }[] = [
@@ -113,6 +116,13 @@ const NAV: { title?: string; items: NavItem[] }[] = [
     title: t('Цели'),
     items: [
       { to: '/guides', label: t('Гайды'), icon: BookOpen, tip: t('Выбор гайда, свои гайды, редактор, импорт и экспорт.') },
+      {
+        to: '/tips',
+        label: t('Советы автора'),
+        icon: Lightbulb,
+        tip: t('Что автор гайда пишет словами: о билде, стадиях, умениях и ротации, досках.'),
+        show: (c) => (c.baseGuide?.tips?.length ?? 0) > 0
+      },
       { to: '/checklist', label: t('Чек-лист'), icon: ListChecks, tip: t('Вехи гайда (отмечаются сами), разовые дела, свои задачи и заметки.') }
     ]
   }
@@ -161,58 +171,63 @@ export function Sidebar() {
         {NAV.map((group, gi) => (
           <div key={gi} className="mb-2">
             {group.title && <div className="px-2.5 pt-3 pb-1.5 text-[10.5px] font-semibold tracking-[0.12em] text-ink-3 uppercase">{group.title}</div>}
-            {group.items.map((item) => {
-              const score = ctx?.guide && item.score ? item.score(ctx.report.scores) : null
-              return (
-                <Tooltip
-                  key={item.to}
-                  block
-                  content={
-                    <>
-                      {item.tip}
-                      {score !== null && <span className="mt-1 block text-ink-3">{t('Оценка раздела по гайду: {score} из 100.', { score })}</span>}
-                    </>
-                  }
-                >
-                  <NavLink
-                    to={item.to}
-                    end={item.to === '/'}
-                    className={({ isActive }) =>
-                      cn(
-                        'group relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-colors',
-                        isActive ? 'text-ink' : 'text-ink-2 hover:bg-surface hover:text-ink'
-                      )
+            {group.items
+              .filter((item) => !item.show || (ctx && item.show(ctx)))
+              .map((item) => {
+                const score = ctx?.guide && item.score ? item.score(ctx.report.scores) : null
+                return (
+                  <Tooltip
+                    key={item.to}
+                    block
+                    content={
+                      <>
+                        {item.tip}
+                        {score !== null && <span className="mt-1 block text-ink-3">{t('Оценка раздела по гайду: {score} из 100.', { score })}</span>}
+                      </>
                     }
                   >
-                    {({ isActive }) => (
-                      <>
-                        {/* Подсветка активного раздела переезжает между пунктами. */}
-                        {isActive && (
-                          <motion.span
-                            layoutId="nav-active"
-                            className="absolute inset-0 rounded-lg bg-accent-soft"
-                            transition={animate ? { type: 'spring', stiffness: 520, damping: 40 } : { duration: 0 }}
-                          >
-                            <span className="absolute top-2 bottom-2 left-0 w-[3px] rounded-full bg-accent" />
-                          </motion.span>
-                        )}
-                        <item.icon
-                          size={16}
-                          className={cn('relative transition-transform group-hover:scale-115', isActive ? 'text-accent' : 'text-ink-3 group-hover:text-ink-2')}
-                        />
-                        <span className="relative flex-1 truncate">{item.label}</span>
-                        {score !== null && (
-                          <span className="tnum relative flex items-center gap-1.5 text-[11px] text-ink-3">
-                            <span className={cn('h-1.5 w-1.5 rounded-full', DOT[toneOfScore(score)])} />
-                            <CountUp value={score} />
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </NavLink>
-                </Tooltip>
-              )
-            })}
+                    <NavLink
+                      to={item.to}
+                      end={item.to === '/'}
+                      className={({ isActive }) =>
+                        cn(
+                          'group relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-colors',
+                          isActive ? 'text-ink' : 'text-ink-2 hover:bg-surface hover:text-ink'
+                        )
+                      }
+                    >
+                      {({ isActive }) => (
+                        <>
+                          {/* Подсветка активного раздела переезжает между пунктами. */}
+                          {isActive && (
+                            <motion.span
+                              layoutId="nav-active"
+                              className="absolute inset-0 rounded-lg bg-accent-soft"
+                              transition={animate ? { type: 'spring', stiffness: 520, damping: 40 } : { duration: 0 }}
+                            >
+                              <span className="absolute top-2 bottom-2 left-0 w-[3px] rounded-full bg-accent" />
+                            </motion.span>
+                          )}
+                          <item.icon
+                            size={16}
+                            className={cn(
+                              'relative transition-transform group-hover:scale-115',
+                              isActive ? 'text-accent' : 'text-ink-3 group-hover:text-ink-2'
+                            )}
+                          />
+                          <span className="relative flex-1 truncate">{item.label}</span>
+                          {score !== null && (
+                            <span className="tnum relative flex items-center gap-1.5 text-[11px] text-ink-3">
+                              <span className={cn('h-1.5 w-1.5 rounded-full', DOT[toneOfScore(score)])} />
+                              <CountUp value={score} />
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </NavLink>
+                  </Tooltip>
+                )
+              })}
           </div>
         ))}
       </nav>

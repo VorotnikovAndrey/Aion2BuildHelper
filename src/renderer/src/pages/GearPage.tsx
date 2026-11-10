@@ -817,7 +817,8 @@ function StonePlan({ ctx }: { ctx: Ctx }) {
               content={t('Эти статы гайд почти не ценит (у стража, например, ОМ, уклонение, сопротивление криту) — их и стоит перековывать в первую очередь.')}
             >
               <div className="w-full text-xs text-ink-3">
-                <span className="text-critical">{t('Бесполезно в PvE:')}</span> {useless.map(([stat, n]) => `${namer.stat(stat).main} ×${n}`).join(', ')}
+                <span className="text-critical">{report.guide?.mode === 'pvp' ? t('Бесполезно в PvP:') : t('Бесполезно в PvE:')}</span>{' '}
+                {useless.map(([stat, n]) => `${namer.stat(stat).main} ×${n}`).join(', ')}
               </div>
             </Tooltip>
           )}
